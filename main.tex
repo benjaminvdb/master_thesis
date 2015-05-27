@@ -1,0 +1,227 @@
+%%% Preamble
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}					% Article class of KOMA-script with 11pt font and a4 format
+
+\usepackage[english]{babel}											% English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
+\usepackage{amsmath,amsfonts,amsthm}								% Math packages
+\usepackage[pdftex]{graphicx}										% Enable pdflatex
+%\usepackage{color,transparent}										% If you use color and/or transparency
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}	% Custom captions under/above floats
+\usepackage{epstopdf}												% Converts .eps to .pdf
+\usepackage{subfig}													% Subfigures
+\usepackage{booktabs}												% Nicer tables
+
+
+%%% Advanced verbatim environment
+\usepackage{verbatim}
+\usepackage{fancyvrb}
+\DefineShortVerb{\|}								% delimiter to display inline verbatim text
+
+
+%%% Custom sectioning (sectsty package)
+\usepackage{sectsty}								% Custom sectioning (see below)
+\allsectionsfont {%									% Change font of al section commands
+	\usefont{OT1}{bch}{b}{n}%						% bch-b-n: CharterBT-Bold font
+%	\hspace{15pt}%									% Uncomment for indentation
+}
+
+\sectionfont {										% Change font of \section command
+	\usefont{OT1}{bch}{b}{n}						% bch-b-n: CharterBT-Bold font
+	\sectionrule{0pt}{0pt}{-5pt}{0.8pt}				% Horizontal rule below section
+}
+
+
+%%% Custom headers/footers (fancyhdr package)
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\fancyhead{}										% No page header
+\fancyfoot[C]{\thepage}								% Pagenumbering at center of footer
+\fancyfoot[R]{\small \texttt{}}						% You can remove/edit this line 
+\renewcommand{\headrulewidth}{0pt}					% Remove header underlines
+\renewcommand{\footrulewidth}{0pt}					% Remove footer underlines
+\setlength{\headheight}{13.6pt}
+
+%%% Equation and float numbering
+\numberwithin{equation}{section}					% Equationnumbering: section.eq#
+\numberwithin{figure}{section}						% Figurenumbering: section.fig#
+\numberwithin{table}{section}						% Tablenumbering: section.tab#
+
+
+%%% Title	
+\title{ \vspace{-1in} 	\usefont{OT1}{bch}{b}{n}
+		\huge \strut Entity resolution in unstructured data \strut
+}
+\author{
+		\usefont{OT1}{bch}{m}{n} Benjamin van der Burgh\\
+		\usefont{OT1}{bch}{m}{n} Leiden University\\
+		\usefont{OT1}{bch}{m}{n} Leiden Institute of Advanced Computer Science\\
+        \texttt{benjamin.van.der.burgh@liacs.leidenuniv.nl}
+}
+\date{\today}
+
+%%% Begin document
+\begin{document}
+\maketitle
+
+\section*{Summary of thesis}
+
+\begin{itemize}
+	\item Record Linkage is the process of detecting references to the same entities in data and merging their associated data.
+	\item The history of record linkage is quite old. A probabilistic approach has been suggested over 40 years ago and has been proven to be optimal under certain conditions.
+	\item Several other methods have been proposed, but their approach is quite complex and it might be hard to integrate known domain knowledge in them.
+	\item In order to perform Record Linkage, the data must be:
+		\begin{itemize}
+			\item Extracted from text.
+			\item Structured / segmented into a table.
+			\item Indexed / partitioned (to group similar items together)
+			\item Pairs must be compared.
+			\item Classified into matches and mismatches.
+			\item Their data integrated.
+			\item Evaluated.
+		\end{itemize}
+	\item The datasets under consideration are unstructured, but are rich. We would like to retrieve contextual information from the texts in order to improve the performance of the record linkage.
+	\item One suggested approach is to achieve this is to use k-Maximally Informative Itemsets that allow us to extract topics / tags. The idea is that if we assume that person references appear in similar contexts, these tags contain information regarding the probability of finding a certain person in that context.
+\end{itemize}
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Introduction}
+
+\subsection{Record Linkage in unstructured data}
+\begin{itemize}
+	\item Record Linkage is the process of disambiguating references.
+	\item The thesis focuses on unstructured text as can be found in archives and the web.
+\end{itemize}
+
+Entity resolution is the process of finding records in one or more datasets that share a common identifier. Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept. Its applications range from duplicate detection to merging datasets to obtain a single, enriched database.
+	
+Entity resolution, also known as record linkage or data matching, has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts. However, many of the techniques developed rely on a database with a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields. Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
+
+\subsection{Motivation}
+\begin{itemize}
+	\item Explain the problem The National Archives have.
+	\item Discuss other possible applications such as entity-driven web search.
+	\item Disambiguation and deduplication can help to build the semantic web by linking together different data sources.
+\end{itemize}
+
+When studying historical documents, researchers are often confronted with the problem of ambiguous references to people in text. A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could be referred to. However, when the document is studied after many centuries, the exact context is often lost and it will be much harder to identify the persons. A careful study of other datasets, such as birth registers and censuses, might be needed to figure out who the person under consideration is. This can be a laborious task and furthermore it can be hard to estimate the quality of the results.
+
+In $2014$ The National Archives (TNA) launched the Traces Through Time project that had to goal of developing a new tool that would enable its users to explore TNA's vast repository of digitized archives in a completely new way. The system would have to identify occurrences of people in text and decide which of them referred to the same persons. It would also have to deal with `fuzzy' nature of historical data, including aliases, incomplete information, spelling variations and errors. This is essentially an entity resolution problem with the added difference that not structured databases, but unstructured documents are to be linked. This projects shows the need for the development of such as system and serves as an excellent use case.
+
+\subsection{Challenges}
+\subsubsection{Unstructured data}
+\begin{itemize}
+	\item Traditionally entity resolution is performed on tables in databases. Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
+	\item In order to be able to apply traditional techniques on unstructured data we first need to segment the references into rows that comply to a predefined schema.
+\end{itemize}
+
+\subsubsection{Information extraction}
+\begin{itemize}
+	\item Most importantly references need to be extracted from the text.
+	\item A rule-based system can be used that works by utilizing a predefined set of forenames as a seed and retrieves the title, surnames, etc. from the surrounding text.
+	\item More advanced Natural Language Processing (NLP) techniques can be governed to potentially improve recall.
+	\item In this thesis we also study the inclusion of contextual information in the record linkage process.
+\end{itemize}
+
+\subsubsection{Pair classification}
+\begin{itemize}
+	\item The core of entity resolution is the classification of candidate pairs.
+	\item In a probabilistic record linker a confidence score is computed for each candidate pair.
+	\item It is based on the informational value of the individual fields of the occurrences and measures our confidence in case of a match.
+\end{itemize}
+
+\subsubsection{Scalability (?)}
+\begin{itemize}
+	\item A naive entity resolution algorithm will compare all possible pairs of references, which grow quadratically with the number of references.
+	\item In order to be able to use the system on a large scale, some pruning can be performed on the candidate pairs.
+	\item Before doing a computationally expensive full comparison we group references together that have something in common, e.g. a forename, in a process that is usually called blocking.
+\end{itemize}
+
+\subsection{Objectives}
+\begin{itemize}
+	\item To study the application of existing entity resolution techniques in the context of unstructured data.
+	\item To study information extraction techniques that can aid the performance of entity resolution.
+\end{itemize}
+
+\subsection{Formal problem definition}
+
+\subsection{Research questions}
+
+\subsection{Related work}
+
+\subsection{Outline}
+In this thesis we study the application of new and existing entity resolution techniques in the context of unstructured source texts. A significant portion of it will be dedicated to the discussion of existing methods that have been successful in performing entity resolution in a traditional setting, i.e., in the presence of structured data.
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Record Linker}
+
+\begin{itemize}
+	\item Data cleaning
+	\item Segmentation
+	\item Indexing / partitioning
+	\item Comparison of pairs (similarity measuring)
+	\item Classification of pairs
+	\item Data fusion
+\end{itemize}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Feature Extraction}
+
+\subsection{Rule-based reference extraction}
+
+\subsection{NLP-driven reference extraction (?)}
+
+\subsection{k-Maximally informative itemsets}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Experimental Evaluation}
+
+\subsection{Datasets}
+
+\subsubsection{Fine Rolls}
+
+\begin{itemize}
+	\item Overview of the dataset (structure, size, etc.)
+	\item First parsing: conversion to JSON.
+	\item Second parsing: entity extraction from text.
+\end{itemize}
+
+
+\subsubsection{Wikipedia}
+	
+\begin{itemize}
+	\item Overview of used data dump (structure, size, etc.)
+	\item Parsing of the data.
+	\item ...
+\end{itemize}
+
+\subsection{Experimental evaluation of MIKIs}
+
+\subsection{Experimental evaluation of Record Linkage}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Conclusions and future work}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Bibliography}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\end{document}
