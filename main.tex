@@ -1,51 +1,7 @@
 %%% Preamble
-\documentclass[paper=a4, fontsize=11pt]{scrartcl}					% Article class of KOMA-script with 11pt font and a4 format
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
 
-\usepackage[english]{babel}											% English language/hyphenation
-\usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
-\usepackage{amsmath,amsfonts,amsthm}								% Math packages
-\usepackage[pdftex]{graphicx}										% Enable pdflatex
-%\usepackage{color,transparent}										% If you use color and/or transparency
-\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}	% Custom captions under/above floats
-\usepackage{epstopdf}												% Converts .eps to .pdf
-\usepackage{subfig}													% Subfigures
-\usepackage{booktabs}												% Nicer tables
-
-
-%%% Advanced verbatim environment
-\usepackage{verbatim}
-\usepackage{fancyvrb}
-\DefineShortVerb{\|}								% delimiter to display inline verbatim text
-
-
-%%% Custom sectioning (sectsty package)
-\usepackage{sectsty}								% Custom sectioning (see below)
-\allsectionsfont {%									% Change font of al section commands
-	\usefont{OT1}{bch}{b}{n}%						% bch-b-n: CharterBT-Bold font
-%	\hspace{15pt}%									% Uncomment for indentation
-}
-
-\sectionfont {										% Change font of \section command
-	\usefont{OT1}{bch}{b}{n}						% bch-b-n: CharterBT-Bold font
-	\sectionrule{0pt}{0pt}{-5pt}{0.8pt}				% Horizontal rule below section
-}
-
-
-%%% Custom headers/footers (fancyhdr package)
-\usepackage{fancyhdr}
-\pagestyle{fancyplain}
-\fancyhead{}										% No page header
-\fancyfoot[C]{\thepage}								% Pagenumbering at center of footer
-\fancyfoot[R]{\small \texttt{}}						% You can remove/edit this line 
-\renewcommand{\headrulewidth}{0pt}					% Remove header underlines
-\renewcommand{\footrulewidth}{0pt}					% Remove footer underlines
-\setlength{\headheight}{13.6pt}
-
-%%% Equation and float numbering
-\numberwithin{equation}{section}					% Equationnumbering: section.eq#
-\numberwithin{figure}{section}						% Figurenumbering: section.fig#
-\numberwithin{table}{section}						% Tablenumbering: section.tab#
-
+\usepackage{mystyle}
 
 %%% Title	
 \title{ \vspace{-1in} 	\usefont{OT1}{bch}{b}{n}
@@ -63,25 +19,6 @@
 \begin{document}
 \maketitle
 
-\section*{Summary of thesis}
-
-\begin{itemize}
-	\item Record Linkage is the process of detecting references to the same entities in data and merging their associated data.
-	\item The history of record linkage is quite old. A probabilistic approach has been suggested over 40 years ago and has been proven to be optimal under certain conditions.
-	\item Several other methods have been proposed, but their approach is quite complex and it might be hard to integrate known domain knowledge in them.
-	\item In order to perform Record Linkage, the data must be:
-		\begin{itemize}
-			\item Extracted from text.
-			\item Structured / segmented into a table.
-			\item Indexed / partitioned (to group similar items together)
-			\item Pairs must be compared.
-			\item Classified into matches and mismatches.
-			\item Their data integrated.
-			\item Evaluated.
-		\end{itemize}
-	\item The datasets under consideration are unstructured, but are rich. We would like to retrieve contextual information from the texts in order to improve the performance of the record linkage.
-	\item One suggested approach is to achieve this is to use k-Maximally Informative Itemsets that allow us to extract topics / tags. The idea is that if we assume that person references appear in similar contexts, these tags contain information regarding the probability of finding a certain person in that context.
-\end{itemize}
 
 % % % % % % % % % % % % % % % % % % % % % %
 
@@ -114,6 +51,7 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 \begin{itemize}
 	\item Traditionally entity resolution is performed on tables in databases. Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
 	\item In order to be able to apply traditional techniques on unstructured data we first need to segment the references into rows that comply to a predefined schema.
+	\item Due to the lack of structure in the texts the mapping may result in (a lot of) missing values which need to be dealt with correctly.
 \end{itemize}
 
 \subsubsection{Information extraction}
@@ -151,7 +89,7 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 \subsection{Related work}
 
 \subsection{Outline}
-In this thesis we study the application of new and existing entity resolution techniques in the context of unstructured source texts.
+
 
 % % % % % % % % % % % % % % % % % % % % % %
 
@@ -183,12 +121,37 @@ In this thesis we study the application of new and existing entity resolution te
 
 \subsubsection{Field-based comparisons}
 \begin{itemize}
-    \item 
+    \item The first step in classification is a field-to-field comparison between references.
+    \item Forward reference the usage of the outcome, namely that we will threshold the similarity scores, resulting in a binary tuple of the reference likeness.
+    \item These tuples are then used, alongside the statistics of the values in the classification of the pairs (see next section).
 \end{itemize}
+
+\subsubsection{Absolute distance}
+\subsubsection{Edit distance}
+\subsubsection{Jaro distance}
 
 \subsection{Classification of pairs}
 
-\subsection{Data fusion}
+\subsubsection{Comparison of binary feature vectors}
+\begin{itemize}
+    \item Classification is generally done on feature vectors as resulting from the field-based comparisons.
+    \item Various methods have been proposed, such as unsupervised, supervised, active-learning and incremental.
+    \item Labeled data is often lacking so unsupervised methods are most widely applicable.
+\end{itemize}
+
+\subsubsection{Probabilistic record linkage}
+\begin{itemize}
+    \item In probabilistic record linkage the values in the records are weighted according to an external source of statistics.
+    \item Give an example which naturally shows how statistics / informative value aids the linkage.
+    \item Define equation that is used in the computation.
+    \item Discuss the relation to joint entropy?
+\end{itemize}
+
+\subsection{Data fusion (?)}
+\begin{itemize}
+    \item Though it is not the primary goal of this thesis, it might be interesting to consider an example of a possible next step in the process.
+    \item Discuss how an entity-driven web search might aggregate information about a person.
+\end{itemize}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -227,7 +190,84 @@ In this thesis we study the application of new and existing entity resolution te
 	\item ...
 \end{itemize}
 
+\subsection{Experimental evaluation of distance metrics}
+
 \subsection{Experimental evaluation of MIKIs}
+
+\begin{table}
+    \begin{minipage}{.5\textwidth}
+        \small
+        \centering
+    	\sisetup{round-mode=places}
+    	\begin{tabular}{l S[round-precision=4]}
+    		\toprule
+    		{Item} & {Entropy}\\
+    		\midrule
+    		mark & 0.9994486557970268\\
+    		king & 1.8147018826248247\\
+    		befor & 2.6235330642969554\\
+    		son & 3.2605532800247521\\
+    		sheriff & 3.8850819263595207\\
+    		taken & 4.3911933509382104\\
+    		writ & 4.8598517328911237\\
+    		aforesaid & 5.3099654282367048\\
+    		wife & 5.7269049944269224\\
+    		land & 6.1245725613443947\\
+    		exchequ & 6.4903439188828891\\
+    		half & 6.8427723677764876\\
+    		thi & 7.1546285665244032\\
+    		yorkshir & 7.4341218502511719\\
+    		render & 7.6827923893317687\\
+    		norfolk & 7.919293824195619\\
+    		lincolnshir & 8.138467999949345\\
+    		justic & 8.341568005640335\\
+    		fine & 8.5119982948892652\\
+    		somerset & 8.6624825596208694\\
+    		\bottomrule
+    	\end{tabular}
+    	\label{t:miki_finerolls}
+    \end{minipage}
+    \begin{minipage}{.5\textwidth}
+        \small
+        \centering
+    	\sisetup{round-mode=places}
+    	\begin{tabular}{l S[round-precision=4]}
+    		\toprule
+    		{Item} & {Entropy}\\
+    		\midrule
+    		allow & 0.99999711460799467\\
+    		univers & 1.9885280695560985\\
+    		german & 2.9554587534421453\\
+    		histori & 3.885064693145309\\
+    		presid & 4.80108986272643\\
+    		near & 5.6856158645882138\\
+    		given & 6.5352458324908422\\
+    		left & 7.2978334845386019\\
+    		project & 7.9730729769060034\\
+    		possibl & 8.5001227573930844\\
+    		refer & 8.8938672662529648\\
+    		servic & 9.1868378998084061\\
+    		physic & 9.3978310762587931\\
+    		written & 9.5430385108901277\\
+    		work & 9.6547452728720131\\
+    		employ & 9.738368181814776\\
+    		thi & 9.7988366838674423\\
+    		chemic & 9.8509902971425589\\
+    		includ & 9.8925000721468823\\
+    		minist & 9.9206648691832591\\
+    		\bottomrule
+    	\end{tabular}
+    	\label{t:miki_wikipedia}
+    \end{minipage}
+    \caption{The tables above show the 20-miki as computed on the Fine Rolls of king Henry III (left) and the Wikipedia subset seeded from the page about Albert Einstein (right).}
+\end{table}
+
+\begin{figure}
+    \input{plots/miki_finerolls.tex}%
+    ~
+    \input{plots/miki_wikipedia.tex}
+    \caption{Plots showing the convergence behavior for the Fine Rolls of King Henry III dataset (left) and the Wikipedia dataset seeded with Albert Einstein (right).}\label{fig:1}
+\end{figure}
 
 \subsection{Experimental evaluation of Record Linkage}
 

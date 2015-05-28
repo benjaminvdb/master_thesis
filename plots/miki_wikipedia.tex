@@ -1,0 +1,12 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        small,
+        %width=.75\linewidth,
+        scale only axis,
+        title={Convergence of entropy},
+        xlabel={k},
+        ylabel={Entropy},
+    ]
+        \addplot table {plots/miki_wikipedia.dat};
+    \end{axis}
+\end{tikzpicture}
