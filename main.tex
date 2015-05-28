@@ -151,21 +151,44 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 \subsection{Related work}
 
 \subsection{Outline}
-In this thesis we study the application of new and existing entity resolution techniques in the context of unstructured source texts. A significant portion of it will be dedicated to the discussion of existing methods that have been successful in performing entity resolution in a traditional setting, i.e., in the presence of structured data.
+In this thesis we study the application of new and existing entity resolution techniques in the context of unstructured source texts.
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
 \section{Record Linker}
 
+\subsection{Record linkage pipeline}
 \begin{itemize}
-	\item Data cleaning
-	\item Segmentation
-	\item Indexing / partitioning
-	\item Comparison of pairs (similarity measuring)
-	\item Classification of pairs
-	\item Data fusion
+    \item This section serves as an introduction to the rest of the chapter.
+    \item Provide an overview of the record linkage pipeline with its various stages.
+    \item Introduce a running example that shows some of the decisions that must be made.
 \end{itemize}
+
+\subsection{Data cleaning and segmentation}
+\begin{itemize}
+    \item The source data consists of natural language.
+    \item Natural language is in an ambiguous format.
+\end{itemize}
+
+\subsection{Indexing / partitioning}
+\begin{itemize}
+    \item A naive comparison of all pairs has a time complexity that is quadratic in the number of references.
+    \item For large scale record linkage it is infeasible to do an expensive comparison.
+    \item One solution is to apply blocking, which partitions references that are similar to some degree together.
+    \item Instead of doing an expensive comparison, the references are partitioned into blocks and references within these blocks are compared.
+\end{itemize}
+
+\subsection{Reference pair comparisons}
+
+\subsubsection{Field-based comparisons}
+\begin{itemize}
+    \item 
+\end{itemize}
+
+\subsection{Classification of pairs}
+
+\subsection{Data fusion}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
