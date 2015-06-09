@@ -59,40 +59,55 @@ This is essentially an entity resolution problem with the added difference that 
 This projects shows the need for the development of such as system and serves as an excellent use case.
 
 \subsection{Challenges}
-\subsubsection{Unstructured data}
-\begin{itemize}
-	\item Traditionally entity resolution is performed on tables in databases. Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
-	\item In order to be able to apply traditional techniques on unstructured data we first need to segment the references into rows that comply to a predefined schema.
-	\item Due to the lack of structure in the texts the mapping may result in (a lot of) missing values which need to be dealt with correctly.
-\end{itemize}
 Traditionally entity resolution is performed on tables in databases.
 Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
 However, the main focus of this thesis is to study entity resolution in natural language, which lacks such a structure.
 Furthermore, the references are not readily accessible and first need to be extracted from text.
 We will describe a simple generic rule-based method that can be used to both extract references from text and segment it into a record consisting of fields.
+Note that the use of a schema imposes a fixed length on the records, even though it might often happen that one or more attributes are not present.
+This becomes more clear with an example.
+The following is a section taken from \emph{Fine Roll C 60/33} from the Fine Rolls of King Henry III. \footnote{The Fine Rolls of King Henry III is a dataset consisting of transcribed medieval calendars. This is the same dataset that is used in the experiments described in Chapter ... TODO: add reference.}
+
+\begin{quote}
+	Concerning the corn of \ul{Roger of Hyde}. Order to the \ul{sheriff of Oxfordshire} to make the king’s advantage without delay, by the view of law-worthy men, from all of the corn of \ul{Roger of Hyde, knight}, in Hyde, who is with the Earl Marshal, and to put in gage etc. all those who he will find threshing that corn and intermeddling with the land of the same \ul{Roger} without warrant, to be before the king at his command to answer for it.
+\end{quote}
+
+\noindent This paragraph could be segmented in various ways, with one possible outcome given in Table~\ref{tab:segmentation}.
+We left out the nouns that refer to people through their jobs, such as king and Earl Marshal, in this example.
+The important thing to note is that there are a lot of missing values that have to be dealt with appropriately.
+
+\begin{table}
+	\centering
+	\input{tables/segmentation.tex}
+	\caption{A possible segmentation of the paragraph taken from \emph{Fine Roll C 60/33}.}
+	\label{tab:segmentation}
+\end{table}
 
 While text in natural language lacks structure, it does not mean that it lacks in information.
 Most of the time the text contains a lot of information and a person is referenced within that context.
 Therefore it is interesting to look at information that might be contained within the text.
 A problem with a rule-based system in this case is that it does not generalize very well.
 It is fast and can make good use of regularities in the text, such as the ordering of names, but it is unclear how to apply such rules to extract more general information from the text.
-We will therefore study the application of more generic techniques and their 
+We will therefore study the application of more generic techniques and their impact on the performance of the system.
 
+The core of any record linkage system is the step in which references are classified into matches and non-matches.
+In order to do so, a similarity-based approach is often used.
+Based on the assumption that references to the same entity are themselves similar, we can start comparing their segmented records.
+However, this required a means of comparing records which is not a trivial task.
+There are many different approaches, such as counting the number of edit operations required to turn one string into the other, and each come with their own quirks and advantages.
+One of the challenges here is to decide select a similarity metric and another is to deal with the missing data such as exemplified in Table~\ref{tab:segmentation}.
 
-\subsubsection{Information extraction}
-\begin{itemize}
-	\item Most importantly references need to be extracted from the text.
-	\item A rule-based system can be used that works by utilizing a predefined set of forenames as a seed and retrieves the title, surnames, etc. from the surrounding text.
-	\item More advanced Natural Language Processing (NLP) techniques can be governed to potentially improve recall.
-	\item In this thesis we also study the inclusion of contextual information in the record linkage process.
-\end{itemize}
+Another issue arises when we take the property of \emph{transitivity} into account, i.e., if $a$ and $b$ are a match and $a$ and $c$ are a match, then also $b$ should be a match.
+We could make use of this property to find more matches or, conversely, we could exclude certain matches if there is an inconsistency.
+Figure~\ref{fig:transitive_closure} shows an example of such an uncertain situation.
+We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched.\todo{add numbers as to make the example more clear.}
 
-\subsubsection{Pair classification}
-\begin{itemize}
-	\item The core of entity resolution is the classification of candidate pairs.
-	\item In a probabilistic record linker a confidence score is computed for each candidate pair.
-	\item It is based on the informational value of the individual fields of the occurrences and measures our confidence in case of a match.
-\end{itemize}
+\begin{figure}
+    \centering
+    \input{graphs/transitive_closure.tex}
+    \caption{John William Smith has a reasonably high confidence score with both John Smith and William Smith. Inferring from this that also John Smith and William Smith should be matched is however dangerous.}
+    \label{fig:transitive_closure}
+\end{figure}
 
 \subsubsection{Inconsistencies under the transitivity assumption}
 \begin{itemize}
@@ -155,6 +170,7 @@ We will therefore study the application of more generic techniques and their
     \item The source data consists of natural language.
     \item Natural language is in an ambiguous format.
     \item In order to use traditional record linkage techniques, we need to extract the interesting parts of text and segment it into a fixed tabular format.
+    \item One way of writing about entity resolution is to first talk about ''references`` and about ''records`` after segmentation.
 \end{itemize}
 
 \subsection{Blocking}
@@ -221,14 +237,7 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
     \centering
     \begin{minipage}{.65\textwidth}
         \centering
-        \begin{tabular}{c|c|c|c|c|c|c|}
-              &   & \textbf{O} & \textbf{w} & \textbf{a} & \textbf{i} & \textbf{n}  \\\hline
-              & $\bm{0}$ & $1$ & $2$ & $3$ & $4$ & $5$ \\\hline
-            \textbf{O} & $1$ & $\bm{0}$ & $1$ & $2$ & $3$ & $4$ \\\hline
-            \textbf{w} & $2$ & $1$ & $\bm{0}$ & $1$ & $2$ & $3$ \\\hline
-            \textbf{e} & $3$ & $2$ & $1$ & $\bm{1}$ & $\bm{2}$ & $3$ \\\hline
-            \textbf{n} & $4$ & $3$ & $2$ & $2$ & $2$ & $\bm{2}$ \\\hline
-        \end{tabular}
+        \input{tables/edit_distance_matrix.tex}
     \end{minipage}%
     \begin{minipage}{.35\textwidth}
         \centering
@@ -240,7 +249,6 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
     \caption{The matrix in the left shows the computation of the edit distance between Owen and Owain. The construction path, presented in bold, can be seen as substituting the 'a' for an 'e' and removing the 'i' from Owain as to obtain Owen, as depicted on the right.}
     \label{fig:edit_distance}
 \end{figure}
-
 
 \subsubsection{Jaro distance}
 

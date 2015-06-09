@@ -1,0 +1,18 @@
+\begin{tikzpicture}[
+    -latex,
+    auto,
+    node distance=3 cm,
+    on grid,
+    semithick,
+]
+
+    \node[ellipse,draw] (A) {John William Smith};
+    \node[ellipse,draw] (B) [below left=of A] {John Smith};
+    \node[ellipse,draw] (C) [below right=of A] {William Smith};
+    
+    \path[thick] (A) edge (B);
+    \path[thick] (B) edge (A);
+    \path[thick] (A) edge (C);
+    \path[thick] (C) edge (A);
+    \path[dashed] (B) edge (C);
+\end{tikzpicture}
