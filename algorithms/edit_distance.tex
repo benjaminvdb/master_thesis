@@ -1,0 +1,17 @@
+
+\begin{algorithmic}[1]
+    \Function{EditDistance}{$\sigma_1, \sigma_2$}
+        \State $D[0,0]:=0$
+        \LineFor{$i:=1 \To \SizeOf{B}$}{$D[i,0]:=D[i-1,0]+1$}%
+        \LineFor{$j:=1 \To \SizeOf{A}$}{$D[0,j]:=D[0,j-1]+1$}%
+        \For{$i:=1 \To \SizeOf{A}$}
+            \For{$j:=1 \To \SizeOf{B}$}
+                \State $m_1 := D[i-1, j-1] + 1$
+                \State $m_2 := D[i-1, j] + 1$
+                \State $m_3 := D[i, j-1] + 1$
+                \State $D[i,j] := \textrm{min}(m_1, m_2, m_3)$
+            \EndFor
+        \EndFor
+        \State \Return{$D[\SizeOf{A}, \SizeOf{B}]$}
+    \EndFunction
+\end{algorithmic}

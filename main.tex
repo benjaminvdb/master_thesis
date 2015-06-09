@@ -31,9 +31,13 @@
 	\item The thesis focuses on unstructured text as can be found in archives and the web.
 \end{itemize}
 
-Entity resolution is the process of finding records in one or more datasets that share a common identifier. Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept. Its applications range from duplicate detection to merging datasets to obtain a single, enriched database.
+Entity resolution is the process of finding records in one or more datasets that share a common identifier.
+Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept.
+Its applications range from duplicate detection to merging datasets to obtain a single, enriched database.
 	
-Entity resolution, also known as record linkage or data matching, has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts. However, many of the techniques developed rely on a database with a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields. Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
+Entity resolution, also known as record linkage or data matching, has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
+However, many of the techniques developed rely on a database with a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields.
+Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
 
 \subsection{Motivation}
 \begin{itemize}
@@ -42,9 +46,17 @@ Entity resolution, also known as record linkage or data matching, has a long his
 	\item Disambiguation and deduplication can help to build the semantic web by linking together different data sources.
 \end{itemize}
 
-When studying historical documents, researchers are often confronted with the problem of ambiguous references to people in text. A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could be referred to. However, when the document is studied after many centuries, the exact context is often lost and it will be much harder to identify the persons. A careful study of other datasets, such as birth registers and censuses, might be needed to figure out who the person under consideration is. This can be a laborious task and furthermore it can be hard to estimate the quality of the results.
+When studying historical documents, researchers are often confronted with the problem of ambiguous references to people in text.
+A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could be referred to.
+However, when the document is studied after many centuries, the exact context is often lost and it will be much harder to identify the persons.
+A careful study of other datasets, such as birth registers and censuses, might be needed to figure out who the person under consideration is.
+This can be a laborious task and furthermore it can be hard to estimate the quality of the results.
 
-In $2014$ The National Archives (TNA) launched the Traces Through Time project that had to goal of developing a new tool that would enable its users to explore TNA's vast repository of digitized archives in a completely new way. The system would have to identify occurrences of people in text and decide which of them referred to the same persons. It would also have to deal with `fuzzy' nature of historical data, including aliases, incomplete information, spelling variations and errors. This is essentially an entity resolution problem with the added difference that not structured databases, but unstructured documents are to be linked. This projects shows the need for the development of such as system and serves as an excellent use case.
+In $2014$ The National Archives (TNA) launched the Traces Through Time project that had to goal of developing a new tool that would enable its users to explore TNA's vast repository of digitized archives in a completely new way.
+The system would have to identify occurrences of people in text and decide which of them referred to the same persons.
+It would also have to deal with `fuzzy' nature of historical data, including aliases, incomplete information, spelling variations and errors.
+This is essentially an entity resolution problem with the added difference that not structured databases, but unstructured documents are to be linked.
+This projects shows the need for the development of such as system and serves as an excellent use case.
 
 \subsection{Challenges}
 \subsubsection{Unstructured data}
@@ -53,6 +65,19 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 	\item In order to be able to apply traditional techniques on unstructured data we first need to segment the references into rows that comply to a predefined schema.
 	\item Due to the lack of structure in the texts the mapping may result in (a lot of) missing values which need to be dealt with correctly.
 \end{itemize}
+Traditionally entity resolution is performed on tables in databases.
+Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
+However, the main focus of this thesis is to study entity resolution in natural language, which lacks such a structure.
+Furthermore, the references are not readily accessible and first need to be extracted from text.
+We will describe a simple generic rule-based method that can be used to both extract references from text and segment it into a record consisting of fields.
+
+While text in natural language lacks structure, it does not mean that it lacks in information.
+Most of the time the text contains a lot of information and a person is referenced within that context.
+Therefore it is interesting to look at information that might be contained within the text.
+A problem with a rule-based system in this case is that it does not generalize very well.
+It is fast and can make good use of regularities in the text, such as the ordering of names, but it is unclear how to apply such rules to extract more general information from the text.
+We will therefore study the application of more generic techniques and their 
+
 
 \subsubsection{Information extraction}
 \begin{itemize}
@@ -69,12 +94,22 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 	\item It is based on the informational value of the individual fields of the occurrences and measures our confidence in case of a match.
 \end{itemize}
 
+\subsubsection{Inconsistencies under the transitivity assumption}
+\begin{itemize}
+    \item We can treat the output of the pair classification step as a labeled set and use it to deduce more labels using the assumption of transitivity, i.e., if $(\alpha, \beta)$ is a match and $(\alpha, \gamma)$ is a match, then also $(\beta, \gamma)$ is a match (\emph{closing triangles}).
+    \item Give graphical example of transitive closure.
+    \item Minimizing the number of inconsistencies is an NP-complete problem \cite{bansal04}.
+    \item This can lead to inconsistencies where $s_c(\beta, \gamma)$ is very low and therefore likely not a match.
+\end{itemize}
+
 \subsubsection{Scalability (?)}
 \begin{itemize}
 	\item A naive entity resolution algorithm will compare all possible pairs of references, which grow quadratically with the number of references.
 	\item In order to be able to use the system on a large scale, some pruning can be performed on the candidate pairs.
 	\item Before doing a computationally expensive full comparison we group references together that have something in common, e.g. a forename, in a process that is usually called blocking.
 \end{itemize}
+
+\subsubsection{Lack of labeled data}
 
 \subsection{Objectives}
 \begin{itemize}
@@ -83,10 +118,22 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 \end{itemize}
 
 \subsection{Formal problem definition}
+\begin{itemize}
+    \item Introduce record linkage as the classification of reference pairs as match or non-match.
+    \item The number of unique entities is unknown \emph{a priori} and there is usually a lack of training data.
+    \item We can assume that matching pairs have similar comparison vectors.
+    \item The natural approach therefore is to use clustering as an unsupervised learning approach.
+    \item Classification can be performed by measuring the similarity between objects, essentially clustering objects.
+    \item We can then threshold the similarity: pairs above the threshold are classified as matches and below the threshold as non-matches.
+\end{itemize}
 
 \subsection{Research questions}
 
 \subsection{Related work}
+\begin{itemize}
+    \item A common probabilistic record linkage approach (Sunter) computes the probability of a pair being a match and equally for being a non-match. The label is assigned according to the highest probability.
+    \item This approach makes no use of domain knowledge. What we also use of the probability of observing a certain value.
+\end{itemize}
 
 \subsection{Outline}
 
@@ -107,9 +154,10 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 \begin{itemize}
     \item The source data consists of natural language.
     \item Natural language is in an ambiguous format.
+    \item In order to use traditional record linkage techniques, we need to extract the interesting parts of text and segment it into a fixed tabular format.
 \end{itemize}
 
-\subsection{Indexing / partitioning}
+\subsection{Blocking}
 \begin{itemize}
     \item A naive comparison of all pairs has a time complexity that is quadratic in the number of references.
     \item For large scale record linkage it is infeasible to do an expensive comparison.
@@ -117,20 +165,86 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
     \item Instead of doing an expensive comparison, the references are partitioned into blocks and references within these blocks are compared.
 \end{itemize}
 
-\subsection{Reference pair comparisons}
-
-\subsubsection{Field-based comparisons}
+\subsection{Field-based comparisons}
 \begin{itemize}
     \item The first step in classification is a field-to-field comparison between references.
     \item Forward reference the usage of the outcome, namely that we will threshold the similarity scores, resulting in a binary tuple of the reference likeness.
     \item These tuples are then used, alongside the statistics of the values in the classification of the pairs (see next section).
 \end{itemize}
 
-\subsubsection{Absolute distance}
-\subsubsection{Edit distance}
+The fundamental principle of the entity resolution techniques described in this thesis are based on the assumption that references to the same entity are relatively similar.
+Naturally, if the references are exactly the same we are confident that indeed the references refer to the same real-world entity.
+In practice, however, it is not always this obvious, since there many circumstances under which the references differ even though the pair should be classified as a match.
+There are are number of reasons that cause these differences, e.g. an error was made during transcription or a name was abbreviated.
+To be able to perform entity resolution under such conditions we can make use of approximate string matching.
+This is usually achieved by computing a similarity score, usually in $[0 \dots 1]$, between the individual fields that make up the records.
+A threshold can then be set for each component, mapping the scores to binary values, or used as-is in the classification of references which will be further discussed in \todo{add section reference here}.
+
+The remaining section describes a number of distance metrics that were used in our record linkage system to perform pairwise comparisons between the fields of a pair of records, which we assume to be of the string data type.
+We denote with $\sigma$ some string constructed from individual literals taken from an alphabet $\Sigma$ and use the superscript notation, e.g. $\sigma^{i}$, to refer to its constituent parts.
+The notation $\vert \times \vert$ is used to refer to the length of a string.
+Note that we are now considering the field strings in isolation and not the records as a whole, hence a \emph{match} in this context means that the fields are ''similar enough``.
+Further processing the results of this phase is further discussed in ...
+
+\subsubsection{Edit and Levenshtein distance}
+As stated, misspellings and typographical errors are a common source of errors and often turn up as a single character being replaced or perhaps an additional being added.
+A natural way to compute a distance between two strings is therefore the smallest number of modifications that is needed for one of the strings to be turned into the other.
+This is the underlying principle of the class of edit distances.
+
+In its simplest form, three operations are considered: substitutions, insertions and deletions, each of them associated with a cost of $1$.
+This variant of the edit distance is often called the \emph{Levenshtein distance} \todo{add reference to Levenshtein's article}.
+The edit distance can efficiently be computed in time $\mathcal{O}(\vert \sigma_1 \times \sigma_2 \vert)$ using a dynamic programming approach.
+It breaks up the computation into smaller subproblems, namely the computation of the edit distance between all possible prefixes of one string and all possible prefixes of the second.
+The algorithm for computing edit distances is given in Algorithm~\ref{alg:edit_distance}.
+First thing to note is that the first row of the matrix keeps track of the cost of deleting literals from $B$ while the first column keeps track of deleting literals from $A$.
+These can be filled in without requiring any knowledge of the strings themselves, except for their length.
+A cell $D[i,j]$ in the matrix corresponds to the number of edits required to convert the first $i$ characters of the string $\sigma_1$ (shown in the first column of a matrix) into the string comprised of the first $j$ characters of string $\sigma_2$ (shown in top row of a matrix) \todo{Literary copy-paste from Peter Christen's "Data Matching". Edit and/or add reference.}
+
+If we look at the example as depicted in Figure~\ref{fig:edit_distance}, we can see how the algorithm computes the Levenshtein distance (i.e. the edit distance with equal cost of all edit operations) between Owen (British) and Owain (Welsh).
+The computation starts in the top left corner with an initial score of $0$.
+Aligning the literal 'O' of Owain with the empty string results in a mismatch and induces a cost of $1$, therefore $D[0, 1]=1$.
+A vertical move down requires similar reasoning and also results in a cost of $1$.
+Aligning both starting letters results in a match and the diagonal move introduces no cost, therefore $D[1, 1]=0$.
+This process is repeated until all cells of the matrix have been computed.
+The edit distance can be found in the lower right corner and is $2$ in this case.
+Shown in bold is a construction path that shows one of the possible alignments associated with the computed distance.
+It is constructed by backtracking from the lower right corner to the top left each of the steps that led to the minimum value, i.e. the lowest value of the vertical, horizontal and diagonal moves must be selected.
+From the example it can be seen that a choice sometimes occurs, since multiple alignments can exist for a certain edit distance.
+
+\begin{algorithm}
+    \input{algorithms/edit_distance.tex}
+    \caption{Computes the edit distance between two strings $\sigma_1$ and $\sigma_2$}
+    \label{alg:edit_distance}
+\end{algorithm}
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.65\textwidth}
+        \centering
+        \begin{tabular}{c|c|c|c|c|c|c|}
+              &   & \textbf{O} & \textbf{w} & \textbf{a} & \textbf{i} & \textbf{n}  \\\hline
+              & $\bm{0}$ & $1$ & $2$ & $3$ & $4$ & $5$ \\\hline
+            \textbf{O} & $1$ & $\bm{0}$ & $1$ & $2$ & $3$ & $4$ \\\hline
+            \textbf{w} & $2$ & $1$ & $\bm{0}$ & $1$ & $2$ & $3$ \\\hline
+            \textbf{e} & $3$ & $2$ & $1$ & $\bm{1}$ & $\bm{2}$ & $3$ \\\hline
+            \textbf{n} & $4$ & $3$ & $2$ & $2$ & $2$ & $\bm{2}$ \\\hline
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.35\textwidth}
+        \centering
+        \begin{tabular}{c||c|c|c|c|c}
+            $\sigma_1$ & O & w & a & i & n \\\hline
+            $\sigma_2$ & O & w & e & \_ & n
+        \end{tabular}
+    \end{minipage}
+    \caption{The matrix in the left shows the computation of the edit distance between Owen and Owain. The construction path, presented in bold, can be seen as substituting the 'a' for an 'e' and removing the 'i' from Owain as to obtain Owen, as depicted on the right.}
+    \label{fig:edit_distance}
+\end{figure}
+
+
 \subsubsection{Jaro distance}
 
-\subsection{Classification of pairs}
+\subsection{Reference pair classification}
 
 \subsubsection{Comparison of binary feature vectors}
 \begin{itemize}
@@ -164,6 +278,8 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 \subsection{NLP-driven reference extraction (?)}
 
 \subsection{k-Maximally informative itemsets}
+
+\subsection{Co-occurrence (?)}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -282,6 +398,9 @@ In $2014$ The National Archives (TNA) launched the Traces Through Time project t
 
 
 \section{Bibliography}
+
+\bibliographystyle{plain}
+\bibliography{mybib}
 
 
 % % % % % % % % % % % % % % % % % % % % % %

@@ -1,5 +1,7 @@
 \ProvidesPackage{mystyle}
 
+\usepackage[utf8]{inputenc}                                         % Use UTF-8 encoding
+\usepackage[T1]{fontenc}
 \usepackage[english]{babel}											% English language/hyphenation
 \usepackage[protrusion=true,expansion=true]{microtype}				% Better typography
 \usepackage{amsmath,amsfonts,amsthm}								% Math packages
@@ -7,19 +9,41 @@
 %\usepackage{color,transparent}										% If you use color and/or transparency
 \usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}	% Custom captions under/above floats
 \usepackage{epstopdf}												% Converts .eps to .pdf
-%\usepackage{subfig}													% Subfigures
+%\usepackage{subfig}												% Subfigures
 \usepackage{booktabs}												% Nicer tables
 \usepackage{siunitx}                                                % Rounding of floats in tables
-%\usepackage{tikz}                                                   % Plotting in LaTeX
+%\usepackage{tikz}                                                  % Plotting in LaTeX
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.12}
 
 \usepackage{subcaption}
+\usepackage{todonotes}
+\usepackage{bm}                                                     % For bold math symbols
 
 %%% Advanced verbatim environment
 \usepackage{verbatim}
 \usepackage{fancyvrb}
 \DefineShortVerb{\|}								% delimiter to display inline verbatim text
+
+%%% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}           % Defined for convenience
+\newcommand*{\LineFor}[2]{%
+    \State\algorithmicfor\ {#1}\ \algorithmicdo\ {#2} \algorithmicend\ \algorithmicfor%
+}
+\newcommand*{\To}{\:\bm{ to }\:}
+\newcommand*{\SizeOf}[1]{\:\vert {#1} \vert\:}
+
+% DroidSerif
+%\usepackage{fontspec}
+%\setromanfont[
+%    Path = fonts/,
+%    UprightFont=DroidSerif-Regular.ttf,
+%    BoldFont=DroidSerif-Bold.ttf,
+%    ItalicFont=DroidSerif-Italic.ttf,
+%    BoldItalicFont=DroidSerif-BoldItalic.ttf,
+%]{DroidSerif}
 
 
 %%% Custom sectioning (sectsty package)
