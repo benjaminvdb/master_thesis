@@ -24,6 +24,7 @@
 
 
 \section{Introduction}
+\label{sec:introduction}
 
 \subsection{Record Linkage in unstructured data}
 \begin{itemize}
@@ -40,6 +41,7 @@ However, many of the techniques developed rely on a database with a well-defined
 Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
 
 \subsection{Motivation}
+\label{sec:motivation}
 \begin{itemize}
 	\item Explain the problem The National Archives have.
 	\item Discuss other possible applications such as entity-driven web search.
@@ -59,6 +61,7 @@ This is essentially an entity resolution problem with the added difference that 
 This projects shows the need for the development of such as system and serves as an excellent use case.
 
 \subsection{Challenges}
+\label{sec:challenges}
 Traditionally entity resolution is performed on tables in databases.
 Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
 However, the main focus of this thesis is to study entity resolution in natural language, which lacks such a structure.
@@ -98,9 +101,13 @@ There are many different approaches, such as counting the number of edit operati
 One of the challenges here is to decide select a similarity metric and another is to deal with the missing data such as exemplified in Table~\ref{tab:segmentation}.
 
 Another issue arises when we take the property of \emph{transitivity} into account, i.e., if $a$ and $b$ are a match and $a$ and $c$ are a match, then also $b$ should be a match.
-We could make use of this property to find more matches or, conversely, we could exclude certain matches if there is an inconsistency.
+A situation might occur in which this property does not hold, thus we find that there is an inconsistency in the matching status.
+Matches can also chain together in which case the ends of the chain are clearly not matches, though intuitively, and by applying the property of transitivity, we could argue that these records should also be matched.
 Figure~\ref{fig:transitive_closure} shows an example of such an uncertain situation.
 We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched.\todo{add numbers as to make the example more clear.}
+However, we could also argue that the transitivity property can aid us in the efficient linking of records as it can in fact provide evidence in a similar way that the content of the records do.
+Namely, instead of comparing references based on their textual representation we could compare them based on graph similarity.
+We will look methods to leverage this property to increase performance while reducing the number of inconsistencies.\todo{this statement is rather bold (it involves some NP-complete problems?), and I don't have a solution, but it's worth trying :).}
 
 \begin{figure}
     \centering
@@ -109,30 +116,25 @@ We could argue that the same person was referenced once with his first name and 
     \label{fig:transitive_closure}
 \end{figure}
 
-\subsubsection{Inconsistencies under the transitivity assumption}
-\begin{itemize}
-    \item We can treat the output of the pair classification step as a labeled set and use it to deduce more labels using the assumption of transitivity, i.e., if $(\alpha, \beta)$ is a match and $(\alpha, \gamma)$ is a match, then also $(\beta, \gamma)$ is a match (\emph{closing triangles}).
-    \item Give graphical example of transitive closure.
-    \item Minimizing the number of inconsistencies is an NP-complete problem \cite{bansal04}.
-    \item This can lead to inconsistencies where $s_c(\beta, \gamma)$ is very low and therefore likely not a match.
-\end{itemize}
-
-\subsubsection{Scalability (?)}
-\begin{itemize}
-	\item A naive entity resolution algorithm will compare all possible pairs of references, which grow quadratically with the number of references.
-	\item In order to be able to use the system on a large scale, some pruning can be performed on the candidate pairs.
-	\item Before doing a computationally expensive full comparison we group references together that have something in common, e.g. a forename, in a process that is usually called blocking.
-\end{itemize}
+The record linkage methods described in this thesis rely on the comparison of references based on their attributes.
+Assuming we have no \emph{a priori} knowledge of the match status of each reference pair, the comparison of all possible pairs takes time $\mathcal{O}(n^2)$.
+This rapidly becomes too expensive for larger datasets.
+Several solutions have been proposed to partially resolve this problem at the expense of decreased sensitivity of the system.
+It is not the main focus of this thesis to address this issue, but since it is fairly standard step in the record linkage pipeline, we will shortly discuss it in Section\todo{add reference here}.
 
 \subsubsection{Lack of labeled data}
 
 \subsection{Objectives}
+\label{sec:objectives}
+
 \begin{itemize}
 	\item To study the application of existing entity resolution techniques in the context of unstructured data.
 	\item To study information extraction techniques that can aid the performance of entity resolution.
 \end{itemize}
 
 \subsection{Formal problem definition}
+\label{sec:formal_problem_definition}
+
 \begin{itemize}
     \item Introduce record linkage as the classification of reference pairs as match or non-match.
     \item The number of unique entities is unknown \emph{a priori} and there is usually a lack of training data.
@@ -143,43 +145,71 @@ We could argue that the same person was referenced once with his first name and 
 \end{itemize}
 
 \subsection{Research questions}
+\label{sec:research_questions}
 
 \subsection{Related work}
+\label{sec:related_work}
+
 \begin{itemize}
+    \item It's probably best to cite literature here that is similar to Traces Through Time, such as ChartEx.
     \item A common probabilistic record linkage approach (Sunter) computes the probability of a pair being a match and equally for being a non-match. The label is assigned according to the highest probability.
-    \item This approach makes no use of domain knowledge. What we also use of the probability of observing a certain value.
+    \item This approach makes no use of domain knowledge. What we also use of the probability of observing a certain value (this is related to what literature? cite it).
 \end{itemize}
 
 \subsection{Outline}
-
+\label{sec:outline}
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
 \section{Record Linker}
+\label{sec:record_linker}
+In this chapter we will give an overview of the record linkage system that was developed to solve issues that were discussed in \cref{sec:objectives}. It is also the basis of the experiments described in \cref{sec:experiments}.
+As we will see, the comparison of references plays a fundamental role in the record linker system described.
+However, recalling the mantra ``\emph{garbage-in, garbage out}'' we will also consider the pre- and postprocessing steps involved and treat the resulting pipeline as a unified system.
+\todo{give an outline of this chapter by shortly describing the pipeline. Introduce running example.}
 
-\subsection{Record linkage pipeline}
-\begin{itemize}
-    \item This section serves as an introduction to the rest of the chapter.
-    \item Provide an overview of the record linkage pipeline with its various stages.
-    \item Introduce a running example that shows some of the decisions that must be made.
-\end{itemize}
+\subsection{Data cleaning and segmentation (``record extraction''?)}
+\label{sec:segmentation}
+Traditional record linkage techniques naturally assume that the input consist of structured records (i.e. tuples).
+Out goal however is to perform entity resolution in documents consisting of natural language.
+The first step therefore is to extract structured records from the input data.
 
-\subsection{Data cleaning and segmentation}
-\begin{itemize}
-    \item The source data consists of natural language.
-    \item Natural language is in an ambiguous format.
-    \item In order to use traditional record linkage techniques, we need to extract the interesting parts of text and segment it into a fixed tabular format.
-    \item One way of writing about entity resolution is to first talk about ''references`` and about ''records`` after segmentation.
-\end{itemize}
+We have considered using existing tools from the field of Natural Language Processing (NLP), but these posed several issues.
+The task is often referred to as \emph{Names-Entity Recognition} (NER) and usually solved with either complicated grammars or statistical (machine learning) approaches.
+A problem with existing grammar-based approaches is that they are often too generic and complicated.
+Statistical techniques generally rely on the availability of labeled data for training, which is often not the case.
+Luckily, the variant of NER we are trying to achieve here is rather simple as it only involves the detection of people in text and not, for example, place names.
+Also, person names have a largely well-defined structure and use capitalization, making it a lot easier to detect them.
+
+The method that we settled to using is a simplified version of a grammar based approach and mainly requires a list of first names as a \emph{seed}.
+The input is processed as a sequence of tokens, which is generated by simply splitting the text on spaces after removing punctuation; no further processing on the tokens is performed.
+After that tokens can be searched for the first names, ignoring tokens that are not recognized as such.
+First names are used as anchor points in the grammar by applying rules that try to match tokens based on their relative position to the names.
+As an example, let us look at a part from the same part that was cited in \todo{add a number to the quote so we can reference it here. Also, add the grammar that was used so the rules can be referenced to}.
+
+By applying grammar rules in this way surnames can effectively be learned.
+These in turn could be used as an anchor point, similar to the first names, which yields a new set of first names that was unknown before.
+Repeated application of this procedure can therefore be used to expand a relatively small list of known names into a bigger one in a process called \emph{bootstrapping}.
+Caution should be taken, however, to prevent errors made in one iteration of the bootstrapping, since they can propagate to a next iteration.
+It is therefore best to manually inspect the learned names after each iteration of the size of the list allows for it.
+
+An advantage of a manually crafted grammar, like the one proposed, is that tokens are classified as part of the parsing, which effectively segments the references into structured records.
+These can then be further processed using traditional record linkage techniques.
 
 \subsection{Blocking}
-\begin{itemize}
-    \item A naive comparison of all pairs has a time complexity that is quadratic in the number of references.
-    \item For large scale record linkage it is infeasible to do an expensive comparison.
-    \item One solution is to apply blocking, which partitions references that are similar to some degree together.
-    \item Instead of doing an expensive comparison, the references are partitioned into blocks and references within these blocks are compared.
-\end{itemize}
+\label{sec:blocking}
+As stated in \cref{sec:challenges} for larger datasets it becomes rapidly infeasible to compare all possible pairs of records which is equal to $(n^2-n)/2$.
+To overcome this problem, a technique called \emph{blocking} is often deployed.
+The goal of blocking is to partition the set of all possible pairs into several mutually exclusive sets.
+Only the records within a set are compared, effectively reducing the number of comparisons that is required.
+Consider for example a set of $1000$ records on which we want to perform record linkage.
+There are a total number of $450000$ possible pairs that can possibly be compared.
+If were able to partition these pairs into $10$ equally sized \emph{blocks}, only $49500$ comparisons would be needed; a reduction of $89\%$.
+This relies, of course, on the ability of the blocking technique to partition the references in blocks of roughly equal size, which is often a problem.
+Another problem arises when the blocking function is unable to group records together that should have been grouped.
+In this case the records will not be compared and are therefore incorrectly classified as nonmatches.
+\todo{describe a number of blocking techniques.}
 
 \subsection{Field-based comparisons}
 \begin{itemize}
@@ -214,7 +244,7 @@ It breaks up the computation into smaller subproblems, namely the computation of
 The algorithm for computing edit distances is given in Algorithm~\ref{alg:edit_distance}.
 First thing to note is that the first row of the matrix keeps track of the cost of deleting literals from $B$ while the first column keeps track of deleting literals from $A$.
 These can be filled in without requiring any knowledge of the strings themselves, except for their length.
-A cell $D[i,j]$ in the matrix corresponds to the number of edits required to convert the first $i$ characters of the string $\sigma_1$ (shown in the first column of a matrix) into the string comprised of the first $j$ characters of string $\sigma_2$ (shown in top row of a matrix) \todo{Literary copy-paste from Peter Christen's "Data Matching". Edit and/or add reference.}
+A cell $D[i,j]$ in the matrix corresponds to the number of edits required to convert the first $i$ characters of the string $\sigma_1$ (shown in the first column of a matrix) into the string comprised of the first $j$ characters of string $\sigma_2$ (shown in top row of a matrix).\cite{christen12}
 
 If we look at the example as depicted in Figure~\ref{fig:edit_distance}, we can see how the algorithm computes the Levenshtein distance (i.e. the edit distance with equal cost of all edit operations) between Owen (British) and Owain (Welsh).
 The computation starts in the top left corner with an initial score of $0$.
@@ -269,6 +299,12 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
     \item Discuss the relation to joint entropy?
 \end{itemize}
 
+\subsection{Leveraging transitivity (?)}
+\begin{itemize}
+    \item Transitivity can lead to inconsistencies in the inference of the record linker.
+    \item However, evidence can be obtained by applying transitivity, since nodes that share a relatively high number of edges, i.e., are graphically similar, might refer to the same entity.
+\end{itemize}
+
 \subsection{Data fusion (?)}
 \begin{itemize}
     \item Though it is not the primary goal of this thesis, it might be interesting to consider an example of a possible next step in the process.
@@ -281,9 +317,11 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
 
 \section{Feature Extraction}
 
-\subsection{Rule-based reference extraction}
+%\subsection{Rule-based reference extraction}
+% I am discussing this as the first step of the pipeline now.
 
-\subsection{NLP-driven reference extraction (?)}
+%\subsection{NLP-driven reference extraction (?)}
+% I will probably not discuss this topic in detail, though I might use it to compare the described rule-based system to.
 
 \subsection{k-Maximally informative itemsets}
 
@@ -294,6 +332,7 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
 
 
 \section{Experimental Evaluation}
+\label{sec:experiments}
 
 \subsection{Datasets}
 
