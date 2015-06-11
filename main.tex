@@ -199,16 +199,30 @@ These can then be further processed using traditional record linkage techniques.
 
 \subsection{Blocking}
 \label{sec:blocking}
-As stated in \cref{sec:challenges} for larger datasets it becomes rapidly infeasible to compare all possible pairs of records which is equal to $(n^2-n)/2$.
-To overcome this problem, a technique called \emph{blocking} is often deployed.
-The goal of blocking is to partition the set of all possible pairs into several mutually exclusive sets.
+As stated in \cref{sec:challenges} for larger datasets it becomes rapidly infeasible to compare all possible pairs of records within a single database, since it grows quadratically.
+The total number of possible comparisons is equal to $n\times(n-1)/2$.
+Because the similarity between records that we are computing is symmetric it only needs to be computed once.
+Since the comparison step is often the most expensive step of the record linkage pipeline, a technique called \emph{blocking} is often deployed.
+The goal of blocking is to effienctly partition the set of all possible pairs into several mutually exclusive sets.
 Only the records within a set are compared, effectively reducing the number of comparisons that is required.
-Consider for example a set of $1000$ records on which we want to perform record linkage.
+Of course the goal of record linkage in general is to create such a partitioning, but in blocking this is process is rather coarse-grained and involves computationally cheap operations.
+
+It is easiest to think about the gain of blocking when an example is considered.
+Say we have a set of $1000$ records on which we want to perform record linkage.
 There are a total number of $450000$ possible pairs that can possibly be compared.
-If were able to partition these pairs into $10$ equally sized \emph{blocks}, only $49500$ comparisons would be needed; a reduction of $89\%$.
-This relies, of course, on the ability of the blocking technique to partition the references in blocks of roughly equal size, which is often a problem.
+If we were able to partition these pairs into $10$ equally sized \emph{blocks}, only $49500$ comparisons would be needed; a reduction of $89\%$.
+Such a reduction is often possible because only a very small fraction of all possible pair as an actual or \emph{true match}, which is often the case.
+In the Fine Rolls of King Henry III, that was mentioned in \cref{sec:challenges}, there appear $902$ unique forenames.
+It is therefore likely that we will end up with hundreds of unique entities.
+Any comparisons that are done between references to these entities, which are of course unknown at the time, would be a waste and should be avoided.
+
+The effectiveness of blocking depends on its ability to partition the references in blocks of roughly equal size, which is often a problem.
 Another problem arises when the blocking function is unable to group records together that should have been grouped.
-In this case the records will not be compared and are therefore incorrectly classified as nonmatches.
+In this case the records will not be compared and are therefore incorrectly classified as non-matches and therefore reduces the system's sensitivity.
+
+Though it is not the main focus of this thesis to study blocking techniques, it is often an important step in the process and we will therefore discuss it shortly.
+As we shall see in Section \todo{add reference to experiment chapter}, simple blocking techniques can easily be implemented without only a slight reduction in sensitivity while vastly reducing the number of required comparisons.
+
 \todo{describe a number of blocking techniques.}
 
 \subsection{Field-based comparisons}
@@ -222,9 +236,24 @@ The fundamental principle of the entity resolution techniques described in this 
 Naturally, if the references are exactly the same we are confident that indeed the references refer to the same real-world entity.
 In practice, however, it is not always this obvious, since there many circumstances under which the references differ even though the pair should be classified as a match.
 There are are number of reasons that cause these differences, e.g. an error was made during transcription or a name was abbreviated.
-To be able to perform entity resolution under such conditions we can make use of approximate string matching.
-This is usually achieved by computing a similarity score, usually in $[0 \dots 1]$, between the individual fields that make up the records.
-A threshold can then be set for each component, mapping the scores to binary values, or used as-is in the classification of references which will be further discussed in \todo{add section reference here}.
+To be able to perform entity resolution under such conditions we can make use of approximate string matching techniques.
+These work by measuring the proximity of one string to another which gives an intuition about the likeliness of the equivalence of the string.
+
+A distance function $d(\times, \times)$ maps a pair of strings $\sigma_1$ and $\sigma_2$ to a real number $r$, with a greater value of $r$ indicating a smaller similarity between $\sigma_1$ and $\sigma_2$.\cite{cohen03}
+Conversely, a similarity function $s(\times, \times$ outputs numbers $r$ with a greater value indicating a larger similarity.
+Often these values are normalized such that their value is between $0 \leq r \leq 1$.
+Distance and similarity functions for strings must intuitively have a number of properties, which are in general:\cite{christen12}
+
+\begin{itemize}
+    \item $s(\sigma_1, \sigma_1)=1$: the similarity is maximal when a string is compared to itself.
+    \item $s(\sigma_1, \sigma_2)=0$: a 'completely different' string results in the minimum similarity value of $0$.
+    \item $0 < s(\sigma_1, \sigma_2) < 1$: a value between the two extremes indicates that the strings are 'somewhat similar'.
+\end{itemize}
+
+With similarity values between $0$ and $1$ it is easy to convert to distance values by subtracting them from $1$, and vice versa.
+It depends on the calculation of the proximity measure whether it makes more sense to talk about one or the other.
+For the record linker it does not make a huge difference as the interpretation of the numbers is simply inversed.
+We will see that a threshold can then be set for each component, mapping the scores to binary values, or used as-is in the classification of references which will be further discussed in \todo{add section reference here}.
 
 The remaining section describes a number of distance metrics that were used in our record linkage system to perform pairwise comparisons between the fields of a pair of records, which we assume to be of the string data type.
 We denote with $\sigma$ some string constructed from individual literals taken from an alphabet $\Sigma$ and use the superscript notation, e.g. $\sigma^{i}$, to refer to its constituent parts.
@@ -233,6 +262,7 @@ Note that we are now considering the field strings in isolation and not the reco
 Further processing the results of this phase is further discussed in ...
 
 \subsubsection{Edit and Levenshtein distance}
+\label{sec:edit_distance}
 As stated, misspellings and typographical errors are a common source of errors and often turn up as a single character being replaced or perhaps an additional being added.
 A natural way to compute a distance between two strings is therefore the smallest number of modifications that is needed for one of the strings to be turned into the other.
 This is the underlying principle of the class of edit distances.
@@ -280,7 +310,62 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
     \label{fig:edit_distance}
 \end{figure}
 
-\subsubsection{Jaro distance}
+\subsubsection{Q-gram string matching}
+\label{sec:qgram}
+Another class of approximate string similarity functions are based on \emph{Q-grams}, sometimes called \emph{n-grams}.
+A q-gram is a sub-sequence of $q$ characters.
+Often selected values for $q$ are $q=2$ (called bigrams or digrams) and $q=3$ (called trigrams).
+They can be obtained from an input string by moving a sliding window of width $q$ over the string and counting occurrences of each q-gram encountered, effectively computing a multiset.
+The general approach of q-gram string matching is to measure similarity of the obtained multisets using the number of q-grams that they have in common.
+Many of ways exist for comparing multisets, but three are most often used.
+
+\begin{align}
+    \text{Overlap coefficient: }sim_overlap(\sigma_1, \sigma_2) &= \frac{c_{common}}{min(c_1, c2)} \\
+    \text{Jaccard coefficient: }sim_jaccard(\sigma_1, \sigma_2) &= \frac{c_{common}}{c_1 + c_2 - c_{common}} \\
+    \text{Dice coefficient: }sim_dice(\sigma_1, \sigma_2) &= \frac{2 \times c_{common}}{c_1 + c_2}
+\end{align}
+
+\noindent A comprehensive overview of multiset distances can be found in \cite{kosters08}.
+
+An advantage of q-gram based functions is that they are efficiently computable.
+Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert + \sigma_2 \vert$, followed by the computation of the intersection, computed in $\mathcal{O}$.
+Compared to the time complexity of $\mathcal{O}(\vert \sigma_1 \vert \times \vert \sigma_2 \vert)$ of the edit distance this an improvement.
+A disadvantage is that, due to the nature of a set, information is lost about the ordering of the q-grams in the string.
+For example, the strings 'abc' and 'bca' both include the bigram 'bc', but in a different place.
+While a method based on edit distance would penalize accordingly, a q-gram based method will simply disregard this fact.
+
+\subsubsection{Jaro and Jaro-Winkler similarity}
+\label{sec:jaro}
+The family of Jaro similarity functions combine some of the advantages of both the edit distance and q-gram similarity.
+It counts the number of characters $c$ that are in common within a window that is of size $\lfloor \frac{\text{max}(\SizeOf{\sigma_1}, \SizeOf{\sigma_2})}{2}\rfloor-1$.
+Moreover, the Jaro similarity function also accounts for the number of transpositions $t$, i.e., adjacent characters that are swapped in the two strings.
+Put together, the metric is defined as follows:
+
+\begin{equation}
+    s_{jaro}(\sigma_1, \sigma_2) =
+    \begin{dcases}
+        \frac{1}{3} \left( \frac{c}{\vert \sigma_1 \vert} + \frac{c}{\vert \sigma_2 \vert} + \frac{c-t}{c} \right) & \text{if } m = 0 \\
+        0 & \text{otherwise}
+    \end{dcases}
+\end{equation}
+
+In the context of record linkage it makes sense to spend time on improving approximate similarity functions on a specific use case, namely for names.
+Names regularly appear abbreviated in text, but this does not change the prefix.
+The Jaro-Winkler similarity function takes this into account by increasing the similarity value based on the number of agreeing characters at the beginning of the two strings.
+It is computed as follow:
+
+\begin{equation}
+    s_winkler(\sigma_1, \sigma_2)=s_jaro(\sigma_1, \sigma_2)(1-s_jaro(\sigma_1, \sigma_2)\frac{p}{10}
+\end{equation}
+
+\noindent with $p\in\{0,\dots,\4}$ being the length of the longest common prefix.
+Looking again at the example from \cref{fig:edit_distance} where we compare 'Owen' and 'Owain', we would compute the Jaro-Winkler distance as follows.
+
+\begin{itemize}
+    \item Matches:
+    \item Transpositions:
+    \item Number of agreeing characters at the beginning:
+\end{itemize}
 
 \subsection{Reference pair classification}
 
