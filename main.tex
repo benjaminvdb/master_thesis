@@ -26,27 +26,15 @@
 \section{Introduction}
 \label{sec:introduction}
 
-\subsection{Record Linkage in unstructured data}
-\begin{itemize}
-	\item Record Linkage is the process of disambiguating references.
-	\item The thesis focuses on unstructured text as can be found in archives and the web.
-\end{itemize}
-
 Entity resolution is the process of finding records in one or more datasets that share a common identifier.
 Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept.
-Its applications range from duplicate detection to merging datasets to obtain a single, enriched database.
-	
-Entity resolution, also known as record linkage or data matching, has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
-However, many of the techniques developed rely on a database with a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields.
+Its applications range from duplicate detection to the merging datasets to obtain a single, enriched database. It has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
+However, many of the techniques developed rely on a database that has a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields.
 Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
+In this thesis we explore methods to overcome these issues and study ways of extracting information from text to improve entity resolution.
 
 \subsection{Motivation}
 \label{sec:motivation}
-\begin{itemize}
-	\item Explain the problem The National Archives have.
-	\item Discuss other possible applications such as entity-driven web search.
-	\item Disambiguation and deduplication can help to build the semantic web by linking together different data sources.
-\end{itemize}
 
 When studying historical documents, researchers are often confronted with the problem of ambiguous references to people in text.
 A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could be referred to.
@@ -60,8 +48,18 @@ It would also have to deal with `fuzzy' nature of historical data, including ali
 This is essentially an entity resolution problem with the added difference that not structured databases, but unstructured documents are to be linked.
 This projects shows the need for the development of such as system and serves as an excellent use case.
 
+Another possible application of a system for entity resolution in unstructured text lies in the semantic web.
+The semantic web can be seen as a graph in which the nodes represent concepts and are connected by edges representing a type of relation.
+By annotating hyperlinks on the web with a type of relation in this way, computers can easily and rapidly parse pages, effectively making the same document suitable for both humans to read and computers to process.
+Though the web standards have been extended to support these type of annotations with RDF, it is not used in all pages on the web, often because it is laborious to incorporate semantic information.
+Entity resolution in this context could allow for automatic detection of people in text and linking documents together that contain information about the same persons.
+This information could also be extracted from text and aggregated into automatically generated summaries, resembling simple Wikipedia pages.
+Web searches could be \emph{entity-driven}: besides the ``Images'' and ``News'' button, a search engine could include ``Peson'' enables a user to search for a person.
+Results from such a system would aggregate web pages referring the same people together, instead of returning a rather unorganized set of pages.
+
 \subsection{Challenges}
 \label{sec:challenges}
+
 Traditionally entity resolution is performed on tables in databases.
 Since these usually have a schema, and therefore a structure, we can compute similarities between references by comparing their individual fields.
 However, the main focus of this thesis is to study entity resolution in natural language, which lacks such a structure.
@@ -352,20 +350,101 @@ Put together, the metric is defined as follows:
 In the context of record linkage it makes sense to spend time on improving approximate similarity functions on a specific use case, namely for names.
 Names regularly appear abbreviated in text, but this does not change the prefix.
 The Jaro-Winkler similarity function takes this into account by increasing the similarity value based on the number of agreeing characters at the beginning of the two strings.
-It is computed as follow:
+It is computed as follows:
 
 \begin{equation}
-    s_winkler(\sigma_1, \sigma_2)=s_jaro(\sigma_1, \sigma_2)(1-s_jaro(\sigma_1, \sigma_2)\frac{p}{10}
+    s_winkler(\sigma_1, \sigma_2)=s_jaro(\sigma_1, \sigma_2) + (1-s_jaro(\sigma_1, \sigma_2)\frac{p}{10}
 \end{equation}
 
-\noindent with $p\in\{0,\dots,\4}$ being the length of the longest common prefix.
-Looking again at the example from \cref{fig:edit_distance} where we compare 'Owen' and 'Owain', we would compute the Jaro-Winkler distance as follows.
+\noindent with $p\in\{0,\dots,4\}$ being the length of the longest common prefix of at most $4$.
+
+\begin{figure}
+    \centering
+    \begin{tabular}{?c | ^c | ^c | ^c | ^c | ^c | ^c | ^c |}
+        \rowstyle{\itshape}
+        Index      & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\\hline
+        $\sigma_1$ & \textbf{j} & \textbf{o} & n & e & s &   &   \\		
+        Matches    & 0 & 1 & 4 & - & 3 & - & - \\		
+        $\sigma_2$ & \textbf{j} & \textbf{o} & h & s & n & o & n \\\hline
+    \end{tabular}
+    \caption{This table shows the matching of individual characters between string 'jones' and 'johsnon'. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
+    \label{fig:jaro_winkler}
+\end{figure}
+
+\cref{fig:jaro_winkler} shows how individual characters in the strings 'jones' and 'johsnon' are matched.
+We can see that four characters can be matches and there is one transposition, since one character must be swapped to turn the list of indexes into a sorted array.
+The Jaro simmilarity can be computed as follows.
+
+\begin{equation*}
+    s_{jaro}('jones', 'johsnon') = \frac{1}{3} \left(\frac{4}{5} + \frac{4}{7} + \frac{3}{4} \right) = 0.70714
+\end{equation*}
+
+\noindent The number of matching starting character is $2$, which is used by the Jaro-Winker distance to increase the similarity as follows:
+
+\begin{align*}
+    s_{winkler}('jones', 'johsnon') &= s_{jaro}('jones', 'johsnon') + (1-s_{jaro}('jones', 'johsnon')\frac{p}{10} \\
+    &= 0.70714 + (1 - 0.70714)\times\frac{2}{10} \\
+    &= 0.76571
+\end{align*}
+
+\subsubsection{Soundex and editex phonetic similarity}
+Another class of approximate string similarities is the \emph{Soundex} phonetic similarity.
+It aims to take into account the phonetics, i.e., the auditory properties of the strings, with emphasis on the \emph{homophones}.
+These are words that are pronounced in the same way, but are written differently, such as road/rode/rowed or seas/sees/seize.
+Ambiguity caused by homophones in conversation are often resolved because of context.
+This does not apply to names, however, which may cause a name to be misspelled.
+An illustrative example of a special case of homophones can be found in datasets SC8 and C53.\footnote{Add references to http://discovery.nationalarchives.gov.uk/details/r/C3613 and http://discovery.nationalarchives.gov.uk/details/r/C13526}
+In C53 there is a mentioned of ``Walter de Gloucestre'' and in SC8 a mention of ``Walter de Gloucester''.
+If these are indeed the same people -- this is unfortunately impossible to know for certain -- then this misspelling was probably caused by a cross-language homophone.
+Such differences in spelling can be dealt with by devising a phonetic string comparison function, such as soundex.
+
+A soundex encoding of a string consists of the first character of the string, followed by three digits that encode the remaining consonants.
+Consonants that are often pronounced similarly are mapped to the same character.
+In total, procedure is as follows:
+
+\begin{enumerate}
+    \item The starting character of the string is used as the first character of the encoding.
+    \item Remove all occurrences of `a', `e', `i', `o', `'u', `y', `h' and `w'.
+    \item Substitute consonants after the first character with digits as follows:\\
+            \begin{align*}
+                b, f, p, v &\rightarrow 1 \\
+                c, g, j, k, q, s, x, z &\rightarrow 2 \\
+                d, t &\rightarrow 3 \\
+                l &\rightarrow 4 \\
+                m, n &\rightarrow 5 \\
+                r &\rightarrow 6
+            \end{align*}
+\end{enumerate}
+
+Additionally, the following rules are applied\footnote{reference http://www.archives.gov/research/census/soundex.html}:
 
 \begin{itemize}
-    \item Matches:
-    \item Transpositions:
-    \item Number of agreeing characters at the beginning:
+    \item \textbf{Names with double letters}: whenever the surname has any double letters, they should be treated as one letter.
+    \item \textbf{Names with letters side-by-side that have the same soundex code number}: if the surname has different letters side-by-side that have the same number in the soundex coding guide, they should be treated as one letter.
+    \item \textbf{Names with prefixes}: if a surname has a prefix, such as `van', `con', `de', `di', `la', or `le', code both with and without the prefix because the surname might be listed under either code.
+    \item \textbf{Consonant separators}: if a vowel separates two consonants that have the same soundex code, the consonant to the right of the vowel is coded.
 \end{itemize}
+
+A drawback of the soundex encoding is that the rules are specifically geared towards a certain language, English, in this case.
+To capture the phonetics of another language a different mapping must be developed and tested.
+Variants for the Indian language are available\footnote{http://airccse.org/journal/ijcsea/papers/4314ijcsea03.pdf}.
+
+Soundex encodings can be used in approximate string matching by checking the encodings of the input strings for equality, resulting in a binary number.
+A different approach is to apply the idea of treating phonetically similar values equivalently in way comparable to the edit distance.
+The similarity function \emph{editex} modifies the cost function of the edit distance slightly.
+
+\begin{equation}
+    c_{editex}(a_i, a_j) =
+    \begin{dcases}
+        0 & \text{if } a_i = a_j \\
+        1 & \text{if } a_i \neq a_j \wedge a_i \equiv_s a_j \\
+        2 & \text{otherwise}
+    \end{dcases}
+\end{equation}
+
+\noindent where $\equiv_s$ is the relation that two characters belong to the same equivalence class in soundex, i.e., they map to the same character, such as `b' and `f'.
+This approach has proven to be quite successful for matching names\cite{zobel96}.
+Since it is computed analogous to the edit distance it is also computed in time $\mathcal{O}(\SizeOf{\sigma_1} \times \SizeOf{\sigma_2})$.
 
 \subsection{Reference pair classification}
 
@@ -531,8 +610,12 @@ Looking again at the example from \cref{fig:edit_distance} where we compare 'Owe
 
 \section{Bibliography}
 
+\begingroup
+\renewcommand{\section}[2]{}%
+%\renewcommand{\chapter}[2]{}% for other classes
 \bibliographystyle{plain}
 \bibliography{mybib}
+\endgroup
 
 
 % % % % % % % % % % % % % % % % % % % % % %

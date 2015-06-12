@@ -40,6 +40,14 @@
 \newcommand*{\To}{\:\bm{ to }\:}
 \newcommand*{\SizeOf}[1]{\:\vert {#1} \vert\:}
 
+%%% Stylize complete rows in tables
+\usepackage{array}
+\newcolumntype{?}{>{\global\let\currentrowstyle\relax}}
+\newcolumntype{^}{>{\currentrowstyle}}
+\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+  #1\ignorespaces
+}
+
 % DroidSerif
 %\usepackage{fontspec}
 %\setromanfont[
