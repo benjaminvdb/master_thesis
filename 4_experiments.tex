@@ -1,0 +1,130 @@
+\section{Experimental Evaluation}
+\label{sec:experiments}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsection{Datasets}
+\label{sec:datasets}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsubsection{Fine Rolls}
+\label{sec:fine_rolls}
+
+\begin{itemize}
+	\item Overview of the dataset (structure, size, etc.)
+	\item First parsing: conversion to JSON.
+	\item Second parsing: entity extraction from text.
+\end{itemize}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsubsection{Wikipedia}
+\label{sec:wikipedia}
+	
+\begin{itemize}
+	\item Overview of used data dump (structure, size, etc.)
+	\item Parsing of the data.
+	\item ...
+\end{itemize}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsection{Experimental evaluation of distance metrics}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsection{Experimental evaluation of MIKIs}
+\label{sec:miki_evaluation}
+
+\begin{table}
+    \begin{minipage}{.5\textwidth}
+        \small
+        \centering
+    	\sisetup{round-mode=places}
+    	\begin{tabular}{l S[round-precision=4]}
+    		\toprule
+    		{Item} & {Entropy}\\
+    		\midrule
+    		mark & 0.9994486557970268\\
+    		king & 1.8147018826248247\\
+    		befor & 2.6235330642969554\\
+    		son & 3.2605532800247521\\
+    		sheriff & 3.8850819263595207\\
+    		taken & 4.3911933509382104\\
+    		writ & 4.8598517328911237\\
+    		aforesaid & 5.3099654282367048\\
+    		wife & 5.7269049944269224\\
+    		land & 6.1245725613443947\\
+    		exchequ & 6.4903439188828891\\
+    		half & 6.8427723677764876\\
+    		thi & 7.1546285665244032\\
+    		yorkshir & 7.4341218502511719\\
+    		render & 7.6827923893317687\\
+    		norfolk & 7.919293824195619\\
+    		lincolnshir & 8.138467999949345\\
+    		justic & 8.341568005640335\\
+    		fine & 8.5119982948892652\\
+    		somerset & 8.6624825596208694\\
+    		\bottomrule
+    	\end{tabular}
+    	\label{t:miki_finerolls}
+    \end{minipage}
+    \begin{minipage}{.5\textwidth}
+        \small
+        \centering
+    	\sisetup{round-mode=places}
+    	\begin{tabular}{l S[round-precision=4]}
+    		\toprule
+    		{Item} & {Entropy}\\
+    		\midrule
+    		allow & 0.99999711460799467\\
+    		univers & 1.9885280695560985\\
+    		german & 2.9554587534421453\\
+    		histori & 3.885064693145309\\
+    		presid & 4.80108986272643\\
+    		near & 5.6856158645882138\\
+    		given & 6.5352458324908422\\
+    		left & 7.2978334845386019\\
+    		project & 7.9730729769060034\\
+    		possibl & 8.5001227573930844\\
+    		refer & 8.8938672662529648\\
+    		servic & 9.1868378998084061\\
+    		physic & 9.3978310762587931\\
+    		written & 9.5430385108901277\\
+    		work & 9.6547452728720131\\
+    		employ & 9.738368181814776\\
+    		thi & 9.7988366838674423\\
+    		chemic & 9.8509902971425589\\
+    		includ & 9.8925000721468823\\
+    		minist & 9.9206648691832591\\
+    		\bottomrule
+    	\end{tabular}
+    	\label{t:miki_wikipedia}
+    \end{minipage}
+    \caption{The tables above show the 20-miki as computed on the Fine Rolls of king Henry III (left) and the Wikipedia subset seeded from the page about Albert Einstein (right).}
+\end{table}
+
+\begin{figure}
+    \input{plots/miki_finerolls.tex}%
+    ~
+    \input{plots/miki_wikipedia.tex}
+    \caption{Plots showing the convergence behavior for the Fine Rolls of King Henry III dataset (left) and the Wikipedia dataset seeded with Albert Einstein (right).}\label{fig:1}
+\end{figure}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsection{Experimental evaluation of Record Linkage}
+\label{sec:record_linkage_evaluation}
