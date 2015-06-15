@@ -3,7 +3,8 @@
 
 Entity resolution is the process of finding records in one or more datasets that share a common identifier.
 Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept.
-Its applications range from duplicate detection to the merging datasets to obtain a single, enriched database. It has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
+Its applications range from duplicate detection to the merging datasets to obtain a single, enriched database.
+It has seen a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
 However, many of the techniques developed rely on a database that has a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields.
 Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
 In this thesis we explore methods to overcome these issues and study ways of extracting information from text to improve entity resolution.
@@ -16,9 +17,9 @@ In this thesis we explore methods to overcome these issues and study ways of ext
 \label{sec:motivation}
 
 When studying historical documents, researchers are often confronted with the problem of ambiguous references to people in text.
-A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could be referred to.
+A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could have been referred to.
 However, when the document is studied after many centuries, the exact context is often lost and it will be much harder to identify the persons.
-A careful study of other datasets, such as birth registers and censuses, might be needed to figure out who the person under consideration is.
+A careful study of other datasets, such as birth registers and censuses, might therefore be needed to figure out who the person under consideration is.
 This can be a laborious task and furthermore it can be hard to estimate the quality of the results.
 
 In $2014$ The National Archives (TNA) launched the Traces Through Time project that had to goal of developing a new tool that would enable its users to explore TNA's vast repository of digitized archives in a completely new way.
@@ -26,6 +27,7 @@ The system would have to identify occurrences of people in text and decide which
 It would also have to deal with `fuzzy' nature of historical data, including aliases, incomplete information, spelling variations and errors.
 This is essentially an entity resolution problem with the added difference that not structured databases, but unstructured documents are to be linked.
 This projects shows the need for the development of such as system and serves as an excellent use case.
+% Write something about increased interest in digital humanities and the unmanagability of ever increasing datasets/archives.
 
 Another possible application of a system for entity resolution in unstructured text lies in the semantic web.
 The semantic web can be seen as a graph in which the nodes represent concepts and are connected by edges representing a type of relation.
@@ -109,7 +111,7 @@ It is not the main focus of this thesis to address this issue, but since it is f
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Objectives + Problem Definition + Research Questions}
+\subsection{Problem definition}
 The goal of the Traces Through Time project was to develop a system that could aid historical research of individuals.
 This thesis comprises both a report of the development of the system in this project and an overview of record linkage with an emphasis on historical documents.
 We will also address the problems that were taken up in \cref{sec:challenges}.
@@ -157,15 +159,19 @@ The total number of possible matches, or edges in the graph, is therefore $n(n-1
 It is up to the record linker to decide which of these edges should be considered \emph{relevant}.
 We will see in ... \todo{add reference} that this involve the computation of our confidence 
 
-%%% Research question
-%How can we apply record linkage to aid the historical research in the absence of tabular structured archive material?
+Now that we have a formal definition of record linkage we will pose the the research question that will be leading throughout this thesis:
 
+\begin{question*}
+    How can we perform entity resolution to aid the historical research in the absence of tabular structured archive material?
+\end{question*}
 
-% % % % % % % % % % % % % % % % % % % % % %
+This research is divided into several sub-questions:
 
-
-\subsection{Research questions}
-\label{sec:research_questions}
+\begin{itemize}
+    \item How do we transform the source data into a format that can be used by traditional record linkage techniques?
+    \item Do we need to transform the source data into a tabular format or can we perform entity resolution without such structure?
+    \item What methods can be use to extract information from documents that improve the performance of entity resolution?
+\end{itemize}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -186,3 +192,7 @@ We will see in ... \todo{add reference} that this involve the computation of our
 
 \subsection{Outline}
 \label{sec:outline}
+
+The remaining part of this thesis will first focus on the theory of record linkage, which will be discussed in \cref{sec:record_linker}.
+In \cref{sec:feature_extraction} we will explore methods of extracting information from text in an unsupervised way with the aim of improving record linkage in unstructured data.
+We will then describe and explain the results of the experimental evaluation that was conducted in \cref{sec:experiments} followed by our conclusions in \cref{sec:conclusions}.

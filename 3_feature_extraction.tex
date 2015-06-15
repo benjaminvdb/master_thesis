@@ -1,6 +1,20 @@
 \section{Feature Extraction}
 \label{sec:feature_extraction}
 
+In the previous chapter we described how to obtain references from documents and how confidences scores are computed that reflect how certain we are that they refer to the same entity.
+During the link classification step we assumed that records consisted only of information directly relating to a reference, e.g. first names, last names, roles, titles, etc.
+If the probability mass function of values for a property is known it can be incorporated, but it does not extend the records themselves.
+When we consider the case of a reference containing a \emph{common name}, however, it becomes apparent that more information is required.
+The confidence score is inversely proportional to the frequency of the reference's components, yielding a low score in the case of a common name.
+This can merely improve the fraction of correctly classified matches (precision), but it cannot avoid missing matches because of a low score (recall).
+In order to achieve that, more information is required.
+Looking at the documents from which references are extracted, we see that more data available that could potentially be useful in aiding classification, is available.
+
+In this chapter we will look at two complementary approaches that extract contextual information.
+The first is based on modeling the content of a section of text in which a reference appears in, while the second is based on co-occurrence of other people.
+The goal is to extract information from the text such that ambiguous cases, such as ``John Smith'', can still be linked.
+
+
 %\subsection{Rule-based reference extraction}
 % I am discussing this as the first step of the pipeline now.
 
@@ -14,9 +28,52 @@
 \subsection{k-Maximally informative itemsets}
 \label{sec:miki}
 
+The primary target for the methods studied in this thesis are historical documents.
+Often these documents comprise the proceedings of a meeting or a summarized version thereof.
+They contain a description of events that took place on a specific date, who was present, etc.
+When looking more closely at the contents it is often possible to extract a few interesting words.
+As an example, consider the following sections taken from ``Officials of the Boards of Trade and Plantations''\footnote{http://www.british-history.ac.uk/office-holders/vol3}.
+
+\begin{quote}
+    A letter from the Secretary to Mr. Carkesse, desiring him to move the Commissioners of the Customs, that their Officers in the Out Ports may give this Board an Account of the quantities of Salt that is necessary and used in curing several species of Fish, was agreed and ordered to be sent.
+\end{quote}
+
+\begin{quote}
+    Ordered that Mr. Carkesse be desired to let this Board have on Tuesday next, if possible, the Account of Fish exported, which was desired the 17th of the last month.
+\end{quote}
+
+\noindent In both cases there is a reference to a ``Mr. Carkesse'', which might be the same person.
+Both texts talk discuss matter that is related to the export of fish, so we could say the overarching topic is ``fish''.
+The fact that Mr. Carkesse is mentioned twice in the context of this topic gives us additional information that we can exploit to determine whether these references should be matched.
+Note that if would have been multiple people called Mr. Carkesse, probably additional information would have been provided.
+It is therefore unlikely that two different persons are referred to.
+However, it is a good example of the kind of ``circumstantial evidence'' that we want to extract from the documents.
+
+\begin{itemize}
+    \item If we consider a set consisting of documents of varying topics, we may argue that people may be mentioned in similar contexts.
+    \item Give example of such a situation, such as Wikipedia.
+    \item We may try to model the various contexts using topics and provide the record linker with that information, represented as a binary vector.
+    \item This means that we need a way of extracting topics from text.
+    \item Documents are sequences of words and each of them has associated to a probability distribution of the words used.
+    \item Potentially, any of these words could be used as a descriptor of a topic.
+    \item However, we want topics to be as discriminative as possible.
+    \item Preferably mutual exclusive partitions of equal size.
+    \item Entropy is the expected value (average) of the information contained in each message received. Here, message stands for an event, sample or character drawn from a distribution or data stream. Entropy thus characterizes our uncertainty about our source of information, and increases for more sources of greater randomness
+    \item The logarithm of the probability distribution is useful as a measure of entropy because it is additive for independent sources. For instance, the entropy of a coin toss is 1 shannon, whereas of m tosses it is m shannons. Generally, you need log2(n) bits to represent a variable that can take one of n values if n is a power of 2. If these values are equiprobable, the entropy (in shannons) is equal to the number of bits.
+    \item $H$
+\end{itemize}
+
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
 \subsection{Co-occurrence (?)}
 \label{sec:co-occurrence}
+
+\begin{quote}
+    Ordered that a letter be writ to Mr. Carkesse, Secretary to the Commrs. of his Majesty's Customs, to desire Mr. John Burgoyn, Deputy Registrar General of all trading ships may attend this Board any morning except Saturdays and Mondays.
+\end{quote}
+
+\begin{quote}
+    Mr. Burgoyn, Deputy Register General of all trading ships attending, their lordships had some discourse with him, and afterwards ordered that a letter be writ to Mr. Carkesse to move the Commrs. of his Majesty's Customs for directions to Mr. Burgoyn to lay before this Board, as soon as conveniently may be, an account of the number of ships, that have cleared from England from Christmas, 1709 to Christmas, 1714 specifying from what ports they have cleared, and to what ports they went, and an account of the tunnage of the said ships, distinguishing the British from the foreign ships.
+\end{quote}
