@@ -87,10 +87,10 @@ Another issue arises when we take the property of \emph{transitivity} into accou
 A situation might occur in which this property does not hold, thus we find that there is an inconsistency in the matching status.
 Matches can also chain together in which case the ends of the chain are clearly not matches, though intuitively, and by applying the property of transitivity, we could argue that these records should also be matched.
 Figure~\ref{fig:transitive_closure} shows an example of such an uncertain situation.
-We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched.\todo{add numbers as to make the example more clear.}
+We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched.\todo{Add numbers as to make the example more clear.}
 However, we could also argue that the transitivity property can aid us in the efficient linking of records as it can in fact provide evidence in a similar way that the content of the records do.
 Namely, instead of comparing references based on their textual representation we could compare them based on graph similarity.
-We will look methods to leverage this property to increase performance while reducing the number of inconsistencies.\todo{this statement is rather bold (it involves some NP-complete problems?), and I don't have a solution, but it's worth trying :).}
+We will look methods to leverage this property to increase performance while reducing the number of inconsistencies.\todo{This is NP-complete so it would involve heuristics.}
 
 \begin{figure}
     \centering
@@ -112,13 +112,13 @@ It is not the main focus of this thesis to address this issue, but since it is f
 
 
 \subsection{Problem definition}
+\label{sec:problem_definition}
 The goal of the Traces Through Time project was to develop a system that could aid historical research of individuals.
 This thesis comprises both a report of the development of the system in this project and an overview of record linkage with an emphasis on historical documents.
 We will also address the problems that were taken up in \cref{sec:challenges}.
 Before we proceed in doing so, let us first give a more formal introduction to the concepts discussed in this thesis.
 
-For several decades, record linkage has seen a lot of interest in many different disciplines, which, ironically, led to a large number of synonymic names for the same process.
-The field of databases speaks about ``data matching'' \todo{add references} etc. etc. etc.
+For several decades, record linkage has seen a lot of interest in many different disciplines, which, ironically, led to a large number of synonymic names for the same process, such as data linkage, entity resolution, object identification, or field matching. \cite{christen12}
 Since we are addressing two slightly different, but strongly related, problems, we will take up on two of these naming conventions, though with a nuanced difference.
 We will speak about \emph{entity resolution} and \emph{record linkage} as two distinct tasks, such that we can distinguish between the main objective of aggregating personal information and linking structured records, respectively.
 

@@ -45,18 +45,126 @@ As an example, consider the following sections taken from ``Officials of the Boa
 \noindent In both cases there is a reference to a ``Mr. Carkesse'', which might be the same person.
 Both texts talk discuss matter that is related to the export of fish, so we could say the overarching topic is ``fish''.
 The fact that Mr. Carkesse is mentioned twice in the context of this topic gives us additional information that we can exploit to determine whether these references should be matched.
-Note that if would have been multiple people called Mr. Carkesse, probably additional information would have been provided.
+Note that if there would have been multiple people called Mr. Carkesse, probably additional information would have been provided.
 It is therefore unlikely that two different persons are referred to.
 However, it is a good example of the kind of ``circumstantial evidence'' that we want to extract from the documents.
 
+Any word from the text may potentially be used as a topic for the text; in fact, we could select all of them.
+However, this would lead to topics, treated as features of the text, to be highly correlated.
+If we were to select ``fish'' as a topic and decide to also include ``fishing'', it is easy to see that probably not much additional information is included.
+Besides trying to decide on a topic by looking at a single document, we can instead look at the complete set of document under consideration and construct a set of uncorrelated, or \emph{orthogonal}, topics.
+This is very much related to the process of \emph{features selection}, that strives to select a subset of features with the purpose of reducing problems caused when too many features are used, such as overfitting.
+
+In our case we aim for the selection of a set of topics that provide as good a distinction between texts as possible.
+This is exactly what \emph{maximally informative $k$-itemsets}\cite{knobbe06}, or \emph{miki's} in short, provide.
+As the name suggests, a miki is an itemset of size $k$ that provides maximum information.
+The amount of information of the itemset is measured as the \emph{joint entropy} of the itemset in \emph{Shannon bits} (or just \emph{bits}), which is defined as follows: \cite{knobbe06}
+
+\begin{definition}[Joint entropy]
+    Suppose that $X = \left\{ x_{1}, \dots, x_{k} \right\}$ is an itemset, and $B = \left( b_{1}, \dots, b_{k} \right) \in \left\{ 0, 1 \right\}^{k}$ is a tuple of binary values. The \emph{joint entropy} of $X$ is defined as
+    \begin{equation*}
+        H(X) = -\sum_{B \in \left\{ 0, 1 \right\}^{k}} p \left( x_{1} = b_{1}, \dots, x_{k} = b_{k} \right) \lg p \left( x_{1} = b_{1}, \dots, x_{k} = b_{k} \right)
+    \end{equation*}
+    \label{def:joint_entropy}
+\end{definition}
+
+\begin{definition}[Maximally informative $k$-itemset]
+    Suppose that I is a collection of $n$ items. An itemset $X \subseteq I$ of cardinality $k$ is a \emph{maximally informative k-itemset}, $iff$ for all itemsets $Y \subseteq I$ of cardinality $k$,
+    \begin{equation}
+        H(Y) \leq H(X)
+    \end{equation}
+    \label{def:miki}
+\end{definition}
+
+We will write a $k$-element subset of $I$ as a list of integers that refer to the elements of $I$.
+
+\begin{equation*}
+    A = \left[ x_{1}, \dots, x_{k} \right]
+\end{equation*}
+
+\noindent where
+
+\begin{equation*}
+    x_{1} < \dots < x_{k}
+\end{equation*}
+
+Entropy can also be explained a measure of disorder or uncertainty, i.e., the higher the entropy of an item the more unpredictable it is.
+For example, a toss of a fair coin is maximally unpredictable and has an entropy of $1$, since its two outcomes ``heads'' and ``tails'' are equally likely.
+
+Analogous to the coin toss example, an itemset $I$ of maximum entropy consists of elements that are uniformly distributed over the data, i.e., a sample contains an item or combination of items of $I$ with equal probability.
+This is best illustrated with an example.
+
+\begin{table}
+\centering
+    \begin{minipage}{.3\textwidth}
+        \centering
+        \begin{tabular}{?c ^c ^c ^c}
+            \toprule
+            \rowstyle{\bfseries}
+            A & B & C & D \\
+            \midrule
+            1 & 1 & 1 & 0 \\
+            1 & 1 & 0 & 0 \\
+            1 & 1 & 1 & 0 \\ 
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 1 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 1 \\
+            0 & 0 & 0 & 1 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.3\textwidth}
+        \centering
+        \sisetup{round-mode=places}
+        \begin{tabular}{c S[round-precision=3]}
+            \toprule
+            $I$ & $H$ \\
+            \midrule
+            A & 1.0 \\
+            B & 1.0 \\
+            C & 1.0 \\
+            D & 0.95443400292496494 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.3\textwidth}
+        \centering
+        \sisetup{round-mode=places}
+        \begin{tabular}{c c S[round-precision=3]}
+            \toprule
+            $I_{1}$ & $I_{2}$ & $H$ \\
+            \midrule
+            A & B & 1.8112781244591329 \\
+            A & C & 2.0 \\
+            A & D & 1.4056390622295665 \\
+            B & B & 1.8112781244591329 \\
+            B & D & 1.4056390622295665 \\
+            C & D & 1.9056390622295665 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}
+\caption{An example dataset of size $8$ and cardinality $4$.}
+\label{tab:joint_entropy}
+\end{table}
+
+\cref{tab:joint_entropy} shows a small example dataset of size $8$ and cardinality $4$. Items $A$, $B$ and $C$ are uniformly distributed over the dataset, so they are $1$-miki's.
+They are however very similar, since there is a lot of overlap, so they are redundant.
+When we sample the dataset and find that it contains $A$ it is quite likely that it will also contain $B$.
+Knowing whether the sample contains $A$ or not gives us a lot of information about whether or not $B$ is included.
+The additional information provided by $B$ is therefore low, so its joint entropy will be relatively low.
+Indeed
+
+
+The dataset is partitioned in such a way that the distribution of its parts are as uniform as possible.
+
+
+
+
 \begin{itemize}
-    \item If we consider a set consisting of documents of varying topics, we may argue that people may be mentioned in similar contexts.
-    \item Give example of such a situation, such as Wikipedia.
     \item We may try to model the various contexts using topics and provide the record linker with that information, represented as a binary vector.
     \item This means that we need a way of extracting topics from text.
     \item Documents are sequences of words and each of them has associated to a probability distribution of the words used.
-    \item Potentially, any of these words could be used as a descriptor of a topic.
-    \item However, we want topics to be as discriminative as possible.
     \item Preferably mutual exclusive partitions of equal size.
     \item Entropy is the expected value (average) of the information contained in each message received. Here, message stands for an event, sample or character drawn from a distribution or data stream. Entropy thus characterizes our uncertainty about our source of information, and increases for more sources of greater randomness
     \item The logarithm of the probability distribution is useful as a measure of entropy because it is additive for independent sources. For instance, the entropy of a coin toss is 1 shannon, whereas of m tosses it is m shannons. Generally, you need log2(n) bits to represent a variable that can take one of n values if n is a power of 2. If these values are equiprobable, the entropy (in shannons) is equal to the number of bits.
