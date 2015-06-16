@@ -1,5 +1,5 @@
-\section{Feature Extraction}
-\label{sec:feature_extraction}
+\chapter{Feature Extraction}
+\label{ch:feature_extraction}
 
 In the previous chapter we described how to obtain references from documents and how confidences scores are computed that reflect how certain we are that they refer to the same entity.
 During the link classification step we assumed that records consisted only of information directly relating to a reference, e.g. first names, last names, roles, titles, etc.
@@ -25,7 +25,7 @@ The goal is to extract information from the text such that ambiguous cases, such
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{k-Maximally informative itemsets}
+\section{$k$-Maximally informative itemsets}
 \label{sec:miki}
 
 The primary target for the methods studied in this thesis are historical documents.
@@ -153,13 +153,9 @@ They are however very similar, since there is a lot of overlap, so they are redu
 When we sample the dataset and find that it contains $A$ it is quite likely that it will also contain $B$.
 Knowing whether the sample contains $A$ or not gives us a lot of information about whether or not $B$ is included.
 The additional information provided by $B$ is therefore low, so its joint entropy will be relatively low.
-Indeed
 
 
 The dataset is partitioned in such a way that the distribution of its parts are as uniform as possible.
-
-
-
 
 \begin{itemize}
     \item We may try to model the various contexts using topics and provide the record linker with that information, represented as a binary vector.
@@ -175,7 +171,7 @@ The dataset is partitioned in such a way that the distribution of its parts are 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Co-occurrence (?)}
+\section{Co-occurrence (?)}
 \label{sec:co-occurrence}
 
 \begin{quote}

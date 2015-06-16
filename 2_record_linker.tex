@@ -3,20 +3,18 @@
 %- Classification can be performed by measuring the similarity between objects, essentially clustering %objects.
 %- We can then threshold the similarity: pairs above the threshold are classified as matches and below the threshold as non-matches.
 
-\section{Record Linker}
-\label{sec:record_linker}
+\chapter{Record Linker}
+\label{ch:record_linker}
 
-In this chapter we will give an overview of the record linkage system that was developed to solve issues that were discussed in \cref{sec:problem_definition}. It is also the basis of the experiments described in \cref{sec:experiments}.
+In this chapter we will give an overview of the record linkage system that was developed to solve issues that were discussed in \cref{sec:problem_definition}. It is also the basis of the experiments described in \cref{ch:experiments}.
 As we will see, the comparison of references plays a fundamental role in the record linker system described.
-However, recalling the mantra ``\emph{garbage-in, garbage out}'' we will also consider the pre- and postprocessing steps involved and treat the resulting pipeline as a unified system.
-
-\textbf{Give an outline of this chapter by shortly describing the pipeline. Introduce running example.}
+However, recalling the mantra ``\emph{garbage-in, garbage out}'' we will also consider the pre- and postprocessing steps involved and treat the resulting pipeline as a unified system.\todo{Give an outline of this chapter by shortly describing the pipeline. Introduce running example.}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Data cleaning and segmentation (``record extraction''?)}
+\section{Data cleaning and segmentation}
 \label{sec:segmentation}
 
 Traditional record linkage techniques naturally assume that the input consist of structured records (i.e. tuples).
@@ -49,7 +47,7 @@ These can then be further processed using traditional record linkage techniques.
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Blocking}
+\section{Blocking}
 \label{sec:blocking}
 
 As stated in \cref{sec:challenges}, for larger datasets it becomes rapidly infeasible to compare all possible pairs of records within a single database, since it grows quadratically.
@@ -82,7 +80,7 @@ As we shall see in Section \todo{add reference to experiment chapter}, simple bl
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Field-based comparisons}
+\section{Field-based comparisons}
 \label{sec:field_comparisons}
 
 \begin{itemize}
@@ -98,8 +96,8 @@ There are are number of reasons that cause these differences, e.g. an error was 
 To be able to perform entity resolution under such conditions we can make use of approximate string matching techniques.
 These work by measuring the proximity of one string to another which gives an intuition about the likeliness of the equivalence of the string.
 
-A distance function $d(\times, \times)$ maps a pair of strings $\sigma_1$ and $\sigma_2$ to a real number $r$, with a greater value of $r$ indicating a smaller similarity between $\sigma_1$ and $\sigma_2$.\cite{cohen03}
-Conversely, a similarity function $s(\times, \times$ outputs numbers $r$ with a greater value indicating a larger similarity.
+A distance function $d(\cdot, \cdot)$ maps a pair of strings $\sigma_1$ and $\sigma_2$ to a real number $r$, with a greater value of $r$ indicating a smaller similarity between $\sigma_1$ and $\sigma_2$.\cite{cohen03}
+Conversely, a similarity function $s(\cdot, \cdot$ outputs numbers $r$ with a greater value indicating a larger similarity.
 Often these values are normalized such that their value is between $0 \leq r \leq 1$.
 Distance and similarity functions for strings must intuitively have a number of properties, which are in general:\cite{christen12}
 
@@ -124,7 +122,7 @@ Further processing the results of this phase is further discussed in ...
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsubsection{Edit and Levenshtein distance}
+\subsection{Edit and Levenshtein distance}
 \label{sec:edit_distance}
 
 As stated, misspellings and typographical errors are a common source of errors and often turn up as a single character being replaced or perhaps an additional being added.
@@ -177,8 +175,8 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
 
 % % % % % % % % % % % % % % % % % % % % % %
 
-\subsubsection{Q-gram string matching}
-\label{sec:qgram}
+\subsection{Q-gram string matching}
+\label{subsec:qgram}
 
 Another class of approximate string similarity functions are based on \emph{Q-grams}, sometimes called \emph{n-grams}.
 A q-gram is a sub-sequence of $q$ characters.
@@ -188,15 +186,15 @@ The general approach of q-gram string matching is to measure similarity of the o
 Many of ways exist for comparing multisets, but three are most often used.
 
 \begin{align}
-    \text{Overlap coefficient: }sim_overlap(\sigma_1, \sigma_2) &= \frac{c_{common}}{min(c_1, c2)} \\
-    \text{Jaccard coefficient: }sim_jaccard(\sigma_1, \sigma_2) &= \frac{c_{common}}{c_1 + c_2 - c_{common}} \\
-    \text{Dice coefficient: }sim_dice(\sigma_1, \sigma_2) &= \frac{2 \times c_{common}}{c_1 + c_2}
+    \text{Overlap coefficient: }sim_{overlap}(\sigma_1, \sigma_2) &= \frac{c_{common}}{min(c_1, c2)} \\
+    \text{Jaccard coefficient: }sim_{jaccard}(\sigma_1, \sigma_2) &= \frac{c_{common}}{c_1 + c_2 - c_{common}} \\
+    \text{Dice coefficient: }sim_{dice}(\sigma_1, \sigma_2) &= \frac{2 \times c_{common}}{c_1 + c_2}
 \end{align}
 
 \noindent A comprehensive overview of multiset distances can be found in \cite{kosters08}.
 
 An advantage of q-gram based functions is that they are efficiently computable.
-Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert + \sigma_2 \vert$, followed by the computation of the intersection, computed in $\mathcal{O}$.
+Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert \sigma_2 \vert$, followed by the computation of the intersection, computed in $\mathcal{O}$.
 Compared to the time complexity of $\mathcal{O}(\vert \sigma_1 \vert \times \vert \sigma_2 \vert)$ of the edit distance this an improvement.
 A disadvantage is that, due to the nature of a set, information is lost about the ordering of the q-grams in the string.
 For example, the strings 'abc' and 'bca' both include the bigram 'bc', but in a different place.
@@ -206,8 +204,8 @@ While a method based on edit distance would penalize accordingly, a q-gram based
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsubsection{Jaro and Jaro-Winkler similarity}
-\label{sec:jaro}
+\subsection{Jaro and Jaro-Winkler similarity}
+\label{subsec:jaro}
 
 The family of Jaro similarity functions combine some of the advantages of both the edit distance and q-gram similarity.
 It counts the number of characters $c$ that are in common within a window that is of size $\lfloor \frac{\text{max}(\SizeOf{\sigma_1}, \SizeOf{\sigma_2})}{2}\rfloor-1$.
@@ -228,7 +226,7 @@ The Jaro-Winkler similarity function takes this into account by increasing the s
 It is computed as follows:
 
 \begin{equation}
-    s_winkler(\sigma_1, \sigma_2)=s_jaro(\sigma_1, \sigma_2) + (1-s_jaro(\sigma_1, \sigma_2)\frac{p}{10}
+    s_{winkler}(\sigma_1, \sigma_2)=s_{jaro}(\sigma_1, \sigma_2) + (1-s_{jaro}(\sigma_1, \sigma_2)\frac{p}{10}
 \end{equation}
 
 \noindent with $p\in\{0,\dots,4\}$ being the length of the longest common prefix of at most $4$.
@@ -266,8 +264,8 @@ The Jaro simmilarity can be computed as follows.
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsubsection{Soundex and editex phonetic similarity}
-\label{sec:soundex}
+\subsection{Soundex and editex phonetic similarity}
+\label{subsec:soundex}
 
 Another class of approximate string similarities is the \emph{Soundex} phonetic similarity.
 It aims to take into account the phonetics, i.e., the auditory properties of the strings, with emphasis on the \emph{homophones}.
@@ -331,7 +329,7 @@ Since it is computed analogous to the edit distance it is also computed in time 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Reference pair classification}
+\section{Reference pair classification}
 \label{sec:classification}
 
 % It is important to note that even though we can similarity metrics to perform `fuzzy' matching, name variants can still cause problems and it is better to learn these first and deal with them.
@@ -340,7 +338,7 @@ Since it is computed analogous to the edit distance it is also computed in time 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsubsection{Comparison of binary feature vectors}
+\subsection{Comparison of binary feature vectors}
 \begin{itemize}
     \item Classification is generally done on feature vectors as resulting from the field-based comparisons.
     \item Various methods have been proposed, such as unsupervised, supervised, active-learning and incremental.
@@ -351,7 +349,7 @@ Since it is computed analogous to the edit distance it is also computed in time 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsubsection{Probabilistic record linkage}
+\subsection{Probabilistic record linkage}
 \begin{itemize}
     \item In probabilistic record linkage the values in the records are weighted according to an external source of statistics.
     \item Give an example which naturally shows how statistics / informative value aids the linkage.
@@ -363,7 +361,7 @@ Since it is computed analogous to the edit distance it is also computed in time 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Leveraging transitivity (?)}
+\section{Leveraging transitivity (?)}
 \begin{itemize}
     \item Transitivity can lead to inconsistencies in the inference of the record linker.
     \item However, evidence can be obtained by applying transitivity, since nodes that share a relatively high number of edges, i.e., are graphically similar, might refer to the same entity.
@@ -373,7 +371,7 @@ Since it is computed analogous to the edit distance it is also computed in time 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Data fusion (?)}
+\section{Data fusion (?)}
 \begin{itemize}
     \item Though it is not the primary goal of this thesis, it might be interesting to consider an example of a possible next step in the process.
     \item Discuss how an entity-driven web search might aggregate information about a person.

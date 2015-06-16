@@ -1,23 +1,11 @@
 %%% Preamble
-\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+\documentclass[11pt,a4paper,oneside,final]{book}        % Add 'draft' or 'final'
 
 %%% Style
 \usepackage{mystyle}
 
-%%% Title	
-\title{ \vspace{-1in} 	\usefont{OT1}{bch}{b}{n}
-		\huge \strut Entity resolution in unstructured data \strut
-}
-\author{
-		\usefont{OT1}{bch}{m}{n} Benjamin van der Burgh\\
-		\usefont{OT1}{bch}{m}{n} Leiden University\\
-		\usefont{OT1}{bch}{m}{n} Leiden Institute of Advanced Computer Science\\
-        \texttt{benjamin.van.der.burgh@liacs.leidenuniv.nl}
-}
-\date{\today}
-
 %%% Modular includes
-\includeonly{3_feature_extraction}
+%\includeonly{3_feature_extraction}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -25,9 +13,13 @@
 
 \begin{document}
 
-%%% Title
-\maketitle
+%%% Front page
+\includepdfmerge{front/frontpage.pdf}
 
+%%% Table of Contents
+\tableofcontents
+
+%%% Some content
 \include{1_introduction}
 \include{2_record_linker}
 \include{3_feature_extraction}
