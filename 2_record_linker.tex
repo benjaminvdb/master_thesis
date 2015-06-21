@@ -1,14 +1,14 @@
-%- We can assume that matching pairs have similar comparison vectors.
-%- The natural approach therefore is to use clustering as an unsupervised learning approach.
-%- Classification can be performed by measuring the similarity between objects, essentially clustering %objects.
-%- We can then threshold the similarity: pairs above the threshold are classified as matches and below the threshold as non-matches.
-
 \chapter{Record Linker}
 \label{ch:record_linker}
 
 In this chapter we will give an overview of the record linkage system that was developed to solve issues that were discussed in \cref{sec:problem_definition}. It is also the basis of the experiments described in \cref{ch:experiments}.
 As we will see, the comparison of references plays a fundamental role in the record linker system described.
 However, recalling the mantra ``\emph{garbage-in, garbage out}'' we will also consider the pre- and postprocessing steps involved and treat the resulting pipeline as a unified system.\todo{Give an outline of this chapter by shortly describing the pipeline. Introduce running example.}
+
+%- We can assume that matching pairs have similar comparison vectors.
+%- The natural approach therefore is to use clustering as an unsupervised learning approach.
+%- Classification can be performed by measuring the similarity between objects, essentially clustering %objects.
+%- We can then threshold the similarity: pairs above the threshold are classified as matches and below the threshold as non-matches.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -59,9 +59,9 @@ Only the records within a set are compared, effectively reducing the number of c
 Note that even though the goal of record linkage itself is to create such a partitioning, in blocking this is process is rather coarse-grained, and involves computationally cheap operations.
 
 It is easiest to think about the gain of blocking when an example is considered.
-Say we have a set of $1000$ records on which we want to perform record linkage.
-There are a total number of $450000$ possible pairs that can possibly be compared.
-If we were able to partition these pairs into $10$ equally sized \emph{blocks}, only $49500$ comparisons would be needed; a reduction of $89\%$.
+Say we have a set of \num{1000} records on which we want to perform record linkage.
+There are a total number of \num{450000} possible pairs that can possibly be compared.
+If we were able to partition these pairs into \num{10} equally sized \emph{blocks}, only \num{49500} comparisons would be needed; a reduction of \SI{89}{\percent}.
 Such a reduction is often possible because only a very small fraction of all possible pair as an actual or \emph{true match}, which is often the case.
 In the Fine Rolls of King Henry III, that was mentioned in \cref{sec:challenges}, there appear $902$ unique forenames.
 It is therefore likely that we will end up with hundreds of unique entities.
@@ -70,12 +70,91 @@ Any comparisons that are done between references to these entities, which are of
 The effectiveness of blocking depends on its ability to partition the references in blocks of roughly equal size, which is often a problem.
 Another problem arises when the blocking function is unable to group records together that should have been grouped.
 In this case the records will not be compared and are therefore incorrectly classified as non-matches and therefore reduces the system's sensitivity.
+Blocking also indirectly affects the specificity of the system since it allows for more expensive, and thus more thorough, candidate pair comparisons, which in theory yield more accurate results \cite{baxter03}.
 
 Though it is not the main focus of this thesis to study blocking techniques, it is often an important step in the process and we will therefore discuss it shortly.
-As we shall see in Section \todo{add reference to experiment chapter}, simple blocking techniques can easily be implemented without only a slight reduction in sensitivity while vastly reducing the number of required comparisons.
+As we shall see in Section \todo{add reference to experiment chapter}, simple blocking techniques can easily be implemented with only a slight reduction in sensitivity while vastly reducing the number of required comparisons.
 
-\todo{describe a number of blocking techniques.}
 
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsection{Standard blocking}
+\label{sec:standard_blocking}
+
+A straight-forward approach to blocking has already been touched on and is often referred to as \emph{standard blocking}.
+This method of blocking is comparable to a hash function that maps a set of elements to distinct partitions indexed with a \emph{key}.
+In the case of standard blocking, the function is based on the value that is contained in a field.
+For example, we can consider the very simple function that takes the first $k$ characters of a \verb+first_name+ field and uses it as key.
+The operation executed by the function is inexpensive and will map first names to a fairly large number of blocks.
+Assuming that the least errors occur at the beginning of a name \todo{I saw this somewhere, but I cannot remember where. Add reference.}, it may also exclude a large number of relevant records when a high setting for $k$ is chosen.
+If this is not the case, however, it may result in a lower specificity.
+Depending on the content and quality of the data and the cost of a missing a true match, the user of the system should therefore make a decision on the setting of $k$.
+Various blocking techniques can be parametrized as to allow a user to choose an appropriate trade-off between sensitivity and specificity.
+
+Blocking keys can also be combined into more specific keys by concatenating them \cite{christen12} or by using different keys in multiple passes \cite{baxter03}.
+Parameter settings for the individual functions can be set to more conservative as to obtain larger blocks.
+The idea is that by looking at at various aspects of the records in such a way, errors caused by too specific blocking settings can be mitigated.
+A disadvantage is that many different combinations are often possible, making it hard to decide on a setting.
+Trying too many settings defeats the purpose of blocking so other strategies might have to be considered.
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\subsection{Sorted neighborhood}
+\label{sec:sorted_neighborhood}
+
+The previously described blocking strategy relies on a mapping function that maps records that are ``close enough'' to the same key.
+Constructing such a function can be hard to accomplish and alternatives may be required.
+
+Consider for example a function that is to map age values to a key, and assume that there is an error caused by the submitter of the data caused by the guessing of the age.
+In this case it is natural to compare records that contain approximately the same age value, but constructing a single key is not a solution.
+The \emph{sorted neighborhood} blocking technique \cite{hernandez95} makes use of the fact that it is much easier to detect records of approximately the same age if the records are first sorted on this field.
+Creating a blocks of records of similar ages can then be achieved by moving a window of size $w$ over the sorted records.
+After each iteration, the window moves one record further, requiring only the newly observed record to be compared with the previous $w-1$ records.
+Completing a full pass thus requires $\mathcal{O}(wn)$ comparisons.
+Since for large databases it holds that $w \ll n$, the computational complexity of this process is $\mathcal{O}(n)$.
+Sorting of the databases can be done in $\mathcal{O}(n \log n)$.
+
+A problem with the sorted neighborhood approach is that some values may occur very frequently, causing records that have the same sorting key to fall outside the window and are therefore not matched.
+An example of this is given in \cref{tab:blocking_example}, where the first row containing the last name ``Asimov'' falls outside the window that contains the last mention.
+One simple solution to overcome this problem is to group records that have the same sorting key together using an inversed index.
+The window is then moved over the inverted index instead \cite{christen12}.
+In this case the value of $w$ must be reconsidered, because many more records are now covered.
+Experimental evaluation of this modification has shown that it can lead to more true matches being included in the set of candidate record pairs and thus to a higher recall \cite{christen12}.
+
+\begin{table}
+    \centering
+        \begin{tabular}{l l l l}
+            \toprule
+            \textbf{First name} & \textbf{Middle name(s)} & \textbf{Last name} & \textbf{Birth year}\\
+            \midrule
+            Douglas & Noel & Adams & 1952 \\
+            Franklin & Robert & Adams & 1932 \\
+            Robert &  & Adams & \\
+            Isaac &  & Asimov & 1920\tikzmark[xshift=3.5em]{asimov1} \\
+            \tikzmark[xshift=-8pt,yshift=1ex]{window_begin}Isaak &  & Asimov & \\
+            Janet &  & Asimov & 1926 \\
+            \tikzmark[xshift=-8pt,yshift=1ex]{window_end}I &  & Asimov & 1926 \\
+            Elizabeth &  & Bear & 1971 \\
+            Gregory & Dale & Bear & 1951 \\
+            Philip & Kindred & Dick & 1928 \\
+            William & Ford & Gibson & 1948 \\
+            Robert & Anson & Heinlein & 1907 \\
+            Aldous & Leonard & Huxley & 1894 \\
+            Ann &  & Leckie & 1966 \\
+            Isaak & Yudovich & Ozimov & \tikzmark[xshift=3.5em]{asimov2} \\
+            Sarah & Bear Elizabeth & Wishnevsky & 1971 \\
+            \bottomrule
+        \end{tabular}
+        \drawcurvedarrow[bend left=60,-stealth]{asimov1}{asimov2}
+        \drawbrace[brace mirrored, thick]{window_begin}{window_end}
+        \annote[left]{brace-1}{Window}
+        %\annote[right]{arrow-1}{ }
+    \caption{Caption}
+    \label{tab:blocking_example}
+\end{table}
 
 % % % % % % % % % % % % % % % % % % % % % %
 

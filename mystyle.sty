@@ -22,6 +22,7 @@
 \usepackage{soul}                                                   % Defines \ul for underlining
 \usepackage{mathtools}                                              % Conditionals in math mode
 \usepackage{pdfpages}                                               % Include complete PDFs
+\usepackage{alltt}                                                  % Inline verbatim text
 
 %%% To-do notes
 \usepackage[textsize=footnotesize,obeyFinal,textwidth=3.7cm]{todonotes}
@@ -30,7 +31,7 @@
 %%% Awesome plotting with TikZ
 \usepackage{tikz}                                                   % Plotting in LaTeX
 \usepackage{pgfplots}
-\usetikzlibrary{positioning,shapes.geometric,snakes}
+\usetikzlibrary{positioning,shapes.geometric,snakes,decorations.pathreplacing,calc}
 \pgfplotsset{compat=1.12}
 
 %%% Improved readability through microtyping
@@ -55,6 +56,32 @@
 \newcolumntype{^}{>{\currentrowstyle}}
 \newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
   #1\ignorespaces
+}
+
+%%% Arrows and brackets between rows in table
+\newcommand{\tikzmark}[2][-3pt]{\tikz[remember picture, overlay, baseline=-0.5ex]\node[#1](#2){};}
+
+\tikzset{brace/.style={decorate, decoration={brace}},
+ brace mirrored/.style={decorate, decoration={brace,mirror}},
+}
+
+\newcounter{brace}
+\setcounter{brace}{0}
+\newcommand{\drawbrace}[3][brace]{%
+ \refstepcounter{brace}
+ \tikz[remember picture, overlay]\draw[#1] (#2.center)--(#3.center)node[pos=0.5, name=brace-\thebrace]{};
+}
+
+\newcounter{arrow}
+\setcounter{arrow}{0}
+\newcommand{\drawcurvedarrow}[3][]{%
+ \refstepcounter{arrow}
+ \tikz[remember picture, overlay]\draw (#2.center)edge[#1]node[coordinate,pos=0.5, name=arrow-\thearrow]{}(#3.center);
+}
+
+% #1 options, #2 position, #3 text 
+\newcommand{\annote}[3][]{%
+ \tikz[remember picture, overlay]\node[#1] at (#2) {#3};
 }
 
 % DroidSerif
