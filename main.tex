@@ -1,11 +1,18 @@
+%%% Nag about outdated packages and incorrect syntax (must be first line!)
+\RequirePackage[l2tabu, orthodox]{nag}
+
 %%% Preamble
 \documentclass[11pt,a4paper,oneside,final]{book}        % Add 'draft' or 'final'
 
 %%% Style
 \usepackage{mystyle}
 
+%%% Author
+\author{Benjamin van der Burgh}
+\degreeyear{2015}
+
 %%% Modular includes
-%\includeonly{2_record_linker}
+%\includeonly{5_conclusions}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -13,13 +20,22 @@
 
 \begin{document}
 
-%%% Front page
-\includepdfmerge{front/frontpage.pdf}
-
-%%% Table of Contents
-\tableofcontents
+%%% Final version only
+\ifdraft{}{
+    \frontmatter
+    \includepdfmerge{front/frontpage.pdf}   % Front page
+    \copyrightpage                          % Copyright
+    %\abstractpage
+    \tableofcontents                        % Table of contents
+    %\authorlist                            % Acknowledge authors of chapters (if any)
+    \listoffigures
+    \listoftables
+    \dedicationpage
+    %\acknowledgements
+}
 
 %%% Some content
+\mainmatter
 \include{1_introduction}
 \include{2_record_linker}
 \include{3_feature_extraction}
@@ -27,7 +43,7 @@
 \include{5_conclusions}
 
 % Bibliography
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{mybib}
 
 \end{document}

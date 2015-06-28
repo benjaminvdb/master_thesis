@@ -1,7 +1,16 @@
+\begin{savequote}[75mm] 
+--Handle a book as a bee does a flower, extract its sweetness but do not damage it.
+\qauthor{John Muir} 
+\end{savequote}
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
 \chapter{Feature Extraction}
 \label{ch:feature_extraction}
 
-In the previous chapter we described how to obtain references from documents and how confidences scores are computed that reflect how certain we are that they refer to the same entity.
+\chaplettrine{I}{n the previous chapter}, we described how to obtain references from documents and how confidences scores are computed that reflect how certain we are that they refer to the same entity.
 During the link classification step we assumed that records consisted only of information directly relating to a reference, e.g. first names, last names, roles, titles, etc.
 If the probability mass function of values for a property is known it can be incorporated, but it does not extend the records themselves.
 When we consider the case of a reference containing a \emph{common name}, however, it becomes apparent that more information is required.
@@ -56,9 +65,9 @@ Besides trying to decide on a topic by looking at a single document, we can inst
 This is very much related to the process of \emph{features selection}, that strives to select a subset of features with the purpose of reducing problems caused when too many features are used, such as overfitting.
 
 In our case we aim for the selection of a set of topics that provide as good a distinction between texts as possible.
-This is exactly what \emph{maximally informative $k$-itemsets}\cite{knobbe06}, or \emph{miki's} in short, provide.
+This is exactly what \emph{maximally informative $k$-itemsets}\citep{Knobbe2006}, or \emph{miki's} in short, provide.
 As the name suggests, a miki is an itemset of size $k$ that provides maximum information.
-The amount of information of the itemset is measured as the \emph{joint entropy} of the itemset in \emph{Shannon bits} (or just \emph{bits}), which is defined as follows: \cite{knobbe06}
+The amount of information of the itemset is measured as the \emph{joint entropy} of the itemset in \emph{Shannon bits} (or just \emph{bits}), which is defined as follows: \citep{Knobbe2006}
 
 \begin{definition}[Joint entropy]
     Suppose that $X = \left\{ x_{1}, \dots, x_{k} \right\}$ is an itemset, and $B = \left( b_{1}, \dots, b_{k} \right) \in \left\{ 0, 1 \right\}^{k}$ is a tuple of binary values. The \emph{joint entropy} of $X$ is defined as

@@ -2,15 +2,20 @@
 
 \usepackage[utf8]{inputenc}                                         % Use UTF-8 encoding
 \usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{lmodern}
 %\usepackage[bitstream-charter]{mathdesign}
 %\usepackage{libertine}
 %\usepackage[libertine]{newtxmath}
 
-\usepackage[american]{babel}											% English language/hyphenation
-\usepackage{amsmath, amsfonts,amsthm}								% Math packages
-\usepackage[pdftex]{graphicx}										% Enable pdflatex
+\usepackage[american]{babel}										% English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm}								% Math packages
+%\usepackage[all,warning]{onlyamsmath}                               % amsmath environments only
+\usepackage{fixmath}                                                % Make maths comply with ISO 31-0:1992 to ISO 31-13:1992
+\usepackage[pdftex]{graphicx}										% Enable pdflatex, use 'final' to always display images
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}             % Enable colored text
-%\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}	% Custom captions under/above floats
+\usepackage{calc}
+\usepackage[font=small,labelfont=bf]{caption}	% Custom captions under/above floats
 \usepackage{epstopdf}												% Converts .eps to .pdf
 \usepackage{booktabs}												% Nicer tables
 \usepackage{siunitx}                                                % Rounding of floats in tables
@@ -23,10 +28,19 @@
 \usepackage{mathtools}                                              % Conditionals in math mode
 \usepackage{pdfpages}                                               % Include complete PDFs
 \usepackage{alltt}                                                  % Inline verbatim text
+\usepackage{ifdraft}                                                % Conditionals for 'draft' and 'final'
+\usepackage[numbers, comma, sort&compress]{natbib}
+\usepackage{titling}                                                % Allows accessing set author, title, etc.
+\usepackage[palatino]{quotchap}                                     % Start chapters with a quote
+\newcommand*\rot{\rotatebox{90}}
+\usepackage{multirow}                                               % Multi-row table cells
+\usepackage{stackengine}                                            % Used in fancy confusion matrix
+\usepackage{enumitem}                                               % Character enumerations in enumerate
+\usepackage{ellipsis}                                               % Corrects \dots
 
-%%% To-do notes
-\usepackage[textsize=footnotesize,obeyFinal,textwidth=3.7cm]{todonotes}
-\setlength{\marginparwidth}{3.7cm}   % Fixed problem with margins being to small
+%%% Scalable paired delimiters in math mode, e.g. |a|
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 
 %%% Awesome plotting with TikZ
 \usepackage{tikz}                                                   % Plotting in LaTeX
@@ -36,9 +50,6 @@
 
 %%% Improved readability through microtyping
 \usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
-%\SetProtrusion{encoding={*},family={bch},series={*},size={6,7}}     % Enable protrusion for superscript
-%              {1={ ,750},2={ ,500},3={ ,500},4={ ,500},5={ ,500},
-%               6={ ,500},7={ ,600},8={ ,500},9={ ,500},0={ ,500}}
 
 %%% Algorithms
 \usepackage{algorithm}
@@ -122,7 +133,7 @@
 %	\sectionrule{0pt}{0pt}{-5pt}{0.8pt}				% Horizontal rule below section
 %}
 
-%%% Custom headers/footers
+%%% Custom headers/footersi
 \usepackage{fancyhdr}
 \setlength{\headheight}{15.2pt}
 \pagestyle{fancy}
@@ -131,10 +142,71 @@
 \renewcommand{\headrulewidth}{0.5pt}                % Header underline
 \renewcommand{\footrulewidth}{0pt}                  % Remove footer underline
 
+\setlength{\skip\footins}{\headsep}
+
+%%% Fancy chapter headers
+\usepackage{titlesec}
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{0pt}}
+\titleformat{\chapter}[hang]%
+    {\flushright\fontseries{b}\fontsize{80}{100}\selectfont}%
+    {\fontseries{b}\fontsize{100}{130}\selectfont \textcolor{gray75}\thechapter\hsp}{0pt}{\\ \Huge\bfseries}[]
+    
+%%% Lettrines as starting capitals
+\usepackage{lettrine}
+\definecolor{clettrine}{gray}{0.6}
+\newcommand{\chaplettrine}[2]{\lettrine[lines=4]{#1}{#2}}  % 1 = capital, 2 = text
+\renewcommand{\LettrineFontHook}{\color{clettrine}}
+    
+%%% To-do notes (must be loaded before xcolor, tikz, calc, among others!)
+\usepackage[textsize=footnotesize,obeyFinal,textwidth=3.7cm]{todonotes}
+\setlength{\marginparwidth}{3.7cm}   % Fixed problem with margins being to small
+
 %%% Equation and float numbering
 \numberwithin{equation}{section}					% Equationnumbering: section.eq#
 \numberwithin{figure}{section}						% Figurenumbering: section.fig#
 \numberwithin{table}{section}						% Tablenumbering: section.tab#
+
+% some definitions
+\def\degreeyear#1{\gdef\@degreeyear{#1}}
+\def\degreemonth#1{\gdef\@degreemonth{#1}}
+\def\degree#1{\gdef\@degree{#1}}
+\def\advisor#1{\gdef\@advisor{#1}}
+\def\department#1{\gdef\@department{#1}}
+\def\field#1{\gdef\@field{#1}}
+\def\university#1{\gdef\@university{#1}}
+\def\universitycity#1{\gdef\@universitycity{#1}}
+\def\universitystate#1{\gdef\@universitystate{#1}}
+
+% You might also consider licensing your work under Creative Commons). See: http://creativecommons.org/weblog/entry/12824 for other PhD students who have released their work under creative commons.
+\newcommand{\copyrightpage}{
+	\newpage \thispagestyle{empty} \vspace*{\fill}
+	\sc \noindent \copyright~\textit{\@degreeyear \hspace{3pt}~- \theauthor} \\
+	\noindent All rights reserved.
+	\vspace*{\fill} \newpage \rm
+}
+
+%%% Dedication
+\newcommand{\dedicationpage}{
+	\pagestyle{fancy}
+	\newpage \thispagestyle{fancy} \vspace*{\fill}
+	\sc \noindent \input{frontmatter/dedication}
+	\vspace*{\fill} \newpage \rm
+}
+
+%%% Acknowledgements
+\newcommand{\acknowledgments}{
+	\chapter*{Acknowledgments}
+	\noindent
+	\input{frontmatter/acknowledgements}
+	\vspace*{\fill} 
+	\newpage
+	\setcounter{page}{1}
+	\pagenumbering{arabic}
+}
+
+%%% Add missing subscript command similar to \textsuperscript
+\newcommand{\textsubscript}[1]{$_{\text{#1}}$}
 
 %%% Sensible spacing
 \frenchspacing

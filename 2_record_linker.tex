@@ -1,44 +1,61 @@
-\chapter{Record Linker}
-\label{ch:record_linker}
-
-In this chapter we will give an overview of the record linkage system that was developed to solve issues that were discussed in \cref{sec:problem_definition}. It is also the basis of the experiments described in \cref{ch:experiments}.
-As we will see, the comparison of references plays a fundamental role in the record linker system described.
-However, recalling the mantra ``\emph{garbage-in, garbage out}'' we will also consider the pre- and postprocessing steps involved and treat the resulting pipeline as a unified system.\todo{Give an outline of this chapter by shortly describing the pipeline. Introduce running example.}
-
-%- We can assume that matching pairs have similar comparison vectors.
-%- The natural approach therefore is to use clustering as an unsupervised learning approach.
-%- Classification can be performed by measuring the similarity between objects, essentially clustering %objects.
-%- We can then threshold the similarity: pairs above the threshold are classified as matches and below the threshold as non-matches.
+\begin{savequote}[75mm] 
+--No matter what he does, every person on earth plays a central role in the history of the world. And normally he doesn't know it.
+\qauthor{Paulo Coelho, The Alchemist} 
+\end{savequote}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\section{Data cleaning and segmentation}
+\chapter{Record Linkage Pipeline}
+\label{ch:record_linker}
+
+\chaplettrine{I}{n this chapter}, we will give an overview of the record linkage system that was developed to solve issues that were discussed in \cref{sec:problem_definition}.
+It is also the basis of the experiments described in \cref{ch:experiments}.
+The methodology described is not much different from techniques that historians would use in a non-automated manner.
+Conceptually, it involves the extraction of occurrences of names, the grouping of promising candidate pairs, the comparison of the records therein, followed by tagging each candidate pair as a \emph{match} or \emph{non-match}.
+This chapter describes how these steps are performed in an automated fashion in-order as a pipeline.
+The strength of an automated system lies in its ability to both extract the required statistics from the data easily and use it to its advantage rapidly in the classification step.
+Viewing the results as a whole can provide further insight, whereas this would be considered infeasible for humans to perform.
+
+As we will see, the record linkage procedure described is constructed around the idea that matching records should be similar, i.e., they contain similar values.
+The classification step utilizes this assumption by attempting to cluster records that are similar with respective to their individual fields. 
+However, since the data is assumed to be unannotated, the references must first be extracted from text and segmented.
+After the classification of record pairs the final results are analyzed in order to find more links and resolve inconsistencies.
+
+Many choices can be made regarding the choice of the individual component and their parameters, causing somewhat of a combinatorial explosion of possible settings.
+To keep things in perspective, we have chosen to give an overview of methods that are fundamentally different in their approach.
+These methods are then evaluated in isolation in \cref{ch:experiments} so as to study their applicability for entity disambiguation in a historical context.
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Named-entity extraction}
 \label{sec:segmentation}
 
 Traditional record linkage techniques naturally assume that the input consist of structured records (i.e. tuples).
-Our goal however is to perform entity resolution in documents consisting of natural language.
-The first step therefore is to extract structured records from the input data.
+Our goal, however, is to perform entity resolution in documents consisting of natural language.
+The first step is therefore to extract structured records from the input data.
 
 We have considered using existing tools from the field of Natural Language Processing (NLP), but these posed several issues.
-The task is often referred to as \emph{Names-Entity Recognition} (NER) and usually solved with either complicated grammars or statistical (machine learning) approaches.
-A problem with existing grammar-based approaches is that they are often too generic and complicated.
+The task is often referred to as \emph{Names-Entity Recognition} (NER)\todo{add reference} and usually solved with either grammars or statistical (machine learning) approaches.
+One of the problems with existing grammar-based approaches is that they often assume modern English and have problems with older English, making them less suitable for a generic system.
 Statistical techniques generally rely on the availability of labeled data for training, which is often not the case.
 Luckily, the variant of NER we are trying to achieve here is rather simple as it only involves the detection of people in text and not, for example, place names.
-Also, person names have a largely well-defined structure and use capitalization, making it a lot easier to detect them.
+Also, person names have a well-defined structure and use capitalization, making it a lot easier to detect them.
 
-The method that we settled on using is a simplified version of a grammar based approach and mainly requires a list of first names as a \emph{seed}.
+The method that we settled on using is a simplified version of a grammar based approach\todo{add reference} and mainly requires a list of first names as a \emph{seed}.
 The input is processed as a sequence of tokens, which is generated simply by splitting the text on spaces after removing punctuation; no further processing on the tokens is performed.
-After that, tokens can be searched for the first names, ignoring tokens that are not recognized as such.
+After that, tokens can be searched for first names, ignoring tokens that are not recognized as such.
 First names are used as anchor points in the grammar by applying rules that try to match tokens based on their relative position to the names.
 As an example, let us look at a part from the same part that was cited in \todo{add a number to the quote so we can reference it here. Also, add the grammar that was used so the rules can be referenced to}.
 
 By applying grammar rules in this way surnames can effectively be learned.
 These in turn could be used as an anchor point, similar to the first names, which yields a new set of first names that were unknown before.
-Repeated application of this procedure can consequently be used to expand a relatively small list of known names into a bigger one in a process called \emph{bootstrapping}.
+Repeated application of this procedure can consequently be used to expand a relatively small list of known names into a bigger one in a process called \emph{bootstrapping}.\todo{referenen aan experiment}
 Caution should be taken, however, to prevent errors made in one iteration of the bootstrapping, since they can propagate to a next iteration.
-It is therefore best to manually inspect the learned names after each iteration of the size of the list allows for it.
+It is therefore best to manually inspect the learned names after each iteration if the size of the list allows for it.
 
 An advantage of a manually crafted grammar, like the one proposed, is that tokens are classified as part of the parsing, which effectively segments the references into structured records.
 These can then be further processed using traditional record linkage techniques.
@@ -51,26 +68,28 @@ These can then be further processed using traditional record linkage techniques.
 \label{sec:blocking}
 
 As stated in \cref{sec:challenges}, for larger datasets it becomes rapidly infeasible to compare all possible pairs of records within a single database, since it grows quadratically.
-The total number of possible record links, and thus comparisons in a naive setting, with a dataset is equal to $n\times(n-1)/2$.
+The total number of possible record links, and thus comparisons in a naive setting, within a dataset of size $n$ is equal to $n\times(n-1)/2$.
 Because the similarity between records that we are computing is symmetric it only needs to be computed once.
+
 Since the comparison step is often the most expensive step of the record linkage pipeline, a technique called \emph{blocking} is often deployed.
 The goal of blocking is to efficiently partition the set of all possible pairs into several mutually exclusive sets.
 Only the records within a set are compared, effectively reducing the number of comparisons that is required.
-Note that even though the goal of record linkage itself is to create such a partitioning, in blocking this is process is rather coarse-grained, and involves computationally cheap operations.
+Note that even though the goal of record linkage itself is to create such a partitioning, in blocking this process is rather coarse-grained, and involves computationally cheap operations.
 
 It is easiest to think about the gain of blocking when an example is considered.
-Say we have a set of \num{1000} records on which we want to perform record linkage.
+Suppose that we have a set of \num{1000} records on which we want to perform record linkage.
 There are a total number of \num{450000} possible pairs that can possibly be compared.
 If we were able to partition these pairs into \num{10} equally sized \emph{blocks}, only \num{49500} comparisons would be needed; a reduction of \SI{89}{\percent}.
 Such a reduction is often possible because only a very small fraction of all possible pair as an actual or \emph{true match}, which is often the case.
 In the Fine Rolls of King Henry III, that was mentioned in \cref{sec:challenges}, there appear $902$ unique forenames.
 It is therefore likely that we will end up with hundreds of unique entities.
 Any comparisons that are done between references to these entities, which are of course unknown at the time, would be a waste and should be avoided.
+An example of a very simple blocking key would be to take the first character of the last name or to combine the first characters of both the first and last names.
 
 The effectiveness of blocking depends on its ability to partition the references in blocks of roughly equal size, which is often a problem.
 Another problem arises when the blocking function is unable to group records together that should have been grouped.
 In this case the records will not be compared and are therefore incorrectly classified as non-matches and therefore reduces the system's sensitivity.
-Blocking also indirectly affects the specificity of the system since it allows for more expensive, and thus more thorough, candidate pair comparisons, which in theory yield more accurate results \cite{baxter03}.
+Blocking also indirectly affects the specificity of the system since it allows for more expensive, and thus more thorough, candidate pair comparisons, which in theory yield more accurate results \citep{Baxter2003}.
 
 Though it is not the main focus of this thesis to study blocking techniques, it is often an important step in the process and we will therefore discuss it shortly.
 As we shall see in Section \todo{add reference to experiment chapter}, simple blocking techniques can easily be implemented with only a slight reduction in sensitivity while vastly reducing the number of required comparisons.
@@ -92,7 +111,7 @@ If this is not the case, however, it may result in a lower specificity.
 Depending on the content and quality of the data and the cost of a missing a true match, the user of the system should therefore make a decision on the setting of $k$.
 Various blocking techniques can be parametrized as to allow a user to choose an appropriate trade-off between sensitivity and specificity.
 
-Blocking keys can also be combined into more specific keys by concatenating them \cite{christen12} or by using different keys in multiple passes \cite{baxter03}.
+Blocking keys can also be combined into more specific keys by concatenating them \citep{Christen2012} or by using different keys in multiple passes \citep{Baxter2003}.
 Parameter settings for the individual functions can be set to more conservative as to obtain larger blocks.
 The idea is that by looking at at various aspects of the records in such a way, errors caused by too specific blocking settings can be mitigated.
 A disadvantage is that many different combinations are often possible, making it hard to decide on a setting.
@@ -110,7 +129,7 @@ Constructing such a function can be hard to accomplish and alternatives may be r
 
 Consider for example a function that is to map age values to a key, and assume that there is an error caused by the submitter of the data caused by the guessing of the age.
 In this case it is natural to compare records that contain approximately the same age value, but constructing a single key is not a solution.
-The \emph{sorted neighborhood} blocking technique \cite{hernandez95} makes use of the fact that it is much easier to detect records of approximately the same age if the records are first sorted on this field.
+The \emph{sorted neighborhood} blocking technique \citep{Hernandez1995} makes use of the fact that it is much easier to detect records of approximately the same age if the records are first sorted on this field.
 Creating a blocks of records of similar ages can then be achieved by moving a window of size $w$ over the sorted records.
 After each iteration, the window moves one record further, requiring only the newly observed record to be compared with the previous $w-1$ records.
 Completing a full pass thus requires $\mathcal{O}(wn)$ comparisons.
@@ -120,9 +139,9 @@ Sorting of the databases can be done in $\mathcal{O}(n \log n)$.
 A problem with the sorted neighborhood approach is that some values may occur very frequently, causing records that have the same sorting key to fall outside the window and are therefore not matched.
 An example of this is given in \cref{tab:blocking_example}, where the first row containing the last name ``Asimov'' falls outside the window that contains the last mention.
 One simple solution to overcome this problem is to group records that have the same sorting key together using an inversed index.
-The window is then moved over the inverted index instead \cite{christen12}.
+The window is then moved over the inverted index instead \citep{Christen2012}.
 In this case the value of $w$ must be reconsidered, because many more records are now covered.
-Experimental evaluation of this modification has shown that it can lead to more true matches being included in the set of candidate record pairs and thus to a higher recall \cite{christen12}.
+Experimental evaluation of this modification has shown that it can lead to more true matches being included in the set of candidate record pairs and thus to a higher recall \citep{Christen2012}.
 
 \begin{table}
     \centering
@@ -156,6 +175,9 @@ Experimental evaluation of this modification has shown that it can lead to more 
     \label{tab:blocking_example}
 \end{table}
 
+
+
+
 % % % % % % % % % % % % % % % % % % % % % %
 
 
@@ -175,15 +197,15 @@ There are are number of reasons that cause these differences, e.g. an error was 
 To be able to perform entity resolution under such conditions we can make use of approximate string matching techniques.
 These work by measuring the proximity of one string to another which gives an intuition about the likeliness of the equivalence of the string.
 
-A distance function $d(\cdot, \cdot)$ maps a pair of strings $\sigma_1$ and $\sigma_2$ to a real number $r$, with a greater value of $r$ indicating a smaller similarity between $\sigma_1$ and $\sigma_2$.\cite{cohen03}
-Conversely, a similarity function $s(\cdot, \cdot$ outputs numbers $r$ with a greater value indicating a larger similarity.
+A distance function $d(\cdot, \cdot)$ maps a pair of strings $\sigma_1$ and $\sigma_2$ to a real number $r$, with a greater value of $r$ indicating a smaller similarity between $\sigma_1$ and $\sigma_2$ \citep{Cohen2003}.
+Conversely, a similarity function $s(\cdot, \cdot)$ outputs numbers $r$ with a greater value indicating a larger similarity.
 Often these values are normalized such that their value is between $0 \leq r \leq 1$.
-Distance and similarity functions for strings must intuitively have a number of properties, which are in general:\cite{christen12}
+Distance and similarity functions for strings must intuitively have a number of properties, which are in general \citep{Christen2012}:
 
 \begin{itemize}
     \item $s(\sigma_1, \sigma_1)=1$: the similarity is maximal when a string is compared to itself.
-    \item $s(\sigma_1, \sigma_2)=0$: a 'completely different' string results in the minimum similarity value of $0$.
-    \item $0 < s(\sigma_1, \sigma_2) < 1$: a value between the two extremes indicates that the strings are 'somewhat similar'.
+    \item $s(\sigma_1, \sigma_2)=0$: a ``completely different'' string results in the minimum similarity value of $0$.
+    \item $0 < s(\sigma_1, \sigma_2) < 1$: a value between the two extremes indicates that the strings are ``somewhat similar''.
 \end{itemize}
 
 With similarity values between $0$ and $1$ it is easy to convert to distance values by subtracting them from $1$, and vice versa.
@@ -193,8 +215,8 @@ We will see that a threshold can then be set for each component, mapping the sco
 
 The remaining section describes a number of distance metrics that were used in our record linkage system to perform pairwise comparisons between the fields of a pair of records, which we assume to be of the string data type.
 We denote with $\sigma$ some string constructed from individual literals taken from an alphabet $\Sigma$ and use the superscript notation, e.g. $\sigma^{i}$, to refer to its constituent parts.
-The notation $\vert \times \vert$ is used to refer to the length of a string.
-Note that we are now considering the field strings in isolation and not the records as a whole, hence a \emph{match} in this context means that the fields are ''similar enough``.
+The notation $\abs{\cdot}$ is used to refer to the length of a string.
+Note that we are now considering the field strings in isolation and not the records as a whole, hence a \emph{match} in this context means that the fields are ``similar enough''.
 Further processing the results of this phase is further discussed in ...
 
 
@@ -209,13 +231,13 @@ A natural way to compute a distance between two strings is therefore the smalles
 This is the underlying principle of the class of edit distances.
 
 In its simplest form, three operations are considered: substitutions, insertions and deletions, each of them associated with a cost of $1$.
-This variant of the edit distance is often called the \emph{Levenshtein distance} \todo{add reference to Levenshtein's article}.
-The edit distance can efficiently be computed in time $\mathcal{O}(\vert \sigma_1 \times \sigma_2 \vert)$ using a dynamic programming approach.
+This variant of the edit distance is often called the \emph{Levenshtein distance}.\todo{add reference to Levenshtein's article}
+The edit distance can efficiently be computed in time $\mathcal{O}(\abs{\sigma_1} \times \abs{\sigma_2})$ using a dynamic programming approach.
 It breaks up the computation into smaller subproblems, namely the computation of the edit distance between all possible prefixes of one string and all possible prefixes of the second.
-The algorithm for computing edit distances is given in Algorithm~\ref{alg:edit_distance}.
-First thing to note is that the first row of the matrix keeps track of the cost of deleting literals from $B$ while the first column keeps track of deleting literals from $A$.
+The algorithm for computing edit distances is given in \cref{alg:edit_distance}.
+First thing to note is that the first row of the matrix keeps track of the cost of deleting literals from $\sigma_{2}$ while the first column keeps track of deleting literals from $\sigma_{1}$.
 These can be filled in without requiring any knowledge of the strings themselves, except for their length.
-A cell $D[i,j]$ in the matrix corresponds to the number of edits required to convert the first $i$ characters of the string $\sigma_1$ (shown in the first column of a matrix) into the string comprised of the first $j$ characters of string $\sigma_2$ (shown in top row of a matrix).\cite{christen12}
+A cell $D[i,j]$ in the matrix corresponds to the number of edits required to convert the first $i$ characters of the string $\sigma_1$ (shown in the first column of a matrix) into the string comprised of the first $j$ characters of string $\sigma_2$ (shown in top row of a matrix).\citep{Christen2012}
 
 If we look at the example as depicted in Figure~\ref{fig:edit_distance}, we can see how the algorithm computes the Levenshtein distance (i.e. the edit distance with equal cost of all edit operations) between Owen (British) and Owain (Welsh).
 The computation starts in the top left corner with an initial score of $0$.
@@ -247,7 +269,7 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
             $\sigma_2$ & O & w & e & \_ & n
         \end{tabular}
     \end{minipage}
-    \caption{The matrix in the left shows the computation of the edit distance between Owen and Owain. The construction path, presented in bold, can be seen as substituting the 'a' for an 'e' and removing the 'i' from Owain as to obtain Owen, as depicted on the right.}
+    \caption[Example of edit distance]{The matrix in the left shows the computation of the edit distance between Owen and Owain. The construction path, presented in bold, can be seen as substituting the 'a' for an 'e' and removing the 'i' from Owain as to obtain Owen, as depicted on the right.}
     \label{fig:edit_distance}
 \end{figure}
 
@@ -270,7 +292,7 @@ Many of ways exist for comparing multisets, but three are most often used.
     \text{Dice coefficient: }sim_{dice}(\sigma_1, \sigma_2) &= \frac{2 \times c_{common}}{c_1 + c_2}
 \end{align}
 
-\noindent A comprehensive overview of multiset distances can be found in \cite{kosters08}.
+\noindent A comprehensive overview of multiset distances can be found in \citep{Kosters2008}.
 
 An advantage of q-gram based functions is that they are efficiently computable.
 Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert \sigma_2 \vert$, followed by the computation of the intersection, computed in $\mathcal{O}$.
@@ -319,7 +341,7 @@ It is computed as follows:
         Matches    & 0 & 1 & 4 & - & 3 & - & - \\		
         $\sigma_2$ & \textbf{j} & \textbf{o} & h & s & n & o & n \\\hline
     \end{tabular}
-    \caption{This table shows the matching of individual characters between string 'jones' and 'johsnon'. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
+    \caption[Example matching]{This table shows the matching of individual characters between string 'jones' and 'johsnon'. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
     \label{fig:jaro_winkler}
 \end{figure}
 
@@ -401,17 +423,15 @@ The similarity function \emph{editex} modifies the cost function of the edit dis
 \end{equation}
 
 \noindent where $\equiv_s$ is the relation that two characters belong to the same equivalence class in soundex, i.e., they map to the same character, such as `b' and `f'.
-This approach has proven to be quite successful for matching names\cite{zobel96}.
+This approach has proven to be quite successful for matching names\citep{Zobel1996}.
 Since it is computed analogous to the edit distance it is also computed in time $\mathcal{O}(\SizeOf{\sigma_1} \times \SizeOf{\sigma_2})$.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\section{Reference pair classification}
+\section{Classification}
 \label{sec:classification}
-
-% It is important to note that even though we can similarity metrics to perform `fuzzy' matching, name variants can still cause problems and it is better to learn these first and deal with them.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
