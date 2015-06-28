@@ -1,0 +1,22 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        no markers,
+        small,
+        xmode = log,
+        ymode = log,
+        %width=.75\linewidth,
+        scale only axis,
+        title={The effects of blocking on the number of comparisons},
+        xlabel={Number of records},
+        ylabel={Number of comparisons},
+        legend style={legend pos=north west,font=\scriptsize},
+        legend cell align=left,
+    ]
+        \addplot table {plots/blocking_example-no_blocking.tex};
+        \addlegendentry{Without blocking}
+        \addplot table {plots/blocking_example-with_blocking.tex};
+        \addlegendentry{With blocking (optimistic)}
+        \addplot table {plots/blocking_example-realistic_blocking.tex};
+        \addlegendentry{With blocking (realistic)}
+    \end{axis}
+\end{tikzpicture}

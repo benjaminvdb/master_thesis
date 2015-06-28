@@ -76,23 +76,13 @@ The goal of blocking is to efficiently partition the set of all possible pairs i
 Only the records within a set are compared, effectively reducing the number of comparisons that is required.
 Note that even though the goal of record linkage itself is to create such a partitioning, in blocking this process is rather coarse-grained, and involves computationally cheap operations.
 
-It is easiest to think about the gain of blocking when an example is considered.
-Suppose that we have a set of \num{1000} records on which we want to perform record linkage.
-There are a total number of \num{450000} possible pairs that can possibly be compared.
-If we were able to partition these pairs into \num{10} equally sized \emph{blocks}, only \num{49500} comparisons would be needed; a reduction of \SI{89}{\percent}.
-Such a reduction is often possible because only a very small fraction of all possible pair as an actual or \emph{true match}, which is often the case.
-In the Fine Rolls of King Henry III, that was mentioned in \cref{sec:challenges}, there appear $902$ unique forenames.
-It is therefore likely that we will end up with hundreds of unique entities.
-Any comparisons that are done between references to these entities, which are of course unknown at the time, would be a waste and should be avoided.
-An example of a very simple blocking key would be to take the first character of the last name or to combine the first characters of both the first and last names.
-
 The effectiveness of blocking depends on its ability to partition the references in blocks of roughly equal size, which is often a problem.
 Another problem arises when the blocking function is unable to group records together that should have been grouped.
-In this case the records will not be compared and are therefore incorrectly classified as non-matches and therefore reduces the system's sensitivity.
-Blocking also indirectly affects the specificity of the system since it allows for more expensive, and thus more thorough, candidate pair comparisons, which in theory yield more accurate results \citep{Baxter2003}.
+In this case the records will not be compared and are therefore incorrectly classified as non-matches and therefore reduces the system's recall.
+Blocking also indirectly affects the precision of the system since it allows for more expensive, and thus more thorough, candidate pair comparisons, which in theory yield more accurate results \citep{Baxter2003}.
 
 Though it is not the main focus of this thesis to study blocking techniques, it is often an important step in the process and we will therefore discuss it shortly.
-As we shall see in Section \todo{add reference to experiment chapter}, simple blocking techniques can easily be implemented with only a slight reduction in sensitivity while vastly reducing the number of required comparisons.
+As we shall see in \cref{sec:standard_blocking}, simple blocking techniques can easily be implemented with only a slight reduction in recall while vastly reducing the number of required comparisons.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -110,6 +100,20 @@ Assuming that the least errors occur at the beginning of a name \todo{I saw this
 If this is not the case, however, it may result in a lower specificity.
 Depending on the content and quality of the data and the cost of a missing a true match, the user of the system should therefore make a decision on the setting of $k$.
 Various blocking techniques can be parametrized as to allow a user to choose an appropriate trade-off between sensitivity and specificity.
+
+\begin{figure}
+    \centering
+    \input{plots/blocking_example.tex}
+    \caption{Partitioning a set into blocks can fairly reduce the number of candidate pair comparisons.}
+    \label{fig:blocking_example}
+\end{figure}
+
+In \cref{fig:blocking_example} the number of candidate pair comparisons is plotted against the number of input records on a logarithmic scale.
+If no blocking scheme is utilized, the number of required comparisons quickly grows, resulting in the blue line.
+Even with the very simple blocking scheme that uses the first character of the name, we can expect the number of comparisons to be much less than without a blocking method.
+In the case of a uniform spread of starting characters, which is rather optimistic, we obtain the red line.
+The black line shows the number of comparisons against the total number of input records as computed using an empirical distribution of starting characters derived from the Gascon Rolls\footnote{http://www.gasconrolls.org/en/}.
+It can be seen that for moderately large to large datasets, even with this simple blocking scheme, the number of comparisons are reduced by an order of magnitude.
 
 Blocking keys can also be combined into more specific keys by concatenating them \citep{Christen2012} or by using different keys in multiple passes \citep{Baxter2003}.
 Parameter settings for the individual functions can be set to more conservative as to obtain larger blocks.
@@ -350,13 +354,14 @@ We can see that four characters can be matches and there is one transposition, s
 The Jaro simmilarity can be computed as follows.
 
 \begin{equation*}
-    s_{jaro}('jones', 'johsnon') = \frac{1}{3} \left(\frac{4}{5} + \frac{4}{7} + \frac{3}{4} \right) = 0.70714
+    s_{jaro}(\text{`jones'}, \text{`johsnon'}) = \frac{1}{3} \left(\frac{4}{5} + \frac{4}{7} + \frac{3}{4} \right) = 0.70714
 \end{equation*}
 
 \noindent The number of matching starting character is $2$, which is used by the Jaro-Winker distance to increase the similarity as follows:
 
 \begin{align*}
-    s_{winkler}('jones', 'johsnon') &= s_{jaro}('jones', 'johsnon') + (1-s_{jaro}('jones', 'johsnon')\frac{p}{10} \\
+    s_{winkler}(\text{`jones'}, \text{`johsnon'}) &= s_{jaro}(\text{`jones'}, \text{`johsnon'}) + \\
+    &+(1-s_{jaro}(\text{`jones'}, \text{`johsnon'}))\frac{p}{10} \\
     &= 0.70714 + (1 - 0.70714)\times\frac{2}{10} \\
     &= 0.76571
 \end{align*}
@@ -433,15 +438,14 @@ Since it is computed analogous to the edit distance it is also computed in time 
 \section{Classification}
 \label{sec:classification}
 
-
-% % % % % % % % % % % % % % % % % % % % % %
-
-
-\subsection{Comparison of binary feature vectors}
 \begin{itemize}
     \item Classification is generally done on feature vectors as resulting from the field-based comparisons.
     \item Various methods have been proposed, such as unsupervised, supervised, active-learning and incremental.
     \item Labeled data is often lacking so unsupervised methods are most widely applicable.
+    \item In probabilistic record linkage the values in the records are weighted according to an external source of statistics.
+    \item Give an example which naturally shows how statistics / informative value aids the linkage.
+    \item Define equation that is used in the computation.
+    \item Discuss the relation to joint entropy?
 \end{itemize}
 
 
@@ -450,11 +454,9 @@ Since it is computed analogous to the edit distance it is also computed in time 
 
 \subsection{Probabilistic record linkage}
 \begin{itemize}
-    \item In probabilistic record linkage the values in the records are weighted according to an external source of statistics.
-    \item Give an example which naturally shows how statistics / informative value aids the linkage.
-    \item Define equation that is used in the computation.
-    \item Discuss the relation to joint entropy?
+    
 \end{itemize}
+
 
 
 % % % % % % % % % % % % % % % % % % % % % %
