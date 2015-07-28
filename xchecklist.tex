@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+
+\usepackage{amssymb}   % Extra symbols
+
+%%% Define nice check and check box
+\newcommand{\MyCheckedBox}{\makebox[0pt][l]{$\square$}\raisebox{.15ex}{\hspace{0.1em}$\checkmark$}}
+\newcommand{\MyCheckBox}{\makebox[0pt][l]{$\square$}\raisebox{.15ex}}
+
+%%% Define check list
+\setlength{\marginparwidth}{1.2in}
+\let\oldmarginpar\marginpar
+\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft #1]%
+{\raggedright #1}}    
+
+\newenvironment{checklist}{%
+  \begin{list}{}{}% whatever you want the list to be
+  \let\olditem\item
+  \renewcommand\item{\olditem -- \marginpar{\MyCheckBox} }
+  \newcommand\checkeditem{\olditem -- \marginpar{\MyCheckedBox} }
+}{%
+  \end{list}
+}
+
+\begin{document}
+
+\section{Experiments}
+
+\subsection{Occurrence extraction}
+\begin{checklist}
+    \item Manually annotate occurrences in a Fine Roll.
+    \item Extract occurrences using parser.
+    \item Describe results in terms of precision and recall.
+    \item Discuss the results relating it to the simplicity of the parser and tell whether something more sophisticated is required.
+\end{checklist}
+
+\subsection{Name learning}
+\begin{checklist}
+    \item Learn surnames and first names by alternating parsing.
+    \item Use the first names list from Fine Rolls on Gascon Rolls.
+    \item Manually inspect the results obtained.
+\end{checklist}
+
+\subsection{Blocking}
+\begin{checklist}
+    \item Comparison of the three described blocking methods.
+    \item Goals of these experiments is to find a suitable one for historical record linkage.
+\end{checklist}
+
+\subsection{Classification}
+\begin{checklist}
+    \item Record Linkage in Fine Rolls.
+\end{checklist}
+
+\subsection{Maximally informative k-itemsets}
+\begin{checklist}
+    \item Extract mikis from Wikipedia and Fine rolls datasets.
+    \item Discuss the outcomes (anecdotal evidence).
+    \item Discuss the "common name" problem and show how prevalent it is in the Wikipedia dataset.
+    \item Take the "John Smith" group in Wikipedia and perform record linkage with mikis.
+\end{checklist}
+
+\subsection{Transitive closure}
+\begin{checklist}
+    \item How big is the problem of inconsistencies in the results obtained thusfar?
+    \item Exploit transitive closure?
+\end{checklist}
+
+\end{document}

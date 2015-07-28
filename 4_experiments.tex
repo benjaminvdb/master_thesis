@@ -10,46 +10,64 @@ That which can be asserted without evidence, can be dismissed without evidence.
 \chapter{Experimental Evaluation}
 \label{ch:experiments}
 
-\chaplettrine{D}{o} not forget the chapter lettrine.\vspace{2cm}
+\chaplettrine{S}{ince} the aim of this project is to aid historians in their research, we found it important to evaluate the described techniques on a dataset that is exemplary of historical research in which entity disambiguation plays an important role.
+To this extent, our methods were applied to a dataset that was made available to us by The National Archives.
+In this chapter the followed procedure is described and the results are compared to the ones that were manually obtained by historians.
+With the experiments we try to point out the advantages and difficulties of the system and provide a basis for future research.
 
-Several options are available for evaluation:
-
-\begin{enumerate}
-    \item A dataset can be artificially generated for which is treated as the ``golden standard''. An advantage of this is that the generation procedure can easily be parametrized so certain aspects, such as the introduction of noise, can be tightly controlled.
-    \item If the proposed record linkage methods can be deemed as \emph{generic}, i.e., they are not tailor-made for a specific dataset, results obtained from a dataset is
-\end{enumerate}
-
-
-% % % % % % % % % % % % % % % % % % % % % %
-
-
-\section{Datasets}
-\label{sec:datasets}
+As has been pointed out in \cref{sec:challenges}, it is impossible to be certain about the results because of a lack of a ``golden standard'', i.e., a dataset that can be assumed to be absolutely correct.
+The experiments must be seen as a \emph{best effort} approach to assess the validity of the system.
+Errors have been discovered both on part of the record linkage system and the data as provided by the historians, some of which will be investigated in this chapter.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Fine Rolls}
-\label{subsec:fine_rolls}
+\section{Overview of the dataset}
+\label{sec:dataset}
+
+The dataset that has been used for validation of the system is that of \emph{The Gascon Rolls project} \citep{GasconRolls}.
+The Gascon Rolls are records that were drawn up by the English royal administration of Aquitaine-Gascony (south-western France) between 1273 and 1468 and contain grants of land, oaths of treaties and other important documents.
+Until 1453, the region of Aquitaine was under English rule and the rolls served as a means of communicating the situation to the government in England.
+This tradition continued until 1468 even though the French annexed it at the end of the Hundred Year's War in 1453.
+The rolls are considered to be of high historical importance because the detailed
+descriptions of events prove an invaluable basis for the biographies of people mentioned.
+People have a central role, since most of the text concerns agreements, making it an ideal candidate for record linkage.
+
+\begin{listing}[tbp]  % minted's listing (float) environment overrides the default placement options
+    \inputminted[
+        breaklines,
+        bgcolor=codebg,
+        tabsize=2,
+        fontsize=\small
+    ]{xml}{xml/gascon_example.xml}
+    \caption{An extract from the Gascon Rolls XML source data.}
+    \label{lst:gascon_xml}
+\end{listing}
+
+In 2009 a project began to produce an on-line calendar, i.e., a descriptive summary of an original archive document in which all significant elements are recorded, of the rolls.
+The project aims to provide an easy to access substitute of the rolls, opening up research to any who might be interested.
+The data thus consists of a translated and summarized extract of the original parchment rolls in digital XML format.
+Historians have thoroughly annotated this data to supply additional information and correct errors, while also providing most of the original text.
+An example of this is given in \cref{lst:gascon_xml}, where an extract of the original data in XML format can be seen.
+The text concerns a grant of the office, that was formerly held by a Master Bernat de Rions, who had deceased, to Master Per-Arnaut de Taller.
+The text has been split into three sections using separate tags: \texttt{head}, \texttt{body} and \texttt{closer}.
+The header usually includes the the recipient, while the closer contains the phrase ``By K.'', which originally stated ``per ipsum regem'', indicating the letter was sent under the authority of the reigning king.
+Within the \texttt{opener} tag, the date and location from the letter was signed are usually included.
+The example also shows most of the different styles of annotations that were provided by the historians.
+Person names are enclosed within a \texttt{name} tag of type \texttt{person}, while $53$ other types exist for names of things such as places, castles and titles.
+Each of these is also accompanied with a key that uniquely identifies them throughout the dataset.
+Other tags that might be of use to a human reader are: \texttt{orig}, that displays the original spelling of a word; \texttt{supplied}, that gives more information than was original present; and \texttt{note}, which gives additional information about something present on the original document that might be of interest to the reader, such as a note in the margin or a reference to another text.
+
+Even though the annotations provided in the data are invaluable for the evaluation of the record linker, they were not used in the linkage itself.
+Since the goal is to develop a system that can automatically provide these tags, we have proceeded as if no information was present except for the plain text.
+
+2.10 Notes of warrant, when they occur at the end of an entry, have been abbreviated as in the published Calendars of Chancery rolls. Thus per ipsum regem becomes 'By K.', per (ipsum) regem et consilium 'By K. and C.'. Where letters are warranted ‘on the information of’, or ‘by the advice of’ named individuals, then that is indicated, as well as when it is indicated that more than one copy of a document has been made ('In duplicate', etc.), or when they are to be sent ‘patent’ or ‘close’. See Appendix 5 for a list of abbreviated forms.
 
 \begin{itemize}
 	\item Overview of the dataset (structure, size, etc.)
 	\item First parsing: conversion to JSON.
 	\item Second parsing: entity extraction from text.
-\end{itemize}
-
-
-% % % % % % % % % % % % % % % % % % % % % %
-
-
-\subsubsection{Wikipedia}
-\label{subsec:wikipedia}
-	
-\begin{itemize}
-	\item Overview of used data dump (structure, size, etc.)
-	\item Parsing of the data.
-	\item ...
 \end{itemize}
 
 
