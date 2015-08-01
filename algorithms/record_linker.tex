@@ -1,0 +1,25 @@
+\begin{algorithmic}[1]
+    \Function{ClassifyPair}{$a_i, a_j, \bm{\delta}, \bm{\tau}, \bm{\sigma}, t$}
+        \For{$k:=1 \To m$}
+            \State $d := \bm{\delta}[k](a_i, a_j)$
+            \If{$d \leq \bm{\tau}[k]$}
+                \If{$a_i == a_j$}
+                    \State{$p := \bm{\sigma}[k](a_i)$}
+                \Else
+                    \State{$p := \bm{\sigma}[k](a_i) + \bm{\sigma}[k](a_j)$}
+                \EndIf
+            \Else
+                \State{$p := 0$}
+            \EndIf
+            \State{$\bm{p}[k] := p$}
+        \EndFor
+        \Statex
+        \State{$c = c_{\mathrm{log}}(p)$}
+        \Statex
+        \If{$c \geq t$}
+            \State \Return{$1$}
+        \Else
+            \State \Return{$0$}
+        \EndIf
+    \EndFunction
+\end{algorithmic}

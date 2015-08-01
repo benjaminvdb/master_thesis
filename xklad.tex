@@ -1,9 +1,23 @@
 \documentclass{book}
 
-\usepackage{mystyle}
+%\usepackage{mystyle}
+
+\usepackage{pgfplots}
+\usepackage{tikzscale}
+
+\newcommand\gratio{0.6180339887}
+
+\pgfplotsset{compat=1.12}
 
 \begin{document}
 
-\input{plots/blocking_example.tex}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/precision_recall_curve.tikz}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
+%\input{algorithms/record_linker.tex}
 
 \end{document}

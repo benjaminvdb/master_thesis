@@ -1,0 +1,26 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        %small,
+        %scale only axis,
+        %height=5cm,
+        %width=\textwidth-\widthof{20}-0.1cm,
+        %scale only axis,
+        %xscale=1.5,
+        title={Precision-Recall Curve},
+        xlabel={Recall},
+        ylabel={Precision},
+        %legend entries={Gascon Rolls, Wikipedia, Optimal},
+        %legend style={
+        %    at={(rel axis cs:0.95,0.05)},
+        %    anchor={south east},font=\small
+        %},
+        legend cell align=right,
+        cycle multi list={Set1-3}
+    ]
+        \addplot table {plots/precision_recall_curve_0.0.dat};
+        \addplot table {plots/precision_recall_curve_1.5.dat};
+%        \addplot table {plots/precision_recall_curve_2.0.dat};
+%       \addplot table {plots/precision_recall_curve_2.5.dat};
+%        \addplot table {plots/precision_recall_curve_3.0.dat};
+    \end{axis}
+\end{tikzpicture}

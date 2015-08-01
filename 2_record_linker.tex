@@ -103,7 +103,8 @@ Various blocking techniques can be parametrized as to allow a user to choose an 
 
 \begin{figure}
     \centering
-    \input{plots/blocking_example.tex}
+    %\input{plots/blocking_example.tex}
+    \includegraphics[width=\textwidth,height=0.618\textwidth]{plots/blocking_example.tikz}
     \caption{Partitioning a set into blocks can fairly reduce the number of candidate pair comparisons.}
     \label{fig:blocking_example}
 \end{figure}
@@ -178,8 +179,6 @@ Experimental evaluation of this modification has shown that it can lead to more 
     \caption{Caption}
     \label{tab:blocking_example}
 \end{table}
-
-
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -318,7 +317,7 @@ Moreover, the Jaro similarity function also accounts for the number of transposi
 Put together, the metric is defined as follows:
 
 \begin{equation}
-    s_{jaro}(\sigma_1, \sigma_2) =
+    \mathrm{s_{jaro}}(\sigma_1, \sigma_2) =
     \begin{dcases}
         \frac{1}{3} \left( \frac{c}{\vert \sigma_1 \vert} + \frac{c}{\vert \sigma_2 \vert} + \frac{c-t}{c} \right) & \text{if } m = 0 \\
         0 & \text{otherwise}
@@ -331,7 +330,7 @@ The Jaro-Winkler similarity function takes this into account by increasing the s
 It is computed as follows:
 
 \begin{equation}
-    s_{winkler}(\sigma_1, \sigma_2)=s_{jaro}(\sigma_1, \sigma_2) + (1-s_{jaro}(\sigma_1, \sigma_2)\frac{p}{10}
+    \mathrm{s_{winkler}}(\sigma_1, \sigma_2)=\mathrm{s_{jaro}}(\sigma_1, \sigma_2) + (1-\mathrm{s_{jaro}}(\sigma_1, \sigma_2)\frac{p}{10}
 \end{equation}
 
 \noindent with $p\in\{0,\dots,4\}$ being the length of the longest common prefix of at most $4$.
@@ -345,23 +344,23 @@ It is computed as follows:
         Matches    & 0 & 1 & 4 & - & 3 & - & - \\		
         $\sigma_2$ & \textbf{j} & \textbf{o} & h & s & n & o & n \\\hline
     \end{tabular}
-    \caption[Example matching]{This table shows the matching of individual characters between string 'jones' and 'johsnon'. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
+    \caption[Example matching]{This table shows the matching of individual characters between string ``jones'' and ``johsnon''. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
     \label{fig:jaro_winkler}
 \end{figure}
 
-\cref{fig:jaro_winkler} shows how individual characters in the strings 'jones' and 'johsnon' are matched.
+\cref{fig:jaro_winkler} shows how individual characters in the strings ``jones'' and ``johsnon'' are matched.
 We can see that four characters can be matches and there is one transposition, since one character must be swapped to turn the list of indexes into a sorted array.
-The Jaro simmilarity can be computed as follows.
+The Jaro similarity can be computed as follows.
 
 \begin{equation*}
-    s_{jaro}(\text{`jones'}, \text{`johsnon'}) = \frac{1}{3} \left(\frac{4}{5} + \frac{4}{7} + \frac{3}{4} \right) = 0.70714
+    \mathrm{s_{jaro}}(\text{`jones'}, \text{`johsnon'}) = \frac{1}{3} \left(\frac{4}{5} + \frac{4}{7} + \frac{3}{4} \right) = 0.70714
 \end{equation*}
 
 \noindent The number of matching starting character is $2$, which is used by the Jaro-Winker distance to increase the similarity as follows:
 
 \begin{align*}
-    s_{winkler}(\text{`jones'}, \text{`johsnon'}) &= s_{jaro}(\text{`jones'}, \text{`johsnon'}) + \\
-    &+(1-s_{jaro}(\text{`jones'}, \text{`johsnon'}))\frac{p}{10} \\
+    \mathrm{s_{winkler}}(\text{`jones'}, \text{`johsnon'}) &= \mathrm{s_{jaro}}(\text{`jones'}, \text{`johsnon'}) + \\
+    &+(1-\mathrm{s_{jaro}}(\text{`jones'}, \text{`johsnon'}))\frac{p}{10} \\
     &= 0.70714 + (1 - 0.70714)\times\frac{2}{10} \\
     &= 0.76571
 \end{align*}
@@ -435,45 +434,87 @@ Since it is computed analogous to the edit distance it is also computed in time 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\section{Classification}
+\section{Candidate pair classification}
 \label{sec:classification}
 
-\begin{itemize}
-    \item Classification is generally done on feature vectors as resulting from the field-based comparisons.
-    \item Various methods have been proposed, such as unsupervised, supervised, active-learning and incremental.
-    \item Labeled data is often lacking so unsupervised methods are most widely applicable.
-    \item In probabilistic record linkage the values in the records are weighted according to an external source of statistics.
-    \item Give an example which naturally shows how statistics / informative value aids the linkage.
-    \item Define equation that is used in the computation.
-    \item Discuss the relation to joint entropy?
-\end{itemize}
+The last step in the pipeline is to classify candidates pairs, i.e., pairs of occurrences within the same block, into \emph{matches} and \emph{non-matches}.
+The classifier bases its decision on roughly on two criteria.
 
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \begin{tabular}{| l | c | c | c |}
+            \cline{2-4}
+            \multicolumn{1}{l|}{ } & \textit{First name} & \textit{Article} & \textit{Last name} \\\hline
+            $p$ & $0.182$ & $0.917$ & $0.00214$ \\\hline
+            $o_1$ & John & de & Engelfield \\\hline
+            \multicolumn{1}{c}{ } & \multicolumn{1}{c}{$0.0 \updownarrow$} & \multicolumn{1}{c}{ } & \multicolumn{1}{c}{$0.13 \updownarrow$} \\\hline
+            $o_2$ & John & & Englefield \\\hline
+            $p$ & $0.182$ &  & $0.00321$\\\hline
+            \multicolumn{1}{l|}{ } & \textit{First name} & \textit{Article} & \textit{Last name}\\\cline{2-4}
+        \end{tabular}
+        \subcaption{}
+        \label{fig:classify1}
+    \end{subfigure}
+    \par\bigskip
+    \begin{subfigure}[b]{\linewidth}
+        \centering
+        \begin{tabular}{| l | c | c | c |}
+            \cline{2-4}
+            \multicolumn{1}{l|}{ } & \textit{First name} & \textit{Article} & \textit{Last name} \\\hline
+            $p'$ & $0.182$ & & $0.0535$ \\\hline
+            $E_q$ & $1$ & $0$ & $1$\\\hline
+        \end{tabular}
+        \subcaption{}
+        \label{fig:classify2}
+    \end{subfigure}
+    \caption{\subref{fig:classify1} shows the pairwise comparison of two occurrences, $o_1$ and $o_2$, based on three fields. The probability $p$ of each value is given if it is known, and the string distance is shown next to the arrow. The first names match exactly and the last names are quite similar, with a distance of $0.13$. \subref{fig:classify2} shows the aggregated probabilities $p'$ and the equivalence status $E_q$.}
+\end{figure}
 
-% % % % % % % % % % % % % % % % % % % % % %
+First, the equivalence of the values of each attribute is established in a pair-wise fashion, using the output of a string distance function.
+An example of this is shown in \cref{fig:classify1} where the references ``John de Engelfield'' and ``John Englefield'' are compared.
+The first name matches exactly, while the last name is a partial match, with a distance of $0.13$.
+By setting a threshold on the distance, an \emph{equivalence function} is obtained that outputs $1$ if the values are considered equivalent and $0$ otherwise, while empty strings are never considered equivalent.
+This is shown in \cref{fig:classify2}, where the threshold has been set at $0.2$, resulting in a binary vector of length $3$.
+Note that different equivalence functions could be set for each of the individual fields, depending on the type of value, such as string, categorical and ordinal, and the thresholds could be varied.
 
+Secondly, if the values are equivalent, then the probability of the value occurring is retrieved.
+If the values were not equal, however, this leaves a choice whether to choose the probability of the value from either the first or second occurrence, or both.
+Since the equivalence function determined that the values are equivalent, we decided to therefore sum the two probabilities, effectively treating the two values as if they are the same.
+In the same example it can be seen that the probabilities of ``Engelfield'' and ``Englefield'' have been summed to a value of $0.0535$.
 
-\subsection{Probabilistic record linkage}
-\begin{itemize}
-    \item Lala
-\end{itemize}
+To compute an overall confidence score, the probabilities are aggregated into a single number.
+One way of doing this is by assuming that the attributes are independent and multiplying the probabilities as to obtain the posterior probability given the attribute values.
+When multiplied with a population size estimate $\alpha$, the estimate number of people having the described properties can be found.
 
+\begin{equation}
+    c_{\pi}(P) = \alpha \prod_{i=0}^{m} p_i
+\end{equation}
 
+\noindent with $m$ the number of fields considered.
 
-% % % % % % % % % % % % % % % % % % % % % %
+Even though the population size of certain areas might retrievable from other historical sources, it can be assumed that the number of people contained within a document $\alpha$ is unknown, since determining this is one of the goals of entity disambiguation.
+For the purposes of entity disambiguation it is not relevant, however, as it is simply a scaling factor, i.e., if candidate pairs are ranked based on their score, omitting $\alpha$ does not influence the ranking.
 
+Instead of multiplying probabilities, the sum of logarithms can also be used.
 
-\section{Leveraging transitivity (?)}
-\begin{itemize}
-    \item Transitivity can lead to inconsistencies in the inference of the record linker.
-    \item However, evidence can be obtained by applying transitivity, since nodes that share a relatively high number of edges, i.e., are graphically similar, might refer to the same entity.
-\end{itemize}
+\begin{equation}
+    c_{\mathrm{log}}(P) = -\sum_{i=0}^{m} \log{p_i}
+    \label{eq:confidence1}
+\end{equation}
 
+\noindent While the $\alpha$ parameter makes the $c_{\pi}$ score easier to interpret, here it is of no use and simply omitted.
+The $c_{\mathrm{log}}$ score has the advantage that it is more efficient to compute and has a better numerical stability.
+Multiplying a large amount of small numbers can lead to underflow errors, which is resolved by instead summing the logarithms.
+Another advantage is of more practical nature: they are much easier to display in tables and plots, which is why all confidence scores will be presented as $c_{\mathrm{log}}$ in thesis.
 
-% % % % % % % % % % % % % % % % % % % % % %
+\begin{algorithm}
+    \caption{Classifies candidate pair $(a_i, a_j$) as a match or non-match}
+    \label{alg:record_linker}
+    \input{algorithms/record_linker.tex}
+\end{algorithm}
 
-
-\section{Data fusion (?)}
-\begin{itemize}
-    \item Though it is not the primary goal of this thesis, it might be interesting to consider an example of a possible next step in the process.
-    \item Discuss how an entity-driven web search might aggregate information about a person.
-\end{itemize}
+To classify candidate pairs, a threshold value is set on the confidence score.
+All candidate pairs that have a confidence score greater than or equal to the threshold are classified as matches, and all others as non-matches.
+The complete algorithm is shown in \cref{alg:record_linker}.

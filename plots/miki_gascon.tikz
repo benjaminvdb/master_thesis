@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        %small,
+        %scale only axis,
+        %height=5cm,
+        %width=\textwidth-\widthof{20}-0.1cm,
+        %scale only axis,
+        %xscale=1.5,
+        title={Convergence of entropy},
+        xlabel={k},
+        ylabel={Entropy},
+        legend entries={Gascon Rolls, Wikipedia, Optimal},
+        legend style={
+            at={(rel axis cs:0.95,0.05)},
+            anchor={south east},font=\small
+        },
+        legend cell align=right,
+        cycle multi list={Mark-Set1-3}
+    ]
+        \addplot table {plots/miki_gascon.dat};
+        \addplot table {plots/miki_wikipedia.dat};
+        \addplot [mark=none, black, dashed] table {plots/miki_optimal.dat};
+    \end{axis}
+\end{tikzpicture}

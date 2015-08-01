@@ -10,4 +10,32 @@
 \chapter{Conclusions and future work}
 \label{ch:conclusions}
 
-\chaplettrine{D}{o} not forget the chapter lettrine.\vspace{2cm}
+\chaplettrine{T}{he} results presented in the previous chapter show that there are aspects of the methods described that work quite reliably, though some parts should still be improved.
+In this chapter we will take another look at the pipeline and discuss the strong and weak points and give some directions for future research.
+
+We started out by extracting named-entities from text using a grammar-based approach.
+The Gascon Rolls dataset was already annotated, enabling us to zoom in solely on the named-entities and evaluating the precision and recall of the grammar.
+This is not a luxury that would be typical in a historical research project and the time that was required to construct the dataset should be taken into account.
+However, because the grammar captures structures that appear throughout many documents, even spanning different time periods, it is likely that the constructed grammar (see ...) can be applied on other datasets as well.
+Indeed, we have done a short test on the Fine Rolls of King Henry III, which showed reasonable results, though a more thorough study should be done to be conclusive.
+
+One of the problems with manually constructing grammar is that rules are heavily entangled, requiring to parse the entire corpus again to verify no regression happened after a change.
+Another problem is use of pre-defined first names as anchor points in the text.
+Even though new first names can be discovered using a bootstrapping procedure, the first names can also cause problems when they appear in names that do not belong to people, such as organizations.
+In our study we saw the name ``Mary'' appearing often as part of the name of church, triggering a false positive.
+We provide two suggestions for further improvement of the entity extraction step.
+
+First, the grammar-based approach could be combined with techniques from natural language processing (NLP).
+Named-entity recognition (NER) not only detects entities in text, but classifies them into categories such as ``person'', ``organization'' and ``place''.
+In recent years, supervised and semi-supervised machine learning techniques have successfully been employed for this task \citep{Miller2004}.
+A difficulty with supervised methods is that they are usually not good at dealing with unseen data.
+This becomes more of a problem when many items are very unlikely to appear, such as in the case of natural language.
+This is also called the ``long tail'' or sparsity problem.
+It can be circumvented by clustering words together in an unsupervised fashion first and using the resulting clusters as features in a supervised learning algorithm such as presented in \citet{Miller2004}.
+Extracting only occurrences contained within a ``person'' segment, as classified by NER, would solve problems similar to that of ``Mary'' in the name of a church.
+
+Secondly, a supervised or semi-supervised machine learning method could also prove useful for the segmentation of occurrences.
+It can often be difficult to determine in what order certain attributes can appear, while it is easy to determine the attributes within a given sentence.
+This suggests that ...
+
+Cite \citep{Lin2009} for phrase-based modelling
