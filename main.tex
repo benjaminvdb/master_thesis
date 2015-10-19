@@ -2,7 +2,7 @@
 \RequirePackage[l2tabu, orthodox]{nag}
 
 %%% Preamble
-\documentclass[11pt,a4paper,oneside,final]{book}        % Add 'draft' or 'final'
+\documentclass[11pt,a4paper,oneside,draft]{book}        % Add 'draft' or 'final'
 
 %%% Style
 \usepackage{mystyle}
@@ -12,7 +12,7 @@
 \degreeyear{2015}
 
 %%% Modular includes
-%\includeonly{2_record_linker}
+\includeonly{2_record_linker}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -24,13 +24,13 @@
 \ifdraft{}{
     \frontmatter
     \includepdfmerge{front/frontpage.pdf}   % Front page
-    \copyrightpage                          % Copyright
+    %\copyrightpage                          % Copyright
     %\abstractpage
     \tableofcontents                        % Table of contents
     %\authorlist                            % Acknowledge authors of chapters (if any)
     %\listoffigures
     %\listoftables
-    \dedicationpage
+    %\dedicationpage
     %\acknowledgements
 }
 

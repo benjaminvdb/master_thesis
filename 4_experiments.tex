@@ -12,11 +12,11 @@ That which can be asserted without evidence, can be dismissed without evidence.
 
 \chaplettrine{S}{ince} the aim of this project is to aid historians in their research, we found it important to evaluate the described techniques on a dataset that is exemplary of historical research in which entity disambiguation plays an important role.
 To this extent, our methods were applied to a dataset that was made available to us by The National Archives.
-In this chapter the followed procedure is described and the results are compared to the ones that were manually obtained by historians.
+In this chapter, the followed procedure is described and the results are compared to the ones that were manually obtained by historians.
 With the experiments we try to point out the advantages and difficulties of the system and provide a basis for future research.
 
 As has been pointed out in \cref{sec:challenges}, it is impossible to be certain about the results because of a lack of a ``golden standard'', i.e., a dataset that can be assumed to be absolutely correct.
-The experiments must be seen as a \emph{best effort} approach to assess the validity of the system.
+The experiments must be seen as a best effort approach to assess the validity of the system.
 Errors have been discovered both on part of the record linkage system and the data as provided by the historians, some of which will be investigated in this chapter.
 
 
@@ -83,10 +83,10 @@ This ensures the tools developed can be applied to a wide range of datasets.
 \end{table}
 
 Not all $112$ existing Gascon rolls are yet available in XML format, but $66$ of them are.
-Out of the $1053$ membranes, $943$ made available, though some of them appear to be unfinished.
+Out of the $1053$ membranes, $943$ are made available, although some of them appear to be unfinished.
 To give an impression of the size of the dataset, some of its characteristics are displayed in \cref{tab:data_overview}.
 The elements were counted using the provided annotations, e.g., the number of occurrences were computed by counting the XML \texttt{name} elements of type \texttt{person}.
-The size of the data is quite modest compared to typical record linkage tasks that can involve millions of records.
+The size of the data is quite modest compared to typical record linkage tasks that can often involve millions of records.
 However, there are over $30$ thousand occurrences that were not only identified in text, but also disambiguated, i.e., each of them has a unique identifier.
 This makes the Gascon rolls dataset an invaluable resource for the task at hand.
 
@@ -102,7 +102,7 @@ The first step, therefore, is to remove the provided XML tags and parse the data
 The identifiers that were contained within the original tags were stored by their starting and ending position in text, so that they could be copied to the corresponding occurrences after segmentation.
 Only occurrences in paragraphs enclosed in \texttt{ab} tags were considered as to make sure the calendar itself was parsed, and not the additional text provided by researchers, such as introductory text.
 The amount of annotated occurrences contained herein is $25836$.
-Using a compact grammar (provided in Appendix \todo{write grammar in LaTeX and include it in the appendix}), we were able to find $22206$ occurrences.
+Using a compact grammar (provided in Appendix A), we were able to find $22206$ occurrences.
 Note that this is not necessarily a subset of the larger set, as not all names were annotated and the grammar is likely to return some errors. 
 In total were unable to match $1684$ occurrences found by the parser with annotated occurrences, so these were removed as to obtain $20522$ occurrences, each with a unique identifier.
 
@@ -150,14 +150,14 @@ In \cref{sec:miki} it was discussed how the inclusion of contextual information 
 Assuming that a person appears within a similar context, the goal is to determine the ``topics'' discussed therein using MIKIs.
 The first question that arises is what the context of the occurrence is.
 The level was chosen to be at that of the sections, because topics are very consistent throughout them and can naturally be regarded as the context.
-One alternative is the text level, but this would greatly reduce the probability of an item of a MIKI occurring in the same text as an occurrence.
-Another options is to capture information on a membrane or roll level, but since most of the information contained therein is unrelated it unlikely to be of relevance to an occurrence.
+One alternative is the sentence level, but this would greatly reduce the probability of an item of a MIKI occurring in the same sentence as an occurrence.
+Another options is to capture information on a membrane or roll level, but since most of the information contained therein is unrelated, it unlikely to be of relevance to an occurrence.
 
 To compute a MIKI for the Gascon rolls corpus, the sections are first \emph{tokenized} by splitting sentences on the whitespace character and converting all words to lowercase.
 The latter step insures no distinction is made between capitalized and non-capitalized tokens.
 These lists of tokens are then converted to multisets by computing the frequency of each token and stored, in the \texttt{words} field of each occurrence that occurs in the same section, for reference.
 
-The time complexity of the computation of MIKIs can be reduced by discarding uninformative tokens beforehand.
+The time required to compute a MIKI can be reduced by discarding uninformative tokens beforehand.
 Three strategies were used:
 
 \begin{enumerate}
@@ -214,8 +214,76 @@ This shows that even though the choice for creating itemsets on a section level 
 \section{Linking entities}
 \label{sec:linking_entities}
 
-The record linker uses the data as described in the previous two section to classify presented candidate pairs.
+The record linker uses the data as described in the previous two sections to classify presented candidate pairs.
+We will denote with $P$ the set of ``truly matching pairs'' (or positives) and with $N$ the set of ``truly non-matching pairs'' (negatives).
+Note that even though the used dataset was created with a lot of effort, it can never be regarded as a ``ground truth'' since the entities were linked with only limited information and will certainly contain errors.
+Since the dataset was parsed and occurrences were segmented, more errors have likely been introduced, so the results of evaluation using the dataset can not be considered as truly reflecting the performance of the linker.
+The dataset provides a realistic use case, however, and findings will certainly help in understanding the problems faced better and provide the information needed to improve the linker.
+
 The simple attributes, such as first names, are processed as described in \cref{sec:classification}: if two attributes in the two records are considered equivalent, the logarithm of the probabilities are summed as to obtain a confidence score.
 The contextual information residing in the \texttt{words} attribute is mapped to $k$ additional binary fields, one for each item in the MIKI.
 These attributes are \texttt{True} whenever the corresponding word is contained in the \texttt{words} attribute and \texttt{False} otherwise.
 This allows these attributes to be treated in a similar fashion to the other attributes.
+Each field is tested for equivalence and the probabilities are aggregated using the $c_{\mathrm{log}}$ function to obtain a confidence score.
+
+However, in our experiments we noticed that the use of a MIKI did not prove useful to increase the score of candidate pairs with very low confidence scores.
+It might happen, for example, that a candidate record pair contains only the first name ``John'', which occurs frequently and thus results in a relatively low confidence score.
+When a MIKI is incorporated in the confidence score computation in these cases, the score is boosted too much, resulting in a lot of false positives.
+Therefore we use the MIKI as a \emph{booster}: it is only addressed when the confidence score up until that point is greater than the threshold.
+This focuses the application of the MIKI on the more promising pairs, i.e., those with a higher probability of being a truly matching pair.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/kde.tikz}
+    \caption{A kernel density plot was created using pairs having score $\geq 0.5$. It shows that there is a major overlap between the scores of truly positive and truly negative candidate pairs, suggesting that the linker is unable to clearly distinguish the two classes.}
+    \label{fig:kde}
+\end{figure}
+
+The aim of the linker is to give elements of the set of truly matching pairs $P$ a relatively higher score than the set non-matching pairs $N$.
+\cref{fig:kde} shows a kernel density estimation (KDE) plot based on the scores of truly matching and truly non-matching candidate pairs using the attributes \texttt{title}, \texttt{forename}, \texttt{article}, \texttt{surname},\texttt{role} and no MIKI, using a gaussian kernel.
+Only pairs with a score higher than $0.5$ have been taken into account, as the pairs with are less of a problem to the linker; most of them have a confidence score of $0.0$ and are simply negatives.
+Note that the two curves have been normalized and are plotted on a different scale, allowing us to plot both curves in one figure, even though there are many more negatives than positives.
+It can be seen that there is a considerable area related to the negatives, that is overlapping with that of the positives.
+The plot suggests that the threshold should be set at a confidence score of approximately $2$ to avoid capturing a lot of negatives, but only a small fraction of the positives can be retrieved this way.
+Lowering the threshold, however, will quickly reduce the precision as more and more negatives are retrieved, which might not be acceptible in many cases.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/roc.tikz}
+    \caption{The ROC curve shows that the trade-off is able to retrieve a large number of truly matching pairs if compared to the number of truly negative pairs that is retrieved. However, this gives an overly optimistic view on the performance of the linker, since the number of truly negative pairs is almost three orders of magnitute larger.}
+    \label{fig:roc}
+\end{figure}
+
+\cref{fig:roc} shows the receiver operating characteristic (ROC) curve of the system using various thresholds
+It appears is af the trade-off between the true positive rate and the false positive rate is not affected by the use of a MIKI: the ROC curves are identical.
+The area under the ROC curve is quite large, meaning a large fraction of the truly matching pairs are found while retrieving only a small fraction of the truly non-matching pairs.
+However, as explained in \cref{sec:problem_definition}, since the false positive rate is based on the number of truly non-matching pairs, it is not a very informative number, since $P \lll N$.
+In the same figure it can be seen that there is a very steep slope in which most of the truly matching pairs are retrieved.
+The long diagonal moving to the upper left corner is associated with candidates pairs that have a low confidence score, of which many are truly non-matching pairs.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/precision_recall_curve.tikz}
+   \caption{The precision-recall curve shows that only a small portion of the truly postive pairs can be retrieved with reasonable precision. The steep decline suggests that the scores of truly matching and non-matching pairs is very similar, which prohibits the retrieval of truly matching pairs without also retrieving a large number of truly non-matching pairs, explaining the low precision.}
+    \label{fig:precision_recall}
+\end{figure}
+
+A more informative plot is perhaps the precision-recall curve shown in \cref{fig:precision_recall}.
+It shows a trade-off between the number of truly matching pairs that are matched by the linker (recall) and the fraction of the pairs retrieved that are indeed truly matching pairs (precision).
+A linker that has a maximum recall of $1$ can easily be devised by classifying all candidate pairs as matches, but this results in a very low precision.
+The area under the precision-recall curve can be used as a measure of the system's ability to optimize both these aspects.
+About $30\%$ of the truly matching pairs can be found without too much difficulty, indicating that these pairs have a relatively high score compared to the truly non-matching pairs, making them easy to distinguish by setting the threshold to a high confidence score, as could also be seen in the KDE plot.
+For the remaining part, the linker has more problems, suggesting that truly matching and non-matching pairs start to get more similar scores at that point.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/f1.tikz}
+    \caption{The F1-measure is optimal at a confidence value of approximately $4$ with a value of $0.35$. Varying the threshold value at which the MIKI is taken into does not affect the curve much, although the curve is wider, indicating that F1-measure score is more stable.}
+    \label{fig:f1}
+\end{figure}
+
+Using the F1-measure of \cref{def:fmeasure} with $\beta = 1$, we aggregate the precision and recall in a single metric in which both aspects are weighted equally.
+The latter is a rather arbitrary decision and any weighting could be achieved by varying $\beta$.
+The resulting F1-measure is plotted against the various thresholds settings in \cref{fig:f1}.
+A clear peak can be seen around a confidence score of $4$ for all different settings of the threshold at which point the MIKI is taken into account.
+When related to the precision-recall curve of \cref{fig:precision_recall}, we know that at this threshold, most of the negatives are not retrieved and the precision is high, but the recall is low, explaining the low F1 value of only $0.35$ at the peak.

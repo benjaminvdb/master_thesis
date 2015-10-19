@@ -6,7 +6,7 @@
   Title                    = {Using Encyclopedic Knowledge for Named entity Disambiguation},
   Author                   = {Razvan C. Bunescu and
  Marius Pasca},
-  Booktitle                = {{EACL} 2006, 11\textsuperscript{st} Conference of the European Chapter of the Association
+  Booktitle                = {{EACL} 2006, 11st Conference of the European Chapter of the Association
  for Computational Linguistics, Proceedings of the Conference, April
  3-7, 2006, Trento, Italy},
   Year                     = {2006},
@@ -42,14 +42,15 @@
   Journal                  = {Machine Learning},
   Year                     = {2004},
   Number                   = {1-3},
-  Pages                    = {89--113},
+  Pages                    = {89-113},
   Volume                   = {56},
 
   Doi                      = {10.1023/B:MACH.0000033116.57574.95},
   ISSN                     = {0885-6125},
   Keywords                 = {clustering; approximation algorithm; document classification},
   Language                 = {English},
-  Publisher                = {Kluwer Academic Publishers-Plenum Publishers}
+  Publisher                = {Kluwer Academic Publishers-Plenum Publishers},
+  Url                      = {http://dx.doi.org/10.1023/B%3AMACH.0000033116.57574.95}
 }
 
 @InProceedings{Baxter2003,
@@ -81,7 +82,7 @@
   Publisher                = {Springer International Publishing},
   Year                     = {2015},
   Editor                   = {Aiello, Luca Maria and McFarland, Daniel},
-  Pages                    = {254--263},
+  Pages                    = {254-263},
   Series                   = {Lecture Notes in Computer Science},
   Volume                   = {8852},
 
@@ -90,7 +91,8 @@
   Keywords                 = {Text classification; Machine learning; Record linkage; Entity linkage; Historical research; Digital humanities; Digital history},
   Language                 = {English},
   Owner                    = {benny},
-  Timestamp                = {2015.06.23}
+  Timestamp                = {2015.06.23},
+  Url                      = {http://dx.doi.org/10.1007/978-3-319-15168-7_32}
 }
 
 @Book{Christen2012,
@@ -126,7 +128,7 @@
 @InProceedings{Cusmai2008,
   Title                    = {Record Linkage as a Multiobjective Optimization Problem solved by Evolutionary Computation},
   Author                   = {Cusmai, Francesco and Aiello, Carola and Scannapieco, Monica and Catarci, Tiziana},
-  Booktitle                = {Proceedings of the 1\textsuperscript{st} International Workshop on Emergent Semantics and cooperaTion in opEn systEMs},
+  Booktitle                = {Proceedings of the 1st International Workshop on Emergent Semantics and cooperaTion in opEn systEMs},
   Year                     = {2008},
   Organization             = {Citeseer},
 
@@ -152,7 +154,8 @@
   ISSN                     = {0002-9572},
   Owner                    = {benny},
   Publisher                = {American Public Health Association},
-  Timestamp                = {2015.06.22}
+  Timestamp                = {2015.06.22},
+  Url                      = {http://dx.doi.org/10.2105/AJPH.36.12.1412}
 }
 
 @Article{Fellegi1969,
@@ -237,48 +240,6 @@
   Language                 = {English}
 }
 
-@Article{Kupiec1992,
-  Title                    = {Robust part-of-speech tagging using a hidden Markov model},
-  Author                   = {Julian Kupiec},
-  Journal                  = {Computer Speech \& Language},
-  Year                     = {1992},
-  Number                   = {3},
-  Pages                    = {225 - 242},
-  Volume                   = {6},
-
-  Doi                      = {http://dx.doi.org/10.1016/0885-2308(92)90019-Z},
-  ISSN                     = {0885-2308},
-  Url                      = {http://www.sciencedirect.com/science/article/pii/088523089290019Z}
-}
-
-@InProceedings{Levenshtein1966,
-  Title                    = {Binary codes capable of correcting deletions, insertions, and reversals},
-  Author                   = {Levenshtein, Vladimir I},
-  Booktitle                = {Soviet physics doklady},
-  Year                     = {1966},
-  Number                   = {8},
-  Pages                    = {707--710},
-  Volume                   = {10}
-}
-
-@InProceedings{Lin2009,
-  Title                    = {Phrase Clustering for Discriminative Learning},
-  Author                   = {Lin, Dekang and Wu, Xiaoyun},
-  Booktitle                = {Proceedings of the Joint Conference of the 47th Annual Meeting of the ACL and the 4th International Joint Conference on Natural Language Processing of the AFNLP: Volume 2 - Volume 2},
-  Year                     = {2009},
-
-  Address                  = {Stroudsburg, PA, USA},
-  Pages                    = {1030--1038},
-  Publisher                = {Association for Computational Linguistics},
-  Series                   = {ACL '09},
-
-  Acmid                    = {1690290},
-  ISBN                     = {978-1-932432-46-6},
-  Location                 = {Suntec, Singapore},
-  Numpages                 = {9},
-  Url                      = {http://dl.acm.org/citation.cfm?id=1690219.1690290}
-}
-
 @InProceedings{Mihalcea2007,
   Title                    = {Wikify!: Linking Documents to Encyclopedic Knowledge},
   Author                   = {Mihalcea, Rada and Csomai, Andras},
@@ -299,15 +260,6 @@
   Owner                    = {benny},
   Timestamp                = {2015.06.23},
   Url                      = {http://doi.acm.org/10.1145/1321440.1321475}
-}
-
-@InProceedings{Miller2004,
-  Title                    = {Name Tagging with Word Clusters and Discriminative Training.},
-  Author                   = {Miller, Scott and Guinness, Jethran and Zamanian, Alex},
-  Booktitle                = {HLT-NAACL},
-  Year                     = {2004},
-  Pages                    = {337--342},
-  Volume                   = {4}
 }
 
 @Article{Newcombe1959,
@@ -362,18 +314,6 @@
   Url                      = {http://dx.doi.org/10.1007/978-3-642-28569-1_5}
 }
 
-@Article{Shah2014,
-  Title                    = {Improvement of Soundex algoruthm for Indian languade based on phonetic matching},
-  Author                   = {Shah, Rima and Singh, Dheeraj Kumar},
-  Journal                  = {International Journal of Computer Science, Engineering and Applications},
-  Year                     = {2014},
-  Number                   = {3},
-  Pages                    = {31},
-  Volume                   = {4},
-
-  Publisher                = {Academy \& Industry Research Collaboration Center (AIRCC)}
-}
-
 @Article{Tansel2006,
   Title                    = {A Survey of Entity Resolution and Record Linkage Methodologies},
   Author                   = {Brizan Tansel and David Guy Brizan and Abdullah Uz Tansel},
@@ -421,32 +361,75 @@
 }
 
 @Misc{GasconRolls,
-  Title                    = {\emph{The Gascon Rolls project}},
-  Note                     = {\url{http://www.gasconrolls.org/en/}
- [Accessed: 28-07-2015]},
-  Year                     = {2015}
+  Title  = "\emph{The Gascon Rolls project}",
+  Note   = "\url{http://www.gasconrolls.org/en/}
+            [Accessed: 28-07-2015]",
+  year = 2015,
 }
 
 @Misc{Soundex,
-  Title                    = {The Soundex indexing system},
-  Note                     = {\url{http://www.archives.gov/research/census/soundex.html}
- [Accessed: 28-07-2015]},
-  Year                     = {2015}
+    Title = "The Soundex indexing system",
+    Note = "\url{http://www.archives.gov/research/census/soundex.html}
+            [Accessed: 28-07-2015]",
+    year = 2015,
 }
 
-@Misc{FineRolls,
-  Title                    = {Fine Rolls Henry III: 18 HENRY III (28 October 1233–27 October 1234)},
-  Note                     = {\url{http://www.finerollshenry3.org.uk/content/calendar/roll_033.html}
- [Accessed: 28-07-2015]},
-  Year                     = {2015}
+@inproceedings{Miller2004,
+  title={Name Tagging with Word Clusters and Discriminative Training.},
+  author={Miller, Scott and Guinness, Jethran and Zamanian, Alex},
+  booktitle={HLT-NAACL},
+  volume={4},
+  pages={337--342},
+  year={2004}
 }
 
-@Book{Rijsbergen1979,
- author = {Rijsbergen, C. J. Van},
- title = {Information Retrieval},
- year = {1979},
- isbn = {0408709294},
- edition = {2nd},
- publisher = {Butterworth-Heinemann},
- address = {Newton, MA, USA},
-} 
+@inproceedings{Lin2009,
+ author = {Lin, Dekang and Wu, Xiaoyun},
+ title = {Phrase Clustering for Discriminative Learning},
+ booktitle = {Proceedings of the Joint Conference of the 47th Annual Meeting of the ACL and the 4th International Joint Conference on Natural Language Processing of the AFNLP: Volume 2 - Volume 2},
+ series = {ACL '09},
+ year = {2009},
+ isbn = {978-1-932432-46-6},
+ location = {Suntec, Singapore},
+ pages = {1030--1038},
+ numpages = {9},
+ url = {http://dl.acm.org/citation.cfm?id=1690219.1690290},
+ acmid = {1690290},
+ publisher = {Association for Computational Linguistics},
+ address = {Stroudsburg, PA, USA},
+}
+
+@article{Kupiec1992,
+    title = "Robust part-of-speech tagging using a hidden Markov model",
+    journal = "Computer Speech \& Language",
+    volume = "6",
+    number = "3",
+    pages = "225 - 242",
+    year = "1992",
+    note = "",
+    issn = "0885-2308",
+    doi = "http://dx.doi.org/10.1016/0885-2308(92)90019-Z",
+    url = "http://www.sciencedirect.com/science/article/pii/088523089290019Z",
+    author = "Julian Kupiec"
+}
+
+@inproceedings{Levenshtein1966,
+  title={Binary codes capable of correcting deletions, insertions, and reversals},
+  author={Levenshtein, Vladimir I},
+  booktitle={Soviet physics doklady},
+  volume={10},
+  number={8},
+  pages={707--710},
+  year={1966}
+}
+
+@article{Shah2014,
+  title={Improvement of Soundex algoruthm for Indian languade based on phonetic matching},
+  author={Shah, Rima and Singh, Dheeraj Kumar},
+  journal={International Journal of Computer Science, Engineering and Applications},
+  volume={4},
+  number={3},
+  pages={31},
+  year={2014},
+  publisher={Academy \& Industry Research Collaboration Center (AIRCC)}
+}

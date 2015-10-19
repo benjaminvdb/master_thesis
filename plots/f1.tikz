@@ -2,13 +2,13 @@
     \begin{axis}[
         axis on top,
         plot graphics/xmin=0,
-        plot graphics/xmax=1,
+        plot graphics/xmax=17.9678,
         plot graphics/ymin=0,
-        plot graphics/ymax=1,
+        plot graphics/ymax=0.36421,
         enlargelimits=false,
-        title={Precision-Recall Curve},
-        xlabel={Recall},
-        ylabel={Precision},
+        title={The F1-measure at varying confidence thresholds},
+        xlabel={Score},
+        ylabel={F1},
         legend cell align=right,
         legend entries={
             thrs = 0.0,
@@ -22,7 +22,7 @@
             anchor={north east},font=\small
         }
     ]
-    \addplot [forget plot] graphics {plots/precision_recall_curve_pdf};
+    \addplot [forget plot] graphics {plots/f1_pdf};
     \addlegendimage{line legend,Set1-6-1,thick},
     \addlegendimage{line legend,Set1-6-2,thick},
     \addlegendimage{line legend,Set1-6-3,thick},

@@ -6,9 +6,9 @@
         plot graphics/ymin=0,
         plot graphics/ymax=1,
         enlargelimits=false,
-        title={Precision-Recall Curve},
-        xlabel={Recall},
-        ylabel={Precision},
+        title={ROC curve},
+        xlabel={False Positive Rate},
+        ylabel={True Positive Rate},
         legend cell align=right,
         legend entries={
             thrs = 0.0,
@@ -22,7 +22,7 @@
             anchor={north east},font=\small
         }
     ]
-    \addplot [forget plot] graphics {plots/precision_recall_curve_pdf};
+    \addplot [forget plot] graphics {plots/roc_pdf};
     \addlegendimage{line legend,Set1-6-1,thick},
     \addlegendimage{line legend,Set1-6-2,thick},
     \addlegendimage{line legend,Set1-6-3,thick},

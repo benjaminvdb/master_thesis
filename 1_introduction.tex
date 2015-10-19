@@ -1,5 +1,5 @@
 \begin{savequote}[75mm] 
---Each person in the worls creates a Book of Life. This Book starts with birth and ends with death. Its pages are made up of the records of the principal events in life. Record linkage is the name given to the process of assembling the pages of this Book into a volume.
+--Each person in the world creates a Book of Life. This Book starts with birth and ends with death. Its pages are made up of the records of the principal events in life. Record linkage is the name given to the process of assembling the pages of this Book into a volume.
 \qauthor{Halbert L. Dunn, 1946} 
 \end{savequote}
 
@@ -10,13 +10,13 @@
 \chapter{Introduction}
 \label{ch:introduction}
 
-\chaplettrine{E}{ntity resolution} is the process of finding records in one or more datasets that share a common identifier.
+\chaplettrine{E}{ntity resolution} is the process of finding records in one or more datasets that relate to the same entity.
 Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept.
-Its applications range from duplicate detection to the merging datasets to obtain a single, enriched database.
-It has seen a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
+Its applications range from duplicate detection to the merging of datasets to obtain a single, enriched database.
+It has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
 However, many of the techniques developed rely on a database that has a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields.
 Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
-In this thesis, we explore methods to overcome these issues and study ways of extracting information from text as to improve entity resolution.
+In this thesis, we explore methods to overcome these issues and study ways of extracting information from text in order to improve entity resolution.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -27,26 +27,26 @@ In this thesis, we explore methods to overcome these issues and study ways of ex
 
 When studying historical documents, researchers are often confronted with the problem of ambiguous references to people in text.
 A document might have been prepared to be of only temporary use or might have been written with a particular set of people in mind, limiting the number of possible people that could have been referred to.
-However, when the document is studied after many centuries, the exact context is often lost and it will be much harder to identify the people.
+However, when the document is studied after many centuries, the exact context is often lost and it will be more difficult to identify the people.
 A careful study of other datasets, such as birth registers and censuses, might therefore be needed to figure out who the person under consideration is.
-This can be a laborious task and furthermore it can be hard to estimate the quality of the results.
+This can be a laborious task and, furthermore, it can be hard to estimate the quality of the results.
 
 In $2014$, The National Archives (TNA) launched the Traces Through Time project that had the goal of developing a new tool that would enable its users to explore TNA's vast repository of digitized archives in a completely new way.
 The system would have to identify occurrences of people in text and decide which of them referred to the same people.
-It would also have to deal with `fuzzy' nature of historical data, including aliases, incomplete information, spelling variations and errors.
+It would also have to deal with ``fuzzy'' nature of historical data, including aliases, incomplete information, spelling variations and errors.
 This is essentially an entity resolution problem with the added difference that not structured databases, but unannotated documents in natural language are to be linked.
-This projects shows the need for the development of such as system and serves as an excellent use case.
+This projects shows the need for the development of such a system and serves as an excellent use case.
 % Write something about increased interest in digital humanities and the unmanagability of ever increasing datasets/archives.
 
 Another possible application of a system for entity resolution in unannotated data lies in the semantic web \citep{Berners2001, Mihalcea2007}.
 The semantic web can be seen as a graph in which the nodes represent concepts which are connected by edges representing a type of relation.
 By annotating hyperlinks on the web with a type of relation in this way, computers can easily and rapidly parse pages, effectively making the same document suitable for both humans to read and computers to process.
-Though the web standards have been extended to support these type of annotations with RDF \citep{Pan2009}, it is not used in all pages on the web, often because it is laborious to incorporate semantic information.
-Entity resolution in this context could allow for automatic detection of people in text and linking documents together that contain information about the same people.
+Although the web standards have been extended to support these types of annotations with RDF \citep{Pan2009}, it is not used in all pages on the web, often because it is laborious to incorporate semantic information.
+In this context, entity resolution could allow for automatic detection of people in text and link documents together that contain information about the same people.
 
-This information could also be extracted from text and aggregated into automatically generated summaries, resembling simple Wikipedia\footnote{http://www.wikipedia.org} pages.
-Web searches could be \emph{entity-driven}: besides the ``Images'' and ``News'' button, a search engine could include ``Person'' enables a user to search for a person.
-Results from such a system would aggregate web pages referring the same people together, instead of returning a rather unorganized set of pages.\todo{Uneasy formulation, change to something better.}
+Information could also be extracted from text and aggregated into automatically generated summaries, resembling simple Wikipedia\footnote{http://www.wikipedia.org} pages.
+Web searches could be \emph{entity-driven}: besides the existing ``Images'' and ``News'' categories of search, the search engine could include one for ``People''.
+Results from such a system would aggregate web pages referring to the same people together, instead of returning a large list of possibly unrelated people.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -58,20 +58,12 @@ Results from such a system would aggregate web pages referring the same people t
 Traditionally, entity resolution is performed on tables in databases.
 Since these usually have a schema, and therefore a well-defined structure, we can compute similarities between references by comparing their individual fields.
 However, the main focus of this thesis is to study entity resolution in data in natural language, which often lacks a well-defined structure.
-Though the text commonly respects the syntax of a language and therefore has structure, it is hard to parse and ambiguity is hard to avoid.\todo{Add reference here.}
+Even though the text commonly respects the syntax of a language and therefore has a certain degree of structure, it is hard to parse and ambiguity is hard to avoid.
 Furthermore, the references are not readily accessible and first need to be extracted from text.
-We will describe a simple generic rule-based method that can be used to both extract references from text and segment it into a record consisting of fields.
+We will describe a simple generic rule-based method that can be used to both extract references from text and segment it into a record consisting of attributes.
 Note that the use of a schema imposes a fixed length on the records, even though it might often happen that one or more attributes are not present.
 This becomes more clear with an example.
-The following is a section taken from \emph{Fine Roll C 60/33} from the Fine Rolls of King Henry III. \footnote{The Fine Rolls of King Henry III is a dataset consisting of transcribed medieval calendars. This is the same dataset that is used in the experiments described in \cref{ch:experiments}.}
-
-\begin{quote}
-	Concerning the corn of \ul{Roger of Hyde}. Order to the \ul{sheriff of Oxfordshire} to make the king’s advantage without delay, by the view of law-worthy men, from all of the corn of \ul{Roger of Hyde, knight}, in Hyde, who is with the Earl Marshal, and to put in gage etc. all those who he will find threshing that corn and intermeddling with the land of the same \ul{Roger} without warrant, to be before the king at his command to answer for it.
-\end{quote}
-
-\noindent This paragraph could be segmented in various ways, with one possible outcome given in Table~\ref{tab:segmentation}.
-We left out the nouns that refer to people through their jobs, such as king and Earl Marshal, in this example.
-The important thing to note is that there are a lot of missing values that have to be dealt with appropriately.
+The following is a section taken from \emph{Fine Roll C 60/33}\citep{FineRolls} from the Fine Rolls of King Henry III, a dataset consisting of transcribed medieval calendars.
 
 \begin{table}
 	\centering
@@ -80,8 +72,16 @@ The important thing to note is that there are a lot of missing values that have 
 	\label{tab:segmentation}
 \end{table}
 
-While text in natural language may lack a well-defined structure, it does not mean that it lacks in information.
-Most of the time the text contains a lot of information and a person is referenced within that context, so it might be interesting to look at ways to extract this information.
+\begin{quote}
+	Concerning the corn of \ul{Roger of Hyde}. Order to the \ul{sheriff of Oxfordshire} to make the king’s advantage without delay, by the view of law-worthy men, from all of the corn of \ul{Roger of Hyde, knight}, in Hyde, who is with the Earl Marshal, and to put in gage etc. all those who he will find threshing that corn and intermeddling with the land of the same \ul{Roger} without warrant, to be before the king at his command to answer for it.
+\end{quote}
+
+\noindent It is not always clear in which way the various properties that are mentioned should be treated. For example, is ``sherrif of Oxfordshire'' one role or is ``sherrif'' a role and should ``Oxfordshire'' therefore be treated as a provenance? The output of the occurrence extraction process therefore depends on various decisions that a made beforehand. An example of such an output in a tabular format can be seen in \cref{tab:segmentation}.
+The nouns that refer to people through their jobs, such as king and Earl Marshal, are left out in this example.
+The important thing to note is that there are a lot of missing values that have to be dealt with appropriately.
+
+While text in natural language may lack a well-defined structure, it obviously does not mean it lacks information.
+Most of the time the text contains a lot of details and a person is referenced within that context, so it might be interesting to look at ways to extract this information.
 A problem with a rule-based system in this case is that it does not generalize very well.
 It is fast and can make good use of regularities in the text, such as the ordering of names, but it is unclear how to apply such rules to extract more general information from the text.
 We will therefore study the application of more generic techniques and their impact on the accuracy of the system.
@@ -90,17 +90,17 @@ The core of any record linkage system is the step in which references are classi
 In order to do so, a similarity-based approach is often used.
 Based on the assumption that references to the same entity are themselves similar, we can start comparing their segmented records.
 However, this requires a means of comparing records which is not a trivial task.
-There are many different approaches, such as counting the number of edit operations required to turn one string into the other, and each come with their own quirks and advantages.
-One of the challenges here is to decide select a similarity metric and another is to deal with the missing data such as exemplified in Table~\ref{tab:segmentation}.
+There are many different approaches, such as counting the number of edit operations required to turn one string into the other, and each comes with their own quirks and advantages.
+One of the challenges here is to select a similarity metric and another is to deal with the missing data, such as exemplified in \cref{tab:segmentation}.
 
-Another issue arises when we take the property of \emph{transitivity} into account, i.e., if $a$ and $b$ are a match and $a$ and $c$ are a match, then also $b$ should be a match.
-A situation might occur in which this property does not hold, thus we find that there is an inconsistency in the matching status.
+Another issue arises when we take the property of \emph{transitivity} into account, i.e., if $a$ and $b$ are a match and $a$ and $c$ are a match, then it is reasonable to assume that also $b$ should be a match with $c$.
+However, in some situations, it might occur in which this property does not hold, thus we find that there is an inconsistency in the matching status of the pairs under consideration.
 Matches can also chain together in which case the ends of the chain are clearly not matches, though intuitively, and by applying the property of transitivity, we could argue that these records should also be matched.
-Figure~\ref{fig:transitive_closure} shows an example of such an uncertain situation.\todo{For such a simple graph the Xy-pic package is probably a lot easier!}
-We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched. \todo{Add numbers as to make the example more clear.}
+\cref{fig:transitive_closure} shows an example of such an uncertain situation.
+We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched.
 However, we could also argue that the transitivity property can aid us in the efficient linking of records as it can in fact provide evidence in a similar way that the content of the records do.
 Namely, instead of comparing references based on their textual representation we could compare them based on graph similarity.
-We will look methods to leverage this property to increase performance while reducing the number of inconsistencies.\todo{This is NP-complete so it would involve heuristics.}
+We will look at methods to leverage this property to increase performance while reducing the number of inconsistencies.
 
 \begin{figure}
     \centering
@@ -110,7 +110,7 @@ We will look methods to leverage this property to increase performance while red
 \end{figure}
 
 The record linkage methods described in this thesis rely on the comparison of references based on their attributes.
-Assuming we have no \emph{a priori} knowledge of the match status of each reference pair, and the goal is to link references within a single dataset, the comparison of all possible pairs takes time $\mathcal{O}(n^2)$.
+Assuming we have no prior knowledge of the match status of each reference pair, and the goal is to link references within a single dataset, the comparison of all possible pairs takes time $\mathcal{O}(n^2)$.
 On the other hand, the number of true matches can be expected to increase only linearly with the size of the dataset, thus relatively more time is spent on unpromising pairs.
 For larger datasets this problem rapidly becomes too expensive.
 Several solutions have been proposed to partially resolve this problem at the expense of decreased sensitivity of the system.
@@ -118,9 +118,9 @@ It is not the main focus of this thesis to address this issue, but since it is f
 
 The last hurdle is that of evaluation.
 Since the data is concerned with people that have all deceased, it is impossible to be certain about the results as produced by a record linkage procedure.
-The best result can be obtained by careful analysis by historians that have thorough knowledge of the data.
-This requires a lot of manual work, and even if then this information can be acquired, it will certainly include a fair amount of errors.
-It can be seen that evaluating can prove to be quite a challenge and its one of the objectives of this thesis to study various approaches of evaluating results.
+The best we can do is to have an expert historian establish for each pair of references whether they are the same person or not.
+Obviously this requires a lot of manual work, and even if such an assessment can be carried out, it will certainly include a fair amount of errors.
+Evaluations can therefore prove to be quite a challenge and it is one of the objectives of this thesis to study various approaches of evaluating the results.
 The outcomes should be both \emph{scientific}, in the sense that they are comparable, and \emph{insightful}, in that they provide historians with new ways of looking at the data that was not possible before.
 
 
@@ -132,11 +132,11 @@ The outcomes should be both \emph{scientific}, in the sense that they are compar
 The goal of the Traces Through Time project was to develop a system that could aid historical research of individuals.
 This thesis comprises both a report of the development of the system in this project and an overview of record linkage with an emphasis on historical documents.
 We will also address the problems that were taken up in \cref{sec:challenges}.
-Before we proceed in doing so, let us first give a more formal introduction to the concepts discussed in this thesis.
+Before we proceed, let us first give a more formal introduction to the concepts discussed in this thesis.
 
 For several decades, record linkage has seen a lot of interest in many different disciplines, which, ironically, led to a large number of synonymic names for the same process, such as data linkage, entity resolution, object identification, or field matching \citep{Christen2012}.
-Since we are addressing two slightly different, but strongly related, problems, we will take up on two of these naming conventions, though with a nuanced difference.
-We will speak about \emph{entity resolution} and \emph{record linkage} as two distinct tasks, such that we can distinguish between the main objective of aggregating personal information and linking structured records, respectively.
+Since two slightly different, but strongly related, problems are addressed, two different naming conventions are taken up in this thesis, in order to distinguish them.
+We will denote \emph{entity resolution} and \emph{record linkage} as two distinct tasks, such that we can distinguish between the main objective of aggregating personal information and linking structured records, respectively.
 Before defining these concepts more formally, we first define their constituents.
 
 We can express entities as \emph{descriptive tuples}, or simply \emph{descriptions}, $t \in A_{1} \times A_{2} \times \dots \times A_{n}$, consisting of the $n$ properties that the object has.
@@ -146,14 +146,14 @@ A \emph{partial description} $t^{*}$ is a descriptive tuple living in a subspace
 Another way of representing a partial description is to add a special null value $\epsilon$ to each of the sets that indicates a \emph{missing value}.
 Instead of omitting a value and thinking about an object in a smaller subspace, we can simply provide $\epsilon$ instead of the omission.
 Using the same example we would obtain $t_{cube}^{*}=(3, \epsilon, 8)$.
-A description $t_i$ is more descriptive than $t_j$ if it has less missing values.
+A description $t_i$ is more descriptive than $t_j$ if it has fewer missing values.
 Let us assume that there exists a set $\mathcal{R}$ with \emph{total descriptions} of all real-world entities, i.e., no extensions of the tuples are possible such that they are more descriptive.
 We denote with $t_{i}^{*} \approx_{d} t_{j}$, where $t^{*} \in \mathcal{S}^{*} \backslash \mathcal{S}$ and $t \in \mathcal{S}$, the one-to-one mapping between partial descriptions and their more descriptive counterparts.
-We can image $t_{cube}$ of the earlier mentioned example to live in a subspace of the much larger space of properties defining any geometric object, thus it can be considered a partial description of the object in that larger space.
+We can imagine $t_{cube}$ of the above mentioned example to live in a subspace of the much larger space of properties defining any geometric object, thus it can be considered a partial description of the object in that larger space.
 We can now describe the process of entity resolution precisely as follows:
 
 \begin{definition}[Entity resolution]
-    Entity resolution is the process of constructing a set of partial descriptions $\mathcal{R}^{*} = \left\{ a \mid a \approx_{d} b, \forall{a}, \exists{b} \in \mathcal{R} \right\}$.
+    Entity resolution is the process of constructing from a set of partial descriptions another set of partial descriptions $\mathcal{R}^{*}$ for which $\mathcal{R}^{*} = \left\{ a \mid a \approx_{d} b, \forall{a}, \exists{b} \in \mathcal{R} \right\}$.
 \end{definition}
 
 \noindent Entity resolution focuses on the construction of a set of unique and complete descriptions, which inherently involves the aggregation of information whenever two partial descriptions exist for the same real-world entity.
@@ -163,16 +163,16 @@ Record linkage, however, is only concerned with the detection of the latter and 
     Given a set of (partial) descriptions $\mathcal{R}_{p}$, record linkage is the process of determining the set of pairs $M = \left\{ (a, b) \mid \exists{r} \in \mathcal{R}: a \approx_{d} r \wedge b \approx_{d} r \right\}$, called \emph{matching pairs} or simply \emph{matches}.
 \end{definition}
 
-Record linkage can also be accomplished by the complemented of the above states, i.e., determining the set of \emph{non-matches}, which we will call $U$, since $R_{p} = M \cup U$.
+Record linkage can also be accomplished by the complement of the above states, i.e., determining the set of \emph{non-matches}, which we will call $U$, since $R_{p} = M \cup U$.
 Another interpretation of record linkage is the establishment of ``same-as'' relations between records in a given dataset.
 Formulated in this way it is trivial that this relation is \emph{symmetric}, i.e., $(a, b) \in M \Leftrightarrow (b, a) \in M$.
-The total number of possible matches to be considered is therefore $n(n-1)/2)$.
+The total number of possible matches to be considered is therefore $n(n-1)/2$.
 
 Note that we assume that, in practice, it is impossible to verify whether both $a$ and $b$ are partial descriptions of $c$ since this would require knowledge of their match status -- a ``chicken-and-egg'' problem.
 This shows an important problem in record linkage, namely that there is often a lack of a ground truth.
 Even if expert knowledge is available, it can be argued that it is impossible to verify any links that are made, since it requires complete knowledge of the set of unique objects, which would invalidate the need to perform entity resolution in the first place.
-We can however artificially generate a set of partial descriptions by sampling from a well-defined set of complete descriptions and replacing some of its elements by $\epsilon$.
-This is the approach that we will take in \todo{add reference} to allow for evaluation of the record linkage system described in this thesis.
+%We can however artificially generate a set of partial descriptions by sampling from a well-defined set of complete descriptions and replacing some of its elements by $\epsilon$.
+%This is the approach that we will take in \todo{add reference} to allow for evaluation of the record linkage system described in this thesis.
 
 \begin{figure}
     \centering
@@ -182,8 +182,8 @@ This is the approach that we will take in \todo{add reference} to allow for eval
     \begin{tabular}{c c | c | c |}
         & \multicolumn{1}{c}{} & \multicolumn{2}{c}{{\small \textit{Predicted label}}} \\ %\cline{2-3}
         & & \textbf{Positive} & \textbf{Negative}  \\ \cline{2-4}
-        \multirow{2}{*}{\rot{{\small \textit{True label}}}} & \textbf{Positive} & \begin{tabular}[x]{@{}c@{}}True\\positive\end{tabular} & \begin{tabular}[x]{@{}c@{}}False\\negative\end{tabular} \\ \cline{2-4}
-        & \textbf{Negative} & \begin{tabular}[x]{@{}c@{}}False\\positive\end{tabular} & \begin{tabular}[x]{@{}c@{}}True\\negative\end{tabular} \\ \cline{2-4}
+        \multirow{2}{*}{\rot{{\small \textit{True label}}}} & \textbf{Positive} & \begin{tabular}[x]{@{}c@{}}true\\positive\end{tabular} & \begin{tabular}[x]{@{}c@{}}false\\negative\end{tabular} \\ \cline{2-4}
+        & \textbf{Negative} & \begin{tabular}[x]{@{}c@{}}false\\positive\end{tabular} & \begin{tabular}[x]{@{}c@{}}true\\negative\end{tabular} \\ \cline{2-4}
     \end{tabular}
     \egroup
     \caption{A confusion matrix shows the performance of a system using the frequencies of the four possible outcomes.}
@@ -193,7 +193,7 @@ This is the approach that we will take in \todo{add reference} to allow for eval
 The record linkage problem can be viewed as a \emph{binary classification} problem in which to goal is to distinguish between \emph{matches} and \emph{non-matches}, respectively labeled as $1$ and $0$.
 When the \emph{ground truth} about the data is known, i.e., the actual labels are available, the outcome of classification can be evaluated.
 \cref{fig:confusion_matrix} shows the organization of a \emph{confusion matrix} that can be used for evaluation.
-The cells contain the frequencies for the four possible outcomes of a classified pair: \emph{true positive}, \emph{false negative}, \emph{false positive} and \emph{true negative}.
+The cells contain the frequencies for the four possible outcomes of a classified pair: \emph{true positive} (TP), \emph{false negative} (FN), \emph{false positive} (FP) and \emph{true negative} (TN).
 These frequencies can be aggregated using metrics that describe different aspects of the results.
 
 \begin{definition}[Precision]
@@ -219,17 +219,17 @@ There exist metrics that also include the number of true negatives, but in recor
 It is also possible to aggregate precision and recall into a single metric, such as the \emph{F-measure}.
 
 \begin{definition}[F-measure]
-    The general F-measure calculates the harmonic mean between precision and recall:
+    The general F-measure measures the effectiveness of retrieval with respect to a user who attaches $\beta$ times as much importance to recall as precision \citep{Rijsbergen1979} in the following way:
     \begin{equation*}
         F_{\beta} = (1 + \beta^{2}) \cdot \frac{2 E_{p} E_{r}}{(\beta \cdot E_{p}) + E_{r}}
     \end{equation*}
+    \label{def:fmeasure}
 \end{definition}
 
 \noindent where $\beta \geq 0$.
 Commonly used values for $\beta$ are $1$, $2$ and $0.5$. The F\textsubscript{1} weighs precision and recall evenly, while the F\textsubscript{2} and F\textsubscript{0.5} put more emphasis on recall and precision, respectively.
 The class of F-measures is interesting because it gives a higher penalty to extreme values when compared to the arithmetic mean, which is in many cases desirable.
 As mentioned, scoring very high on either precision or recall is easy to achieve and should generally be avoided.
-\emph{ROC-curve} and \emph{Precision-Recall} plots are also often used to visualize the results.
 
 Now that we have a formal definition of record linkage we will pose the the research question that will be leading throughout this thesis:
 
@@ -241,7 +241,7 @@ Now that we have a formal definition of record linkage we will pose the the rese
 
 \begin{enumerate}[label=\emph{\roman*.}]
     \item How do we transform the source data into a format that can be used by traditional record linkage techniques?
-    \item Do we need to transform the source data into a tabular format or can we perform entity resolution without such structure?
+    %\item Do we need to transform the source data into a tabular format or can we perform entity resolution without such structure?
     \item What methods can be used to extract information from documents that improve the performance of entity resolution?
 \end{enumerate}
 
@@ -252,29 +252,29 @@ Now that we have a formal definition of record linkage we will pose the the rese
 \section{Related work}
 \label{sec:related_work}
 
-The Traces Through Time project started as a continuation of the ChartEx \citep{Knobbe2014} project that had the goal of developing new ways of analyzing historic documents in an integrated fashion and reconstructing medieval social networks.
+The Traces Through Time project started as a continuation of the ChartEx \citep{Knobbe2014} project that had the goal of developing new ways of analyzing historical documents in an integrated fashion and reconstructing medieval social networks.
 In ChartEx the focus was on medieval charters, which are records of legal transactions of property, while Traces Through Time considered only people.
-This thesis gives an overview of the work that was done in the latter, so the focus will also be on people.
+This thesis gives an overview of the work that was done in the latter, meaning that the focus will also be on people.
 
-The ultimate goal of these projects is not much different from the one proposed in \citep{Dunn1946}, namely to aggregate all significant information about a person from birth to death into a single record.
+The goal of these projects is not much different from the one proposed in \citep{Dunn1946}, namely to aggregate all significant information about a person from birth to death into a single record.
 In \citep{Newcombe1959} the \emph{probabilistic record linkage} method was proposed as a solution to this problem, which was later formalized in \citep{Fellegi1969}.
-This method is based on attaining ``evidence'' that supports the hypothesis that two distinct records are descriptions of the same real-world entity.
+This method is based on attaining evidence that supports the hypothesis that two distinct records are descriptions of the same real-world entity.
 In \cref{sec:classification} we will describe a procedure that is based on the same principle and differences in the way statistics about the various fields are incorporated.
 
-The research done in \citep{Cucerzan2007} and \citep{Bunescu2006} is similar to that conducted in that of this thesis, though the domain is different.
+The research done in \citep{Cucerzan2007} and \citep{Bunescu2006} is similar to that conducted in this thesis, although the domain is different.
 Their goal is also to perform record linkage in text and both use Wikipedia as a source of evidence.
 Linking ``out-of-Wikipedia''\citep{Bunescu2006} entities is achieved by introducing a special entity $e_{out}$ that has all its attributes set to null values.
-Experimental evaluation of these systems shows that using external knowledge from Wikipedia, i.e., information not present in the data that contains the references that are to be matched, enhances the accuracy.
+Experimental evaluation of these systems has shown that using external knowledge from Wikipedia, i.e., information not present in the data that contains the references that are to be matched, enhances the accuracy.
 
 The work described in \citep{Winchester1970} is interesting since it is one of the earliest mentions of record linkage in a historical setting and executed in close collaboration with historians.
 The involvement of historians resulted in some requirements that computer scientists might miss, such as allowing researchers to document the information that guided the decision making process.
 This is something that was also requested by the historians that we cooperated with during the Traces Through Time project.
-The paper also reports some of the major difficulties found during a manual linkage of two censuses that took five months, most notably the high discrepancy between the way names and occupations were written.
+The paper also reports some of the major difficulties found during manual linkage of two censuses that took five months, most notably the high discrepancy between the way names and occupations were written.
 
-In the recent work of \citep{Balado2015}, the entity disambiguation problem is studied in a historical context.
+In the recent work of \citep{Balado2015}, the entity resolution problem is studied in a historical context.
 The goal of this work is to link mentions of ship names in news paper articles with a curated list of ship names and crew members.
 The research is similar to that conducted as part of this thesis in that entities in natural language are disambiguated.
-The most important difference is that the researchers obtained a labeled dataset through careful inspection of the text by domain experts.
+The most important difference is that the researchers obtained a labeled dataset through careful inspection of the text by domain experts, which was used to train a classifier.
 The work proposed in this thesis aims to provide methods for unsupervised learning instead.
 
 
@@ -285,7 +285,7 @@ The work proposed in this thesis aims to provide methods for unsupervised learni
 \label{sec:outline}
 
 The next chapters describe the research that has been conducted to answer the research question posed in the previous section.
-The theory of record linkage is first discussed in \cref{ch:record_linker}, which will lay the foundation of further research.
-In it, the various steps involved in their order of appearance as is common in a record linkage pipeline.
+The theory of record linkage is first discussed in \cref{ch:record_linker}, which will lay the foundation for further research.
+In it, the various steps involved in their order of appearance as is common in a record linkage pipeline, is studied.
 \cref{ch:feature_extraction} explores methods for extracting information from unannotated text in an unsupervised way with the aim of improving the results in the presence of common names.
 The results of experimental evaluation that was conducted will then be described in \cref{ch:experiments}, followed by our conclusions in \cref{ch:conclusions}.
