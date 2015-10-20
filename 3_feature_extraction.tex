@@ -10,17 +10,17 @@
 \chapter{Feature Extraction}
 \label{ch:feature_extraction}
 
-\chaplettrine{I}{n the previous chapter}, we described how to obtain references from documents and how confidences scores are computed that reflect how certain we are that they refer to the same entity.
+\chaplettrine{I}{n the previous chapter}, we described how to obtain references from documents and how confidence scores are computed that reflect how certain we are that they refer to the same entity.
 During the link classification step we assumed that records consisted only of information directly relating to a reference, e.g. first names, last names, roles, titles, etc.
 If the probability mass function of values for a property is known it can be incorporated, but it does not extend the records themselves.
 When we consider the case of a reference containing a \emph{common name}, however, it becomes apparent that more information is required.
 The confidence score is inversely proportional to the frequency of the reference's components, yielding a low score in the case of a common name.
 This can merely improve the fraction of correctly classified matches (precision), but it cannot avoid missing matches because of a low score (recall).
 In order to achieve that, more information is required.
-Looking at the documents from which references are extracted, we see that more data available that could potentially be useful in aiding classification, is available.
+Looking at the documents from which references are extracted, we see that more data is available that could potentially be useful in aiding classification.
 
-In this chapter we will look at two complementary approaches that extract contextual information.
-The first is based on modeling the content of a section of text in which a reference appears in, while the second is based on co-occurrence of other people.
+In this chapter, we will look at two complementary approaches that extract contextual information.
+The first is based on modeling the content of a section of text in which a reference appears, while the second is based on co-occurrence of other people.
 The goal is to extract information from the text such that ambiguous cases, such as ``John Smith'', can still be linked.
 
 
@@ -30,7 +30,7 @@ The goal is to extract information from the text such that ambiguous cases, such
 \section{Maximally informative $k$-itemsets}
 \label{sec:miki}
 
-The primary target for the methods studied in this thesis are historical documents.
+The primary targets for the methods studied in this thesis are historical documents.
 Often these documents comprise the proceedings of a meeting or a summarized version thereof.
 They contain a description of events that took place on a specific date, who was present, etc.
 When looking more closely at the contents it is often possible to extract a few interesting words.
@@ -44,23 +44,23 @@ As an example, consider the following sections taken from ``Officials of the Boa
     Ordered that Mr. Carkesse be desired to let this Board have on Tuesday next, if possible, the Account of Fish exported, which was desired the 17th of the last month.
 \end{quote}
 
-\noindent In both cases there is a reference to a ``Mr. Carkesse'', which might be the same person.
-Both texts talk discuss matter that is related to the export of fish, so we could say the overarching topic is ``fish''.
+\noindent In both cases, there is a reference to a ``Mr. Carkesse'', which might be the same person.
+Both texts discuss matter that is related to the export of fish, so we could say the overarching topic is ``fish''.
 The fact that Mr. Carkesse is mentioned twice in the context of this topic gives us additional information that we can exploit to determine whether these references should be matched.
-Note that if there would have been multiple people called Mr. Carkesse, probably additional information would have been provided.
-It is therefore unlikely that two different persons are referred to.
-However, it is a good example of the kind of ``circumstantial evidence'' that we want to extract from the documents.
+Note that if there would have been multiple people called Mr. Carkesse, probably additional information would have been provided to avoid confusion.
+It is therefore unlikely that two different persons are being referred to.
+However, it is a good example of the kind of `circumstantial evidence' that we want to extract from the documents.
 
 Any word from the text may potentially be used as a topic for the text; in fact, we could select all of them.
 However, this would lead to topics, treated as features of the text, to be highly correlated.
 If we were to select ``fish'' as a topic and decide to also include ``fishing'', it is easy to see that probably not much additional information is included.
 Besides trying to decide on a topic by looking at a single document, we can instead look at the complete set of document under consideration and construct a set of uncorrelated, or \emph{orthogonal}, topics.
-This is very much related to the process of \emph{features selection}, that strives to select a subset of features with the purpose of reducing problems caused when too many features are used, such as overfitting.
+This is very much related to the process of \emph{features selection} \citep{Knobbe2006}, that strives to select a subset of features with the purpose of reducing problems caused when too many features are used, such as overfitting.
 
-In our case we aim for the selection of a set of topics that provide as good a distinction between texts as possible.
-This is exactly what \emph{maximally informative $k$-itemsets}\citep{Knobbe2006}, or \emph{miki's} in short, provide.
-As the name suggests, a miki is an itemset of size $k$ that provides maximum information.
-The amount of information of the itemset is measured as the \emph{joint entropy} of the itemset in \emph{Shannon bits} (or just \emph{bits}), which is defined as follows: \citep{Knobbe2006}
+In our case, we aim for the selection of a set of topics that provide as good a distinction between texts as possible.
+This is exactly what \emph{maximally informative $k$-itemsets} \citep{Knobbe2006}, or \emph{miki's} in short, provide.
+As the name suggests, a miki is an itemset (equivalent to the mathematical \emph{set}) of size $k$ that provides maximum information to distinguish between the entities considered.
+The amount of information of the itemset is measured as the \emph{joint entropy} of the itemset in \emph{Shannon bits} (or just \emph{bits}), which is defined as follows \citep{Knobbe2006}:
 
 \begin{definition}[Joint entropy]
     Suppose that $X = \left\{ x_{1}, \dots, x_{k} \right\}$ is an itemset, and $B = \left( b_{1}, \dots, b_{k} \right) \in \left\{ 0, 1 \right\}^{k}$ is a tuple of binary values. The \emph{joint entropy} of $X$ is defined as
@@ -71,7 +71,7 @@ The amount of information of the itemset is measured as the \emph{joint entropy}
 \end{definition}
 
 \begin{definition}[Maximally informative $k$-itemset]
-    Suppose that I is a collection of $n$ items. An itemset $X \subseteq I$ of cardinality $k$ is a \emph{maximally informative k-itemset}, $iff$ for all itemsets $Y \subseteq I$ of cardinality $k$,
+    Suppose that $I$ is a collection of $n$ items. An itemset $X \subseteq I$ of cardinality $k$ is a \emph{maximally informative k-itemset}, $\mathrm{iff}$ for all itemsets $Y \subseteq I$ of cardinality $k$,
     \begin{equation}
         H(Y) \leq H(X)
     \end{equation}

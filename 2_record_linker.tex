@@ -67,7 +67,7 @@ These can then be further processed using traditional record linkage techniques.
 
 As stated in \cref{sec:challenges}, for larger datasets it becomes rapidly infeasible to compare all possible pairs of records within a single database, since it grows quadratically.
 The total number of possible record links, and thus comparisons in a naive setting, within a dataset of size $n$ is equal to $n\times(n-1)/2$.
-Because the similarity between records that we are computing is symmetric it only needs to be computed once.
+Because the similarity between records that we are computing is symmetric, it only needs to be computed once.
 
 Since the comparison step is often the most expensive step of the record linkage pipeline, a technique called \emph{blocking} is often deployed.
 The goal of blocking is to efficiently partition the set of all possible pairs into several mutually exclusive sets.
@@ -115,10 +115,10 @@ The black line shows the number of comparisons against the total number of input
 It can be seen that for moderately large to large datasets, even with this simple blocking scheme, the number of comparisons are reduced by an order of magnitude.
 
 Blocking keys can also be combined into more specific keys by concatenating them \citep{Christen2012} or by using different keys in multiple passes \citep{Baxter2003}.
-Parameter settings for the individual functions can be set to more conservative as to obtain larger blocks.
-The idea is that by looking at at various aspects of the records in such a way, errors caused by too specific blocking settings can be mitigated.
+Parameter settings for the individual functions can be set to more conservative so that larger blocks are obtained.
+The idea is that by looking at various aspects of the records in such a way, errors caused by too specific blocking settings can be mitigated.
 A disadvantage is that many different combinations are often possible, making it hard to decide on a setting.
-Trying too many settings defeats the purpose of blocking so other strategies might have to be considered.
+Trying too many settings defeats the purpose of blocking, so other strategies might have to be considered.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -147,6 +147,8 @@ In this case the value of $w$ must be reconsidered, because many more records ar
 Experimental evaluation of this modification has shown that it can lead to more true matches being included in the set of candidate record pairs and thus to a higher recall \citep{Christen2012}.
 
 \begin{table}
+    \caption{Graphical illustration of the sorted neighborhood blocking method. Here, the records were first sorted by last name and then a window of length three was moved across them.}
+    \label{tab:blocking_example}
     \centering
         \begin{tabular}{l l l l}
             \toprule
@@ -174,8 +176,6 @@ Experimental evaluation of this modification has shown that it can lead to more 
         \drawbrace[brace mirrored, thick]{window_begin}{window_end}
         \annote[left]{brace-1}{Window}
         %\annote[right]{arrow-1}{ }
-    \caption{Caption}
-    \label{tab:blocking_example}
 \end{table}
 
 
@@ -199,19 +199,19 @@ Distance and similarity functions for strings must intuitively have a number of 
 
 \begin{itemize}
     \item $s(\sigma_1, \sigma_1)=1$: the similarity is maximal when a string is compared to itself.
-    \item $s(\sigma_1, \sigma_2)=0$: a ``completely different'' string results in the minimum similarity value of $0$.
-    \item $0 < s(\sigma_1, \sigma_2) < 1$: a value between the two extremes indicates that the strings are ``somewhat similar''.
+    \item $s(\sigma_1, \sigma_2)=0$: the strings are `completely different', meaning that $\sigma_1$ and $\sigma_2$ have no characters in common, resulting in the minimum similarity value of $0$.
+    \item $0 < s(\sigma_1, \sigma_2) < 1$: a value between the two extremes indicates that the strings are `somewhat similar'.
 \end{itemize}
 
-With similarity values between $0$ and $1$ it is easy to convert to distance values by subtracting them from $1$, and vice versa.
+With similarity values between $0$ and $1$, it is easy to convert to distance values by subtracting them from $1$, and vice versa.
 It depends on the calculation of the proximity measure whether it makes more sense to talk about one or the other.
-For the record linker it does not make a huge difference as the interpretation of the numbers is simply inversed.
+For the record linker it does not make a huge difference, as the interpretation of the numbers is simply inversed.
 We will see that a threshold can then be set for each component, mapping the scores to binary values, or used as-is in the classification of references which will be further discussed in \cref{sec:classification}.
 
 The remaining section describes a number of distance metrics that were used in our record linkage system to perform pairwise comparisons between the fields of a pair of records, which we assume to be of the string data type.
 We denote with $\sigma$ some string constructed from individual literals taken from an alphabet $\Sigma$, and use the superscript notation, e.g. $\sigma^{i}$, to refer to its constituent parts.
 The notation $\abs{\cdot}$ is used to refer to the length of a string.
-Note that we are now considering the field strings in isolation and not the records as a whole, hence a \emph{match} in this context means that the fields are ``similar enough''.
+Note that we are now considering the field strings in isolation and not the records as a whole, hence a \emph{match} in this context means that the fields are `similar enough'.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -235,7 +235,7 @@ A cell $D[i,j]$ in the matrix corresponds to the number of edits required to con
 
 If we look at the example as depicted in Figure~\ref{fig:edit_distance}, we can see how the algorithm computes the Levenshtein distance (i.e. the edit distance with equal cost of all edit operations) between Owen (British) and Owain (Welsh).
 The computation starts in the top left corner with an initial score of $0$.
-Aligning the literal 'O' of Owain with the empty string results in a mismatch and induces a cost of $1$, therefore $D[0, 1]=1$.
+Aligning the literal `O' of Owain with the empty string results in a mismatch and induces a cost of $1$, therefore $D[0, 1]=1$.
 A vertical move down requires similar reasoning and also results in a cost of $1$.
 Aligning both starting letters results in a match and the diagonal move introduces no cost, therefore $D[1, 1]=0$.
 This process is repeated until all cells of the matrix have been computed.
@@ -263,7 +263,7 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
             $\sigma_2$ & O & w & e & \_ & n
         \end{tabular}
     \end{minipage}
-    \caption[Example of edit distance]{The matrix in the left shows the computation of the edit distance between Owen and Owain. The construction path, presented in bold, can be seen as substituting the 'a' for an 'e' and removing the 'i' from Owain as to obtain Owen, as depicted on the right.}
+    \caption[Example of edit distance]{The matrix in the left shows the computation of the edit distance between Owen and Owain. The construction path, presented in bold, can be seen as substituting the `a' for an `e' and removing the `i' from Owain as to obtain Owen, as depicted on the right.}
     \label{fig:edit_distance}
 \end{figure}
 
@@ -273,7 +273,7 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
 \subsection{Q-gram string matching}
 \label{subsec:qgram}
 
-Another class of approximate string similarity functions are based on \emph{Q-grams}, sometimes called \emph{n-grams}.
+Another class of approximate string similarity functions are based on \emph{q-grams}, sometimes called \emph{n-grams}.
 A q-gram is a sub-sequence of $q$ characters.
 Often selected values for $q$ are $q=2$ (called bigrams or digrams) and $q=3$ (called trigrams).
 They can be obtained from an input string by moving a sliding window of width $q$ over the string and counting occurrences of each q-gram encountered, effectively computing a multiset of q-grams.
@@ -289,7 +289,7 @@ Many of ways exist for comparing multisets, but three are most often used.
 \noindent A comprehensive overview of multiset distances can be found in \citep{Kosters2008}.
 
 An advantage of q-gram based functions is that they are efficiently computable.
-Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert \sigma_2 \vert$, followed by the computation of the intersection, computed in $\mathcal{O}$.
+Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert \sigma_2 \vert)$, followed by the computation of the intersection, computed in $\mathcal{O}$.
 Compared to the time complexity of $\mathcal{O}(\vert \sigma_1 \vert \times \vert \sigma_2 \vert)$ of the edit distance this an improvement.
 A disadvantage is that, due to the nature of a set, information is lost about the ordering of the q-grams in the string.
 For example, the strings ``abc'' and ``bca'' both include the bigram ``bc'', but in a different place.
@@ -326,7 +326,7 @@ It is computed as follows:
 
 \noindent with $p\in\{0,\dots,4\}$ being the length of the longest common prefix of at most $4$.
 
-\begin{figure}
+\begin{table}
     \centering
     \begin{tabular}{?c | ^c | ^c | ^c | ^c | ^c | ^c | ^c |}
         \rowstyle{\itshape}
@@ -334,12 +334,12 @@ It is computed as follows:
         $\sigma_1$ & \textbf{j} & \textbf{o} & n & e & s &   &   \\		
         Matches    & 0 & 1 & 4 & - & 3 & - & - \\		
         $\sigma_2$ & \textbf{j} & \textbf{o} & h & s & n & o & n \\\hline
-    \end{tabular}
+    \end{table}
     \caption[Example matching]{This table shows the matching of individual characters between string ``jones'' and ``johsnon''. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
-    \label{fig:jaro_winkler}
+    \label{tab:jaro_winkler}
 \end{figure}
 
-\cref{fig:jaro_winkler} shows how individual characters in the strings ``jones'' and ``johsnon'' are matched.
+\cref{tab:jaro_winkler} shows how individual characters in the strings ``jones'' and ``johsnon'' are matched.
 We can see that four characters can be matches and there is one transposition, since one character must be swapped to turn the list of indexes into a sorted array.
 The Jaro similarity can be computed as follows.
 
@@ -360,7 +360,7 @@ The Jaro similarity can be computed as follows.
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\subsection{Soundex and editex phonetic similarity}
+\subsection{Soundex and Editex phonetic similarity}
 \label{subsec:soundex}
 
 Another class of approximate string similarities is the \emph{Soundex} phonetic similarity.
@@ -379,7 +379,7 @@ In total, procedure is as follows:
 
 \begin{enumerate}
     \item The starting character of the string is used as the first character of the encoding.
-    \item Remove all occurrences of `a', `e', `i', `o', `'u', `y', `h' and `w'.
+    \item Remove all occurrences of `a', `e', `i', `o', `u', `y', `h' and `w'.
     \item Substitute consonants after the first character with digits as follows:\\
             \begin{align*}
                 b, f, p, v &\rightarrow 1 \\
@@ -479,7 +479,7 @@ Since the equivalence function determined that the values are equivalent, we dec
 In the same example it can be seen that the probabilities of ``Engelfield'' and ``Englefield'' have been summed to a value of $0.0535$.
 
 To compute an overall confidence score, the probabilities are aggregated into a single number.
-One way of doing this is by assuming that the attributes are independent and multiplying the probabilities as to obtain the posterior probability given the attribute values.
+One way of doing this is by assuming that the attributes are independent and multiplying the probabilities in order to obtain the posterior probability given the attribute values.
 When multiplied with a population size estimate $\alpha$, the estimate number of people having the described properties can be found.
 
 \begin{equation}
@@ -488,7 +488,7 @@ When multiplied with a population size estimate $\alpha$, the estimate number of
 
 \noindent with $m$ the number of fields considered.
 
-Even though the population size of certain areas might retrievable from other historical sources, it can be assumed that the number of people contained within a document $\alpha$ is unknown, since determining this is one of the goals of entity disambiguation.
+Even though the population size of certain areas might be retrievable from other historical sources, it can be assumed that the number of people contained within a document $\alpha$ is unknown, since determining this is one of the goals of entity disambiguation.
 For the purposes of entity disambiguation it is not relevant, however, as it is simply a scaling factor, i.e., if candidate pairs are ranked based on their score, omitting $\alpha$ does not influence the ranking.
 
 Instead of multiplying probabilities, the sum of logarithms can also be used.
@@ -501,7 +501,7 @@ Instead of multiplying probabilities, the sum of logarithms can also be used.
 \noindent While the $\alpha$ parameter makes the $c_{\pi}$ score easier to interpret, here it is of no use and simply omitted.
 The $c_{\mathrm{log}}$ score has the advantage that it is more efficient to compute and has a better numerical stability.
 Multiplying a large amount of small numbers can lead to underflow errors, which is resolved by instead summing the logarithms.
-Another advantage is of more practical nature: they are much easier to display in tables and plots, which is why all confidence scores will be presented as $c_{\mathrm{log}}$ scores in thesis.
+Another advantage is of more practical nature: they are much easier to display in tables and plots, which is why all confidence scores will be presented as $c_{\mathrm{log}}$ scores in this thesis.
 
 \begin{algorithm}
     \caption{Classifies candidate pair $(a_i, a_j$) as a match or non-match}
