@@ -13,11 +13,11 @@ That which can be asserted without evidence, can be dismissed without evidence.
 \chaplettrine{S}{ince} the aim of this project is to aid historians in their research, we found it important to evaluate the described techniques on a dataset that is exemplary of historical research in which entity disambiguation plays an important role.
 To this extent, our methods were applied to a dataset that was made available to us by The National Archives.
 In this chapter, the followed procedure is described and the results are compared to the ones that were manually obtained by historians.
-With the experiments we try to point out the advantages and difficulties of the system and provide a basis for future research.
+With the experiments, we try to point out the advantages and difficulties of the system and provide a basis for future research.
 
 As has been pointed out in \cref{sec:challenges}, it is impossible to be certain about the results because of a lack of a ``golden standard'', i.e., a dataset that can be assumed to be absolutely correct.
 The experiments must be seen as a best effort approach to assess the validity of the system.
-Errors have been discovered both on part of the record linkage system and the data as provided by the historians, some of which will be investigated in this chapter.
+Errors have been discovered both on the part of the record linkage system and the data as provided by the historians, some of which will be investigated in this chapter.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -45,7 +45,7 @@ People have a central role, since most of the text concerns agreements, making i
     \label{lst:gascon_xml}
 \end{listing}
 
-In 2009 a project began to produce an on-line calendar, i.e., a descriptive summary of an original archive document in which all significant elements are recorded, of the rolls.
+In 2009, a project began to produce an on-line calendar, i.e., a descriptive summary of an original archive document in which all elements that can be of historical importance are recorded, of the rolls.
 The project aims to provide an easy to access substitute of the rolls, opening up research to anyone who might be interested.
 The data thus consists of a translated and summarized extract of the original parchment rolls in digital XML format.
 Historians have thoroughly annotated this data to supply additional information and correct errors, while also providing most of the original text.
@@ -55,18 +55,20 @@ An example of this is given in \cref{lst:gascon_xml}, where an extract of the or
 The text concerns a grant of the office, that was formerly held by a Master Bernat de Rions, who had deceased, to Master Per-Arnaut de Taller.
 The text has been split into three sections using separate tags: \texttt{head}, \texttt{body} and \texttt{closer}.
 The header usually includes the the recipient, while the closer contains the phrase ``By K.'', which originally stated ``per ipsum regem'', indicating the letter was sent under the authority of the reigning king.
-Within the \texttt{opener} tag, the date and location from the letter was signed are usually included.
+Within the \texttt{opener} tag, the date and location from which the letter was signed are usually included.
 The example also shows most of the different styles of annotations that were provided by the historians.
 Person names are enclosed within a \texttt{name} tag of type \texttt{person}, while $53$ other types exist for names of things such as places, castles and titles.
 Each of these is also accompanied with a key that uniquely identifies them throughout the dataset.
-Other tags that might be of use to a human reader are: \texttt{orig}, that displays the original spelling of a word; \texttt{supplied}, that gives more information than was original present; and \texttt{note}, which gives additional information about something present on the original document that might be of interest to the reader, such as a note in the margin or a reference to another text.
+Other tags that might be of use to a human reader are: \texttt{orig}, that displays the original spelling of a word; \texttt{supplied}, that gives more information than was originally present; and \texttt{note}, which gives additional information about something present on the original document that might be of interest to the reader, such as a note in the margin or a reference to another text.
 
 Even though the annotations provided in the data are invaluable for the evaluation of the record linker, they were not used in the linkage itself.
-Since the goal is to develop a system that can automatically provide these tags, we have proceeded as if no information was present except for the plain text.
+Since the goal is to develop a system that can automatically provide these tags, we have proceeded as if no information were present except for the plain text.
 This ensures the tools developed can be applied to a wide range of datasets.
 
 \begin{table}
     \centering
+    \caption{Overview of the size of the Gascon Rolls dataset.}
+    \label{tab:data_overview}
     \begin{tabular}{l r}
         \toprule
         & Size \\
@@ -78,8 +80,6 @@ This ensures the tools developed can be applied to a wide range of datasets.
         Sum of file sizes & $27$ MB \\
         \bottomrule
     \end{tabular}
-    \caption{Overview of the size of the Gascon Rolls dataset.}
-    \label{tab:data_overview}
 \end{table}
 
 Not all $112$ existing Gascon rolls are yet available in XML format, but $66$ of them are.
@@ -100,15 +100,17 @@ This makes the Gascon rolls dataset an invaluable resource for the task at hand.
 The record linkage system works on a list of person references, while the source data is in XML format.
 The first step, therefore, is to remove the provided XML tags and parse the data using the methods described in \cref{sec:segmentation}.
 The identifiers that were contained within the original tags were stored by their starting and ending position in text, so that they could be copied to the corresponding occurrences after segmentation.
-Only occurrences in paragraphs enclosed in \texttt{ab} tags were considered as to make sure the calendar itself was parsed, and not the additional text provided by researchers, such as introductory text.
-The amount of annotated occurrences contained herein is $25836$.
-Using a compact grammar (provided in Appendix A), we were able to find $22206$ occurrences.
+Only occurrences in paragraphs enclosed in \texttt{ab} tags were considered, to make sure the calendar itself was parsed, and not the additional text provided by researchers, such as introductory text.
+The amount of annotated occurrences contained herein is \num{25836}.
+Using a compact grammar, we were able to find \num{22206} occurrences.
 Note that this is not necessarily a subset of the larger set, as not all names were annotated and the grammar is likely to return some errors. 
-In total were unable to match $1684$ occurrences found by the parser with annotated occurrences, so these were removed as to obtain $20522$ occurrences, each with a unique identifier.
+In total, we were unable to match \num{1684} occurrences found by the parser with annotated occurrences, so these were removed as to obtain \num{20522} occurrences, each with a unique identifier.
 
 \begin{table}
     \footnotesize
     \centering
+    \caption{Overview of the occurrence fields as extracted from the source text.}
+    \label{tab:occurrence_overview}
     \begin{tabularx}{\textwidth}{l X r}
         \toprule
         \textbf{Field} & \textbf{Description} & \textbf{Example} \\
@@ -130,32 +132,30 @@ In total were unable to match $1684$ occurrences found by the parser with annota
         orig & Original text. & John of France, knight \\
         \bottomrule
     \end{tabularx}
-    \caption{Overview of the occurrence fields as extracted from the source text.}
-    \label{tab:occurrence_overview}
 \end{table}
 
 In \cref{tab:occurrence_overview}, an overview of the occurrence fields can be found.
 Some of the fields are the result of applying the grammar to the plain text, while other fields contain metadata such as the name of the file in which the occurrence was found.
-The \texttt{words} field contains a set of words that appear in the section of the text in which the occurrence appears in, along with their frequencies.
-These are used by the record linker to determine whether an element of a MIKI was mentioned in the same section as the occurrence.
+The \texttt{words} field contains a set of words that appear in the section of the text in which the occurrence appears, along with their frequencies.
+These are used by the record linker to determine whether an element of a miki was mentioned in the same section as the occurrence.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
 
 
-\section{MIKI extraction}
+\section{Miki extraction}
 \label{sec:miki_evaluation}
 
 In \cref{sec:miki} it was discussed how the inclusion of contextual information might improve the performance of the record linker.
-Assuming that a person appears within a similar context, the goal is to determine the ``topics'' discussed therein using MIKIs.
+Assuming that a person appears within a similar context, the goal is to determine the ``topics'' discussed therein using miki's.
 The first question that arises is what the context of the occurrence is.
 The level was chosen to be at that of the sections, because topics are very consistent throughout them and can naturally be regarded as the context.
 One alternative is the sentence level, but this would greatly reduce the probability of an item of a MIKI occurring in the same sentence as an occurrence.
-Another options is to capture information on a membrane or roll level, but since most of the information contained therein is unrelated, it unlikely to be of relevance to an occurrence.
+Another option is to capture information on a membrane or roll level, but since most of the information contained therein is unrelated, it unlikely to be of relevance to an occurrence.
 
 To compute a MIKI for the Gascon rolls corpus, the sections are first \emph{tokenized} by splitting sentences on the whitespace character and converting all words to lowercase.
-The latter step insures no distinction is made between capitalized and non-capitalized tokens.
-These lists of tokens are then converted to multisets by computing the frequency of each token and stored, in the \texttt{words} field of each occurrence that occurs in the same section, for reference.
+The latter step ensures no distinction is made between capitalized and non-capitalized tokens.
+These lists of tokens are then converted to multisets by computing the frequency of each token, and stored in the \texttt{words} field of each occurrence that occurs in the same section, for reference.
 
 The time required to compute a MIKI can be reduced by discarding uninformative tokens beforehand.
 Three strategies were used:
@@ -163,13 +163,13 @@ Three strategies were used:
 \begin{enumerate}
     \item \emph{Infrequent tokens} are of low entropy, hence they are unlikely to contribute much to the joint entropy of a MIKI. Therefore, any tokens that appear less than $5$ times are discarded.
     \item Conversely, \emph{stop words}, such as ``the'' and ``and'', are highly frequent tokens that are of low entropy. They are unrelated to the topics discussed in text and are very likely to appear, thus not contributing much to the joint entropy of an itemset. All tokens appearing in a fixed list of $319$ stop words were ignored.
-    \item Tokens that are part of \emph{occurrences}, such as first names, were ignored. The aim is to extract tokens that represent a certain topic and relate them to occurrences. Occurrences always appear in sections that they appear in.
+    \item Tokens that are part of \emph{occurrences}, such as first names, were ignored. The aim is to extract tokens that represent a certain topic and relate them to occurrences. The constituent parts of an occurrence directly relate to the person, instead of capturing contextual information, and are used in the field-based comparisons described in \cref{sec:field_comparisons}.
 \end{enumerate}
 
 An index is constructed by scanning over the entire corpus once and taking note of the token frequencies.
-Infrequent tokens were then removed using the previously mentioned condition and stop words were simply ignored, resulting in an index consisting of $3221$ entries.
+Infrequent tokens were then removed using the previously mentioned condition and stop words were simply ignored, resulting in an index consisting of \num{3221} entries.
 The multisets of tokens were then converted into regular sets by including only tokens that are within the index. 
-Following the representation used in \cref{sec:miki}, the bags were transformed into a matrix of size $1153 \times 3221$ on which the MIKIs were computed using the \emph{Forward Selection} algorithm.
+Following the representation used in \cref{sec:miki}, the bags were transformed into a matrix of size $\num{1153} \times \num{3221}$ on which the MIKIs were computed using the \emph{Forward Selection} algorithm \citep{Knobbe2006}.
 
 \begin{table}
     \centering
@@ -180,32 +180,46 @@ Following the representation used in \cref{sec:miki}, the bags were transformed 
 
 In \cref{tab:miki_words_gascon} the resulting MIKI of size $20$ is shown, along with the cumulative joint entropy of the set of size $k$ and the probability of a token appearing in a section, comparable to the inverse document frequency.
 The first item found is the token ``king'', which naturally appears frequently in texts, because many of the texts concern oaths to or grants by the king.
-It seems reasonable that this token could be used to distinguish between people that may address the king directly and those who cannot.
-The second item is the token ``letters'', which appears in texts that contain the phrase ``letters of general attorney'', which indicate that the people mentioned thereafter were joining the principality of the king.
-This fact could be used to tell something about the status of a person, though it is unlikely that an occurrence appears twice in context containing this phrase.
+However, since the presence and absence of an item are treated equally in the computation of the entropy, the token would be of low entropy if were to occur to frequently.
+In the same table, it can be seen that it occurs in \SI{36}{\percent} of the sections, resulting in a decent entropy of $0.94$.
+The second item is the token ``letters'', which appears in texts that contain the phrase ``letters of general attorney'', which indicates that the people mentioned thereafter were joining the principality of the king.
+This fact could be used to tell something about the status of a person, though it is unlikely that an occurrence appears twice in contexts containing this phrase.
 
-Thus a problem with the usage of MIKIs becomes apparent: although it makes sense to model the topics in a section using MIKIs, their usefulness is far from guaranteed.
-The computation of the MIKI and the record linkage procedure are treated as two separate processes, so in the current setting it impossible to communicate findings of one process to the other.
-If a person is likely to be mentioned in relation to a certain topic once, that topic is not useful for entity disambiguation and should not be considered.
+Thus, a problem with the usage of miki's becomes apparent: although it makes sense to model the topics in a section using miki's, their usefulness is far from guaranteed.
+The computation of the miki and the record linkage procedure are treated as two separate processes, so in the current setting it is impossible to communicate findings of one process to the other.
+If a person is likely to be mentioned in relation to a certain topic only once, that topic is not useful for entity disambiguation and should not be considered.
 However, this implies that the match status of some of the candidate pairs is known, which is not the case in the current set-up, suggesting that an iterative approach might be useful.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/miki_gascon.tikz}
-    \caption{The cumulative entropy of the MIKI obtained from the Gascon Rolls dataset has a weak sleap, indicating that the items contained within them are less orthogonal than would be ideal for the purpose of context modelling.}
+    \caption{The cumulative entropy of the MIKI obtained from the Gascon Rolls dataset has a weak slope, indicating that the items contained within them are less orthogonal than would be ideal for the purpose of context modelling.}
     \label{fig:gascon_convergence}
 \end{figure}
 
-In \cref{fig:gascon_convergence} the cumulative entropy is shown as it is increasing with size $k$ of the MIKI.
-It is compared to the cumulative entropy of the MIKI of a subset of pages of Wikipedia.
-A similar approach to the construction of the Gascon rolls dataset was taken to construct it, though the ``sections'' in this case consist of entire pages.
-The subset was created by starting at the page of Albert Einstein and following links on pages in a breadth-first fashion until a set of $1000$ pages was collected.
-From the figure it can be seen that the convergence behavior is quite different from that of the Gascon Rolls MIKI.
-The slope of latter is weaker, indicating that the items found are less orthogonal, or, similarly, there is higher \emph{mutual entropy} between the items.
-Shown as a black dashes line is the theoretical optimal slope that occurs when the items of the MIKI are completely orthogonal (mutual entropy is $0$).
-The difference in slope can be explained by the fact that the itemsets from which the MIKIs are constructed are much smaller in the Gascon Rolls dataset.
-The probability of a token appearing on a Wikipedia page increases with the length of the text, making it more likely to obtain a token that matches the properties of an ideal item much closer.
-This shows that even though the choice for creating itemsets on a section level some appropriate, the MIKIs obtained from them might not be ideal for modelling the context of the section.
+In \cref{fig:gascon_convergence} the cumulative entropy is shown as it increases with size $k$ of the miki.
+It is compared to the cumulative entropy of the miki of a subset of pages of Wikipedia.
+A similar approach to the construction of the Gascon rolls dataset was taken to construct it, though the sections in this case consist of entire pages.
+The subset was created by starting at the page of Albert Einstein and following links on pages in a breadth-first fashion until a set of \num{1000} pages was collected.
+From the figure, it can be seen that the convergence behavior is quite different from that of the Gascon Rolls miki.
+The slope of the latter is weaker, indicating that the items found are less orthogonal, or, similarly, there is higher \emph{mutual information} between the items.
+Shown as a black dashes line is the theoretical optimal slope that occurs when the items of the MIKI are completely orthogonal (mutual information is $0$).
+There are several explanations for the difference in slope that the cumulative entropy of the miki's extracted from the Gascon Rolls and Wikipedia dataset make.
+
+The length of Wikipedia pages is usually a lot longer than the length of the section in the Gascon Rolls (respectively \num{2511} vs. \num{60} on average) and the vocabulary of words is much larger (respectively \num{52320} vs. \num{9411}).
+While a very large vocabulary will often contain a high amount of words that occur infrequently and carry almost no information, a larger section length naturally increases the probability of finding any word in a section.
+It is tempting to conclude that the Wikipedia dataset is richer in 
+
+%%%%%% START MAKING EDITS HERE %%%%%%
+
+
+The vocabulary of the Wikipedia dataset is much larger than that of the Gascon Rolls dataset, which increases the probability of finding a word with the desired
+
+The larger section length used for the Wikipedia dataset increases the 
+
+
+Since the Wikipedia pages are usually a lot longer than sections in the Gascon Rolls dataset, it is more likely to find a word with desirable 
+This shows that even though the choice for creating itemsets on a section level seems appropriate, the MIKIs obtained from them might not be ideal for modelling the context of the section.
 
 
 % % % % % % % % % % % % % % % % % % % % % %

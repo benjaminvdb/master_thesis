@@ -85,15 +85,14 @@ We will write a $k$-element subset of $I$ as a list of integers that refer to th
 \end{equation*}
 
 \noindent where
-
 \begin{equation*}
     x_{1} < \dots < x_{k}
 \end{equation*}
 
-Entropy can also be explained a measure of disorder or uncertainty, i.e., the higher the entropy of an item the more unpredictable it is.
+Entropy can also be explained as a measure of disorder or uncertainty, i.e., the higher the entropy of an item the more unpredictable it is.
 For example, a toss of a fair coin is maximally unpredictable and has an entropy of $1$, since its two outcomes ``heads'' and ``tails'' are equally likely.
 
-Analogous to the coin toss example, an itemset $I$ of maximum entropy consists of elements that are uniformly distributed over the data, i.e., a sample contains an item or combination of items of $I$ with equal probability.
+Analogous to the coin toss example, an itemset $I$ of maximum entropy consists of elements that are uniformly distributed over the data, i.e., a sample contains an item, or combination of items, of $I$ with equal probability.
 This is best illustrated with an example.
 
 \begin{table}
@@ -157,9 +156,8 @@ This is best illustrated with an example.
 \end{table}
 
 \cref{tab:joint_entropy} shows a small example dataset of size $8$ and cardinality $4$. Items $A$, $B$ and $C$ are uniformly distributed over the dataset, so they are $1$-miki's of entropy \num{1}.
-It can be seen that item $A$ and $D$ are mostly complementary, i.e., if a sample includes $A$ it is unlikely that it will include $D$.
-Another way of stating this fact is that $D$ becomes predictable given $A$, thus this itemset is of low intropy.
-Indeed, looking at \cref{tab:2miki_example} it becomes clear that this is indeed the case.
+It can be seen that item $A$ and $D$ are mostly complementary, i.e., if a sample includes $A$, it is unlikely that it will include $D$.
+Another way of stating this fact is that $D$ becomes predictable given $A$, thus the itemset $\left\{ A, D \right\}$ is of low entropy (see \cref{tab:2miki_example}).
 
 The itemset $\left\{ A, C \right\}$ is uniformly spread over the database and therefore has the maximum entropy of \num{2} and is a $2$-miki.
 
