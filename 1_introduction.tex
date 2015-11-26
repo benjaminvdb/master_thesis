@@ -44,7 +44,7 @@ By annotating hyperlinks on the web with a type of relation in this way, compute
 Although the web standards have been extended to support these types of annotations with RDF \citep{Pan2009}, it is not used in all pages on the web, often because it is laborious to incorporate semantic information.
 In this context, entity resolution could allow for automatic detection of people in text and link documents together that contain information about the same people.
 
-Information could also be extracted from text and aggregated into automatically generated summaries, resembling simple Wikipedia\footnote{http://www.wikipedia.org} pages.
+Information could also be extracted from text and aggregated into automatically generated summaries, resembling simple Wikipedia \citep{Wikipedia} pages.
 Web searches could be \emph{entity-driven}: besides the existing ``Images'' and ``News'' categories of search, the search engine could include one for ``People''.
 Results from such a system would aggregate web pages referring to the same people together, instead of returning a large list of possibly unrelated people.
 
@@ -76,7 +76,11 @@ The following is a section taken from \emph{Fine Roll C 60/33}\citep{FineRolls} 
 	Concerning the corn of \ul{Roger of Hyde}. Order to the \ul{sheriff of Oxfordshire} to make the king’s advantage without delay, by the view of law-worthy men, from all of the corn of \ul{Roger of Hyde, knight}, in Hyde, who is with the Earl Marshal, and to put in gage etc. all those who he will find threshing that corn and intermeddling with the land of the same \ul{Roger} without warrant, to be before the king at his command to answer for it.
 \end{quote}
 
-\noindent It is not always clear in which way the various properties that are mentioned should be treated. For example, is ``sherrif of Oxfordshire'' one role or is ``sherrif'' a role and should ``Oxfordshire'' therefore be treated as a provenance? The output of the occurrence extraction process therefore depends on various decisions that a made beforehand. An example of such an output in a tabular format can be seen in \cref{tab:segmentation}.
+\noindent It is not always clear in which way the various properties that are mentioned should be treated.
+For example, is ``sherrif of Oxfordshire'' one role or is ``sherrif'' a role and should ``Oxfordshire'' therefore be treated as a provenance?
+The output of the occurrence extraction process therefore depends on various decisions that a made beforehand.
+
+An example of such an output in a tabular format can be seen in \cref{tab:segmentation}.
 The nouns that refer to people through their jobs, such as king and Earl Marshal, are left out in this example.
 The important thing to note is that there are a lot of missing values that have to be dealt with appropriately.
 
@@ -153,14 +157,20 @@ We can imagine $t_{cube}$ of the above mentioned example to live in a subspace o
 We can now describe the process of entity resolution precisely as follows:
 
 \begin{definition}[Entity resolution]
-    Entity resolution is the process of constructing from a set of partial descriptions another set of partial descriptions $\mathcal{R}^{*}$ for which $\mathcal{R}^{*} = \left\{ a \mid a \approx_{d} b, \forall{a}, \exists{b} \in \mathcal{R} \right\}$.
+    Entity resolution is the process of constructing from a set of partial descriptions another set of partial descriptions $\mathcal{R}^{*}$, defined as
+    \begin{equation*}
+        \mathcal{R}^{*} = \left\{ a \mid a \approx_{d} b, \forall{a}, \exists{b} \in \mathcal{R} \right\}
+    \end{equation*}
 \end{definition}
 
-\noindent Entity resolution focuses on the construction of a set of unique and complete descriptions, which inherently involves the aggregation of information whenever two partial descriptions exist for the same real-world entity.
+Entity resolution focuses on the construction of a set of unique and complete descriptions, which inherently involves the aggregation of information whenever two partial descriptions exist for the same real-world entity.
 Record linkage, however, is only concerned with the detection of the latter and not with the aggregation itself.
 
 \begin{definition}[Record linkage]
-    Given a set of (partial) descriptions $\mathcal{R}_{p}$, record linkage is the process of determining the set of pairs $M = \left\{ (a, b) \mid \exists{r} \in \mathcal{R}: a \approx_{d} r \wedge b \approx_{d} r \right\}$, called \emph{matching pairs} or simply \emph{matches}.
+    Given a set of (partial) descriptions $\mathcal{R}_{p}$, record linkage is the process of determining the set of pairs $M$, called \emph{matching pairs} or simply \emph{matches}, defined as
+    \begin{equation}
+        M = \left\{ (a, b) \mid \exists{r} \in \mathcal{R}: a \approx_{d} r \wedge b \approx_{d} r \right\}
+    \end{equation}
 \end{definition}
 
 Record linkage can also be accomplished by the complement of the above states, i.e., determining the set of \emph{non-matches}, which we will call $U$, since $R_{p} = M \cup U$.
@@ -171,8 +181,6 @@ The total number of possible matches to be considered is therefore $n(n-1)/2$.
 Note that we assume that, in practice, it is impossible to verify whether both $a$ and $b$ are partial descriptions of $c$ since this would require knowledge of their match status -- a ``chicken-and-egg'' problem.
 This shows an important problem in record linkage, namely that there is often a lack of a ground truth.
 Even if expert knowledge is available, it can be argued that it is impossible to verify any links that are made, since it requires complete knowledge of the set of unique objects, which would invalidate the need to perform entity resolution in the first place.
-%We can however artificially generate a set of partial descriptions by sampling from a well-defined set of complete descriptions and replacing some of its elements by $\epsilon$.
-%This is the approach that we will take in \todo{add reference} to allow for evaluation of the record linkage system described in this thesis.
 
 \begin{figure}
     \centering
@@ -227,6 +235,7 @@ It is also possible to aggregate precision and recall into a single metric, such
 \end{definition}
 
 \noindent where $\beta \geq 0$.
+
 Commonly used values for $\beta$ are $1$, $2$ and $0.5$. The F\textsubscript{1} weighs precision and recall evenly, while the F\textsubscript{2} and F\textsubscript{0.5} put more emphasis on recall and precision, respectively.
 The class of F-measures is interesting because it gives a higher penalty to extreme values when compared to the arithmetic mean, which is in many cases desirable.
 As mentioned, scoring very high on either precision or recall is easy to achieve and should generally be avoided.

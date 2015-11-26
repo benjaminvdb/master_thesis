@@ -43,12 +43,10 @@
 \usepackage{ellipsis}                                               % Corrects \dots
 \usepackage{tabularx}
 
-
 %%% Syntax highlighting in code
 \usepackage{minted}                                                 
 \usemintedstyle{autumn}
 \definecolor{codebg}{RGB}{248,248,248}
-
 
 %%% Awesome plotting with TikZ
 \usepackage{tikz}
@@ -76,10 +74,6 @@
 \pgfplotsset{
     compat=1.12,                           % newest version, most features
 }
-%    every axis/.append style={
-%        /pgfplots/cycle list name=seaborn  % set 'seaborn' colors as default palette for plots
-%    }
-%}
 
 
 %%% Scalable paired delimiters in math mode, e.g. |a|
@@ -92,8 +86,8 @@
 
 
 %%% Algorithms
-\usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{algorithm}
 \newcommand*\Let[2]{\State #1 $\gets$ #2}                           % Defined for convenience
 \newcommand*{\LineFor}[2]{%
     \State\algorithmicfor\ {#1}\ \algorithmicdo\ {#2} \algorithmicend\ \algorithmicfor%
@@ -164,19 +158,6 @@
 \newtheorem*{question*}{Research question}
 
 
-%%% Custom sectioning (sectsty package)
-%\usepackage{sectsty}								% Custom sectioning (see below)
-%\allsectionsfont {%									% Change font of al section commands
-%	\usefont{OT1}{bch}{b}{n}%						% bch-b-n: CharterBT-Bold font
-%	\hspace{15pt}%									% Uncomment for indentation
-%}
-
-%\sectionfont {										% Change font of \section command
-%	\usefont{OT1}{bch}{b}{n}						% bch-b-n: CharterBT-Bold font
-%	\sectionrule{0pt}{0pt}{-5pt}{0.8pt}				% Horizontal rule below section
-%}
-
-
 %%% Custom headers/footersi
 \usepackage{fancyhdr}
 \setlength{\headheight}{15.2pt}
@@ -229,32 +210,42 @@
 \newcommand\gratio{0.6180339887}
 
 
-% You might also consider licensing your work under Creative Commons). See: http://creativecommons.org/weblog/entry/12824 for other PhD students who have released their work under creative commons.
-\newcommand{\copyrightpage}{
-	\newpage \thispagestyle{empty} \vspace*{\fill}
-	\sc \noindent \copyright~\textit{\@degreeyear \hspace{3pt}~- \theauthor} \\
-	\noindent All rights reserved.
-	\vspace*{\fill} \newpage \rm
-}
-
-
 %%% Dedication
 \newcommand{\dedicationpage}{
 	\pagestyle{fancy}
-	\newpage \thispagestyle{fancy} \vspace*{\fill}
-	\sc \noindent \input{frontmatter/dedication}
-	\vspace*{\fill} \newpage \rm
+	\newpage
+	\thispagestyle{fancy}
+	\vspace*{\fill}
+	\noindent
+	\textsc{\input{frontmatter/dedication}}
+	\vspace*{\fill}
+	\newpage
+	\rm
 }
 
 
 %%% Acknowledgements
-\newcommand{\acknowledgments}{
-	\chapter*{Acknowledgments}
-	\noindent
-	\input{frontmatter/acknowledgements}
+\newcommand{\acknowledgements}{
+	\chapter*{Acknowledgements}
+	\noindent \input{frontmatter/acknowledgements}
 	\vspace*{\fill} 
 	\newpage
 	\setcounter{page}{1}
+	\pagenumbering{arabic}
+}
+
+%%% Abstract
+\newcommand{\abstractpage}{
+    \pagestyle{empty}
+    \vspace*{\fill}
+    \begin{center}
+    	\textsc{Abstract}
+    \end{center}
+	\begin{quotation}
+	    \noindent
+	    \input{frontmatter/abstract}
+	\end{quotation}
+    \vspace*{\fill} \newpage \rm
 	\pagenumbering{arabic}
 }
 

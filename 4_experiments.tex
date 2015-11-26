@@ -204,22 +204,18 @@ The subset was created by starting at the page of Albert Einstein and following 
 From the figure, it can be seen that the convergence behavior is quite different from that of the Gascon Rolls miki.
 The slope of the latter is weaker, indicating that the items found are less orthogonal, or, similarly, there is higher \emph{mutual information} between the items.
 Shown as a black dashes line is the theoretical optimal slope that occurs when the items of the MIKI are completely orthogonal (mutual information is $0$).
-There are several explanations for the difference in slope that the cumulative entropy of the miki's extracted from the Gascon Rolls and Wikipedia dataset make.
+It is hard to determine whether this is caused by the contents of the dataset or the difference in the definition of a section that was chosen.
 
-The length of Wikipedia pages is usually a lot longer than the length of the section in the Gascon Rolls (respectively \num{2511} vs. \num{60} on average) and the vocabulary of words is much larger (respectively \num{52320} vs. \num{9411}).
-While a very large vocabulary will often contain a high amount of words that occur infrequently and carry almost no information, a larger section length naturally increases the probability of finding any word in a section.
-It is tempting to conclude that the Wikipedia dataset is richer in 
+The length of Wikipedia pages is usually a lot longer than the length of the section in the Gascon Rolls (respectively \num{2511} vs. \num{60} average words per page) and the vocabulary of words is much larger (respectively \num{52320} vs. \num{9411}).
+A shorter section length decreases the probability of a certain word occurring in that section.
+Infrequent words will therefore appear in fewer texts, reducing their contribution to the joint entropy of an itemsets.
+This is the reason that words that appear in only one text are removed from the vocabulary before the computation of the MIKI.
+We can see that the section length determines the size of the \emph{effective vocabulary}, i.e., the vocabulary after removal of frequent (stop) words and infrequent words.
+The vocabulary of the Gascon Rolls is thus further reduced, making it less likely that combinations of uncorrelated words are found, which would result in a MIKI with a high joint entropy.
 
-%%%%%% START MAKING EDITS HERE %%%%%%
-
-
-The vocabulary of the Wikipedia dataset is much larger than that of the Gascon Rolls dataset, which increases the probability of finding a word with the desired
-
-The larger section length used for the Wikipedia dataset increases the 
-
-
-Since the Wikipedia pages are usually a lot longer than sections in the Gascon Rolls dataset, it is more likely to find a word with desirable 
-This shows that even though the choice for creating itemsets on a section level seems appropriate, the MIKIs obtained from them might not be ideal for modelling the context of the section.
+Luckily, however, the MIKI is computed as part of an unsupervised learning strategy and its influence can be controlled by limiting its size.
+The cumulative joint entropy, as shown in \cref{fig:gascon_convergence}, can be kept track of by storing the joint entropy of each subsequently larger MIKI and can aid in setting this parameter.
+While for the Gascon Rolls we might want to limit the size of the MIKI to perhaps $4$, the joint entropy of the MIKI found for the Wikipedia dataset can be deemed sufficiently large at $8$.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -229,14 +225,14 @@ This shows that even though the choice for creating itemsets on a section level 
 \label{sec:linking_entities}
 
 The record linker uses the data as described in the previous two sections to classify presented candidate pairs.
-We will denote with $P$ the set of ``truly matching pairs'' (or positives) and with $N$ the set of ``truly non-matching pairs'' (negatives).
+We will denote with $P$ the set of ``truly matching pairs'' (or positives) and with $N$ the set of ``truly non-matching pairs'' (negatives), according to the annotations.
 Note that even though the used dataset was created with a lot of effort, it can never be regarded as a ``ground truth'' since the entities were linked with only limited information and will certainly contain errors.
 Since the dataset was parsed and occurrences were segmented, more errors have likely been introduced, so the results of evaluation using the dataset can not be considered as truly reflecting the performance of the linker.
-The dataset provides a realistic use case, however, and findings will certainly help in understanding the problems faced better and provide the information needed to improve the linker.
+The dataset provides a realistic use case, however, and findings will certainly help in understanding better the problems faced and provide the information needed to improve the linker.
 
-The simple attributes, such as first names, are processed as described in \cref{sec:classification}: if two attributes in the two records are considered equivalent, the logarithm of the probabilities are summed as to obtain a confidence score.
+The simple attributes, such as first names, are processed as described in \cref{sec:classification}: if two attributes in the two records are considered equivalent, the logarithm of the probabilities are summed to obtain a confidence score.
 The contextual information residing in the \texttt{words} attribute is mapped to $k$ additional binary fields, one for each item in the MIKI.
-These attributes are \texttt{True} whenever the corresponding word is contained in the \texttt{words} attribute and \texttt{False} otherwise.
+These attributes are $1$ whenever the corresponding word is contained in the \texttt{words} attribute and $0$ otherwise.
 This allows these attributes to be treated in a similar fashion to the other attributes.
 Each field is tested for equivalence and the probabilities are aggregated using the $c_{\mathrm{log}}$ function to obtain a confidence score.
 
@@ -254,25 +250,25 @@ This focuses the application of the MIKI on the more promising pairs, i.e., thos
 \end{figure}
 
 The aim of the linker is to give elements of the set of truly matching pairs $P$ a relatively higher score than the set non-matching pairs $N$.
-\cref{fig:kde} shows a kernel density estimation (KDE) plot based on the scores of truly matching and truly non-matching candidate pairs using the attributes \texttt{title}, \texttt{forename}, \texttt{article}, \texttt{surname},\texttt{role} and no MIKI, using a gaussian kernel.
-Only pairs with a score higher than $0.5$ have been taken into account, as the pairs with are less of a problem to the linker; most of them have a confidence score of $0.0$ and are simply negatives.
+\cref{fig:kde} shows the distribution (computed by a kernel density estimation (KDE) \citep{Rosenblatt1956}) based on the scores of truly matching and truly non-matching candidate pairs using the attributes \texttt{title}, \texttt{forename}, \texttt{article}, \texttt{surname}, \texttt{role} and no MIKI.
+Only candidate pairs with a score higher than $0.5$ have been taken into account; the other pairs are most likely negatives.
 Note that the two curves have been normalized and are plotted on a different scale, allowing us to plot both curves in one figure, even though there are many more negatives than positives.
 It can be seen that there is a considerable area related to the negatives, that is overlapping with that of the positives.
 The plot suggests that the threshold should be set at a confidence score of approximately $2$ to avoid capturing a lot of negatives, but only a small fraction of the positives can be retrieved this way.
-Lowering the threshold, however, will quickly reduce the precision as more and more negatives are retrieved, which might not be acceptible in many cases.
+Lowering the threshold, however, will quickly reduce the precision as more and more negatives are retrieved, which might not be acceptable in many cases.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth,height=\gratio\textwidth]{plots/roc.tikz}
-    \caption{The ROC curve shows that the trade-off is able to retrieve a large number of truly matching pairs if compared to the number of truly negative pairs that is retrieved. However, this gives an overly optimistic view on the performance of the linker, since the number of truly negative pairs is almost three orders of magnitute larger.}
+    \caption{The ROC curve shows that the trade-off is able to retrieve a large number of truly matching pairs if compared to the number of truly negative pairs that is retrieved. However, this gives an overly optimistic view on the performance of the linker, since the number of truly negative pairs is almost three orders of magnitude larger.}
     \label{fig:roc}
 \end{figure}
 
-\cref{fig:roc} shows the receiver operating characteristic (ROC) curve of the system using various thresholds
-It appears is af the trade-off between the true positive rate and the false positive rate is not affected by the use of a MIKI: the ROC curves are identical.
+\cref{fig:roc} shows the receiver operating characteristic (ROC) curve of the system using various thresholds at which MIKIs are used to boost the score, e.g., a threshold of $0.0$ always uses MIKIs, while a threshold of $3.0$ starts taking information from the MIKI into account if the confidence score without use of MIKIs is at least $3.0$.
+It appears as if the trade-off between the true positive rate and the false positive rate is not affected by the use of a MIKI, since the ROC curves are identical.
 The area under the ROC curve is quite large, meaning a large fraction of the truly matching pairs are found while retrieving only a small fraction of the truly non-matching pairs.
 However, as explained in \cref{sec:problem_definition}, since the false positive rate is based on the number of truly non-matching pairs, it is not a very informative number, since $P \lll N$.
-In the same figure it can be seen that there is a very steep slope in which most of the truly matching pairs are retrieved.
+In the same figure, it can be seen that there is a very steep slope in which most of the truly matching pairs are retrieved.
 The long diagonal moving to the upper left corner is associated with candidates pairs that have a low confidence score, of which many are truly non-matching pairs.
 
 \begin{figure}

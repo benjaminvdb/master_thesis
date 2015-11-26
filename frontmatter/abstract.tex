@@ -1,0 +1,17 @@
+Archives around the world store innumerable amounts of historical data.
+In the last few years, many of these archives have been digitized, which enables new ways of exploring the data.
+Computer applications can search through hundreds of years of data in just seconds.
+However, many of these datasets lack a structure that is easily interpretable by computers.
+In order to be able to construct the comprehensive life stories of individuals that are hidden within these datasets, the references to individuals should be extracted.
+Furthermore, it should be decided which of these references refer to the same real-world entities in a process called \emph{entity resolution}.
+
+This thesis discusses the methods and techniques that can be used for this purpose.
+A software pipeline is described that takes unstructured text as input and outputs reference pairs, ranked by a confidence score.
+This score is based on the rareness of the properties of the reference, such as name and occupation, and information extracted from the surrounding context.
+The novelty of this research was the introduction of the \emph{Maximally k-Informative Itemset} (MIKI) as a means of capturing the topics of a section that a reference occurs in.
+Experiments were conducted on real archive data supplied by the The National Archives in London.
+For a portion of this data, entity resolution had been carried out manually by historians.
+This allowed us to compare theirs results with that of our automated technique.
+
+We found that even entity resolution can be performed automatically in many cases, though our technique has difficulties in linking references of which little information is known.
+Better methods are therefore required that are able to extract more information from the context in which references appear.

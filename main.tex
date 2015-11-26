@@ -1,3 +1,15 @@
+% % % % % % % % % % % % % % % % % % % % % %
+%
+% Author:  Benjamin van der Burgh
+% Date:    November 26th 2015
+% Type:    Master's Thesis
+% Title:   Entity Resolution in Unstructured Data
+% License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+%          International
+%
+% % % % % % % % % % % % % % % % % % % % % %
+
+
 %%% Nag about outdated packages and incorrect syntax (must be first line!)
 \RequirePackage[l2tabu, orthodox]{nag}
 
@@ -7,12 +19,19 @@
 %%% Style
 \usepackage{mystyle}
 
+%%% CC BY-NC-SA 4.0 license
+\usepackage[
+    type={CC},
+    modifier={by-nc-sa},
+    version={4.0},
+]{doclicense}
+
 %%% Author
 \author{Benjamin van der Burgh}
 \degreeyear{2015}
 
 %%% Modular includes
-\includeonly{4_experiments}
+%\includeonly{1_introduction}
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -23,15 +42,12 @@
 %%% Final version only
 \ifdraft{}{
     \frontmatter
-    \includepdfmerge{front/frontpage.pdf}   % Front page
-    %\copyrightpage                          % Copyright
-    %\abstractpage
-    \tableofcontents                        % Table of contents
-    %\authorlist                            % Acknowledge authors of chapters (if any)
-    %\listoffigures
-    %\listoftables
-    %\dedicationpage
-    %\acknowledgements
+    \includepdfmerge{front/frontpage.pdf}
+    \doclicenseThis
+    \dedicationpage
+    \abstractpage
+    \acknowledgements
+    \tableofcontents
 }
 
 %%% Some content

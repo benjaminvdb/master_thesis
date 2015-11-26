@@ -111,7 +111,7 @@ In \cref{fig:blocking_example} the number of candidate pair comparisons is plott
 If no blocking scheme is utilized, the number of required comparisons quickly grows, resulting in the blue line.
 Even with the very simple blocking scheme that uses the first character of the name, we can expect the number of comparisons to be much less than without a blocking method.
 In the case of a uniform spread of starting characters, which is rather optimistic, we obtain the red line.
-The black line shows the number of comparisons against the total number of input records as computed using an empirical distribution of starting characters derived from the Gascon Rolls\footnote{http://www.gasconrolls.org/en/}.
+The black line shows the number of comparisons against the total number of input records as computed using an empirical distribution of starting characters derived from the Gascon Rolls \citep{GasconRolls}.
 It can be seen that for moderately large to large datasets, even with this simple blocking scheme, the number of comparisons are reduced by an order of magnitude.
 
 Blocking keys can also be combined into more specific keys by concatenating them \citep{Christen2012} or by using different keys in multiple passes \citep{Baxter2003}.
@@ -334,10 +334,10 @@ It is computed as follows:
         $\sigma_1$ & \textbf{j} & \textbf{o} & n & e & s &   &   \\		
         Matches    & 0 & 1 & 4 & - & 3 & - & - \\		
         $\sigma_2$ & \textbf{j} & \textbf{o} & h & s & n & o & n \\\hline
-    \end{table}
+    \end{tabular}
     \caption[Example matching]{This table shows the matching of individual characters between string ``jones'' and ``johsnon''. The longest sequence of matching starting characters is $2$ and is printed in bold face.}
     \label{tab:jaro_winkler}
-\end{figure}
+\end{table}
 
 \cref{tab:jaro_winkler} shows how individual characters in the strings ``jones'' and ``johsnon'' are matched.
 We can see that four characters can be matches and there is one transposition, since one character must be swapped to turn the list of indexes into a sorted array.
@@ -368,7 +368,7 @@ It aims to take into account the phonetics, i.e., the auditory properties of the
 These are words that are pronounced in the same way, but are written differently, such as road/rode/rowed or seas/sees/seize.
 Ambiguity caused by homophones in conversation are often resolved because of context.
 This does not apply to names, however, which may cause a name to be misspelled.
-An illustrative example of a special case of homophones can be found in datasets SC8 and C53.\footnote{Add references to http://discovery.nationalarchives.gov.uk/details/r/C3613 and http://discovery.nationalarchives.gov.uk/details/r/C13526}
+An illustrative example of a special case of homophones can be found in datasets SC8 \citep{SC8} and C53 \citep{C53}.
 In C53 there is a mentioned of ``Walter de Gloucestre'' and in SC8 a mention of ``Walter de Gloucester''.
 If these are indeed the same people -- this is unfortunately impossible to know for certain -- then this misspelling was probably caused by a cross-language homophone.
 Such differences in spelling can be dealt with by devising a phonetic string comparison function, such as soundex.
@@ -503,7 +503,7 @@ The $c_{\mathrm{log}}$ score has the advantage that it is more efficient to comp
 Multiplying a large amount of small numbers can lead to underflow errors, which is resolved by instead summing the logarithms.
 Another advantage is of more practical nature: they are much easier to display in tables and plots, which is why all confidence scores will be presented as $c_{\mathrm{log}}$ scores in this thesis.
 
-\begin{algorithm}
+\begin{algorithm}[tb]
     \caption{Classifies candidate pair $(a_i, a_j$) as a match or non-match}
     \label{alg:record_linker}
     \input{algorithms/record_linker.tex}

@@ -11,18 +11,18 @@
 \label{ch:conclusions}
 
 \chaplettrine{T}{he} results presented in the previous chapter show that there are aspects of the methods described that work quite reliably, though some parts should still be improved.
-In this chapter we will take another look at the pipeline and discuss the strong and weak points and give some directions for future research.
+In this chapter, we will take another look at the pipeline and discuss the strong and weak points and give some directions for future research.
 
-We started out by extracting named-entities from text using a grammar-based approach.
-The Gascon Rolls dataset was already annotated, enabling us to zoom in solely on the named-entities and evaluating the precision and recall of the grammar.
-This is not a luxury that would be typical in a historical research project and the time that was required to construct the dataset should be taken into account.
-However, because the grammar captures structures that appear throughout many documents, even spanning different time periods, it is likely that the constructed grammar (see ...) can be applied on other datasets as well.
+We started out by extracting named entities from text using a grammar-based approach.
+The Gascon Rolls dataset was already annotated, enabling us to zoom in solely on the named entities and evaluating the precision and recall of the grammar.
+It is not common that these annotations are readily available, since it takes a lot of effort to annotate a dataset.
+However, because the grammar captures structures that appear throughout many documents, even spanning different time periods, it is likely that the constructed grammar can be applied on other datasets as well.
 Indeed, we have done a short test on the Fine Rolls of King Henry III, which showed reasonable results, though a more thorough study should be done to be conclusive.
 
-One of the problems with manually constructing grammar is that rules are heavily entangled, requiring to parse the entire corpus again to verify no regression happened after a change.
-Another problem is use of pre-defined first names as anchor points in the text.
+One of the problems with manually constructing a grammar is that rules are heavily entangled, requiring parsing the entire corpus again to verify no regression happened after a change.
+Another problem is the use of pre-defined first names as anchor points in the text.
 Even though new first names can be discovered using a bootstrapping procedure, the first names can also cause problems when they appear in names that do not belong to people, such as organizations.
-In our study we saw the name ``Mary'' appearing often as part of the name of church, triggering a false positive.
+In our study, we saw the name ``Mary'' appearing often as part of the name of a church, triggering a false positive.
 We provide two suggestions for further improvement of the entity extraction step.
 
 First, the grammar-based approach could be combined with techniques from natural language processing (NLP).
@@ -38,42 +38,43 @@ Secondly, a supervised or semi-supervised machine learning method could also pro
 It can often be difficult to determine in what order certain attributes can appear, while it is easy to determine the attributes within a given sentence.
 It should be straightforward, though laborious, to construct a training set in which all significant attributes have been annotated.
 Hidden Markov Models (HHM) have since long been used in NLP for part-of-speech tagging \citep{Kupiec1992}, the process in which the words in a sentence are assigned to word categories, such as noun, verb, adjective, etc.
-In these models the part-of-speech categories are represented as states with transitions weighted in accordance with the probability of transitioning to the state, given the current state, as was learned from a training set.
-A first-order HMM uses one word as its context, but the model can be extended as to use more context and capture more complex data.
+In these models, the part-of-speech categories are represented as states with transitions weighted in accordance to the probability of transitioning to the state, given the current state, as was learned from a training set.
+A first-order HMM uses one word as its context, but the model can be extended to use more context and capture more complex data.
 Attribute tagging is similar to part-of-speech tagging in the sense that words can only appear in certain categories and their actual meaning is dependant on the surrounding words, a property that was exploited in our grammar.
-Thus HMMs might prove useful for automatic learning of grammars if sufficiently large training dataset can be obtained.
+Thus HMMs might prove useful for automatic learning of grammars if a sufficiently large training dataset can be obtained.
 
 The use of a MIKI in the linking procedure has not shown a significant impact on the performance of the record linker, indicating that the use of MIKI as a method of capturing contextual informative is insufficient.
-One explanation is that the length of the sections, that were taken as the context, are insufficiently large.
-Let us assume that two tokens $t_1$ and $t_2$ often appear together in documents of corpus, then they have a high mutual entropy and are unlikely to both be present in the MIKI of that corpus.
+One explanation is that the length of the sections, that were taken as the context, was insufficiently large.
+Assume that two tokens $t_1$ and $t_2$ often appear together in documents of corpus, then they have a high mutual entropy and are unlikely to both be present in the MIKI of that corpus.
 If $t_1$ is present in the MIKI, and $t_2$ is found in a text, then it is likely that $t_1$ is also found, but its probability is reduced if the text in which it occurs is short.
 A possible enhancement could be to compute for each ``representative'' item of the MIKI a ranking of the remaining items based on their mutual entropy.
-Depending on the length of the text under consideration, more or less items are considered equivalent with the representative, i.e., they model the same topic.
-Another possibility is to use an approach similar to phrase-based modelling \citep{Lin2009} in which not single tokens but sequences of tokens are used to model context.
-An advantage of this is that the number of items can greatly be reduced if infrequent phrases are discarded, as was one during the preprocessing of the itemsets described in \cref{ch:experiments}.
+Depending on the length of the text under consideration, more or fewer items are considered equivalent with the representative, i.e., they model the same topic.
+Another possibility is an approach similar to phrase-based modelling \citep{Lin2009} in which not single tokens but sequences of tokens are used to model context.
+An advantage of this method is that the number of items can be greatly reduced if infrequent phrases are discarded, as was done during the preprocessing of the itemsets described in \cref{ch:experiments}.
 
-Depending on the requirements set by the user, the results of the linker can be interpreted in various ways.
+Depending on the requirements of the user, the results of the linker can be interpreted in various ways.
 The method can retrieve about $30\%$ of the truly positive pairs with reasonable precision.
 However, the remaining part is hard to distinguish from the truly negative pairs, since pairs from both classes occur frequently with lower confidence scores.
 Retrieving these truly positive pairs results in a precision that would be unacceptable in many circumstances.
 MIKIs have been investigated as a means of providing contextual information, but they have proven unable to accomplish this.
-It must be noted that if a person is mentioned several times in the same text, they usually be regarded as the same person.
-This has not been taken into account, because we set out construct a general purpose linker for plain text, yet it would have been more pragmatic to utilize this knowledge and possibly obtain less pessimistic results.
+It must be noted that if a person is mentioned several times in the same text, they usually would be regarded as the same person.
+This has not been taken into account, because we set out to construct a general purpose linker for plain text, yet it would have been more pragmatic to utilize this knowledge and possibly obtain less pessimistic results.
 
 The entity-disambiguation task can be viewed as an optimization problem in which the properties of the set of disambiguated entities should reflect those of the bigger population, from which the statistics were computed, as closely as possible.
-One major drawback of the system as it was presented here, is that is considers the candidate pairs \emph{in isolation}, i.e., it does not take into account what the set of disambiguated entities looks like.
-An alternative approach is start linking the more ``promising'' pairs, that have a high confidence score first, and consider the other pairs later.
-Because of the high cost of computing confidence scores, heuristics can be used as to avoid the number of comparisons.
-Pairs that have more non-empty attributes are more likely to have a high confidence score and can be processed first.
+One major drawback of the system as it was presented here, is that it considers the candidate pairs \emph{in isolation}, i.e., it does not take into account what the set of disambiguated entities looks like.
+An alternative approach is to start linking the more ``promising'' pairs, that have a high confidence score first, and consider the other pairs later.
+Because of the high cost of computing confidence scores, heuristics can be used to avoid the number of comparisons.
+Pairs that have more non-empty attributes are more likely to have a high confidence score if they are a true match and can be processed first.
 Blocking could be applied to further reduce the number of promising pairs.
-Knowledge obtained about the network formed by the disambiguated pairs can then be used in the computation of confidence scores by penalizing the confidence scores of pairs that alter the network of disambiguated pairs in a way that is inconsistent with that of the global population.
+Knowledge obtained about the network formed by the disambiguated pairs can then be used in the computation of confidence scores.
+This could be done by penalizing the confidence scores of pairs that alter the network of disambiguated pairs in a way that is inconsistent with that of the global population.
 Note that this approach relies heavily on the knowledge of the global population, as reflected in the statistics, and this might often not be the case.
 
-For much larger datasets it might be beneficial to take into account the relational and social aspect of the population.
-There is an hidden social network reflecting the connections that people had with each other.
+For much larger datasets, it might be beneficial to take into account the relational and social aspect of the population.
+There is a hidden social network reflecting the connections that people had with each other.
 People are indirectly connected to other people through the connections that they have.
-Two persons can be considered as being ``close'' if there number of people in between them is small.
-Assuming that two people are more likely to be contact if they are close, they are also more likely to be mentioned within the same context.
+Two persons can be considered as being ``close'' if the number of people in between them is small.
+Assuming that two people are more likely to have been in contact if they are close, they are also more likely to be mentioned within the same context.
 However, incorporating this information requires a radically different approach to the one presented in this thesis.
 
 We set out to develop a system for the disambiguation of entities in historical documents.

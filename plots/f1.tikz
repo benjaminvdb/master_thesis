@@ -1,10 +1,6 @@
 \begin{tikzpicture}
     \begin{axis}[
         axis on top,
-        plot graphics/xmin=0,
-        plot graphics/xmax=17.9678,
-        plot graphics/ymin=0,
-        plot graphics/ymax=0.36421,
         enlargelimits=false,
         title={The F1-measure at varying confidence thresholds},
         xlabel={Score},
@@ -22,7 +18,7 @@
             anchor={north east},font=\small
         }
     ]
-    \addplot [forget plot] graphics {plots/f1_pdf};
+    \addplot [forget plot] graphics[xmin=0, xmax=17.9678, ymin=0, ymax=0.36421] {plots/f1_eps};
     \addlegendimage{line legend,Set1-6-1,thick},
     \addlegendimage{line legend,Set1-6-2,thick},
     \addlegendimage{line legend,Set1-6-3,thick},
