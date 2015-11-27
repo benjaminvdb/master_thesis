@@ -95,7 +95,7 @@ For example, a toss of a fair coin is maximally unpredictable and has an entropy
 Analogous to the coin toss example, an itemset $I$ of maximum entropy consists of elements that are uniformly distributed over the data, i.e., a sample contains an item, or combination of items, of $I$ with equal probability.
 This is best illustrated with an example.
 
-\begin{table}
+\begin{table}[!tbp]
 \centering
     \begin{minipage}{.3\textwidth}
         \centering
@@ -114,8 +114,6 @@ This is best illustrated with an example.
             0 & 0 & 0 & 1 \\
             \bottomrule
         \end{tabular}
-        \caption{}
-        \label{tab:miki_example}
     \end{minipage}%
     \begin{minipage}{.3\textwidth}
         \centering
@@ -130,8 +128,6 @@ This is best illustrated with an example.
             D & 0.95443400292496494 \\
             \bottomrule
         \end{tabular}
-        \caption{}
-        \label{tab:example_1miki}
     \end{minipage}%
     \begin{minipage}{.3\textwidth}
         \centering
@@ -148,8 +144,6 @@ This is best illustrated with an example.
             C & D & 1.9056390622295665 \\
             \bottomrule
         \end{tabular}
-        \caption{}
-        \label{tab:2miki_example}
     \end{minipage}
 \caption{An example dataset of size $8$ and cardinality $4$.}
 \label{tab:joint_entropy}
@@ -157,6 +151,60 @@ This is best illustrated with an example.
 
 \cref{tab:joint_entropy} shows a small example dataset of size $8$ and cardinality $4$. Items $A$, $B$ and $C$ are uniformly distributed over the dataset, so they are $1$-miki's of entropy \num{1}.
 It can be seen that item $A$ and $D$ are mostly complementary, i.e., if a sample includes $A$, it is unlikely that it will include $D$.
-Another way of stating this fact is that $D$ becomes predictable given $A$, thus the itemset $\left\{ A, D \right\}$ is of low entropy (see \cref{tab:2miki_example}).
+Another way of stating this fact is that $D$ becomes predictable given $A$, thus the itemset $\left\{ A, D \right\}$ is of low entropy (see \cref{tab:joint_entropy}).
 
 The itemset $\left\{ A, C \right\}$ is uniformly spread over the database and therefore has the maximum entropy of \num{2} and is a $2$-miki.
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Algorithms for computing MIKIs}
+\label{sec:miki_computation}
+
+\begin{algorithm}[!tbp]
+    \caption{Computes the lexicographic successor of itemset $X$ of size $k$}
+    \label{alg:lexicographic}
+    \input{algorithms/lexicographic}
+\end{algorithm}
+
+\begin{algorithm}[!tbp]
+    \caption{Computes an exact MIKI by exhaustive search}
+    \label{alg:exhaustive_miki}
+    \input{algorithms/exhaustive_miki}
+\end{algorithm}
+
+To compute a MIKI from a set of itemsets $Y$ of size $n$, an exhaustive search algorithm, as given in \cref{alg:exhaustive_miki}, can be employed \citep{Knobbe2006}.
+This algorithm computes the joint entropy for all itemsets of given size $k$ and outputs the one for which this value is maximized.
+The order in which the itemsets are processed is determined by the function \texttt{LexicographicSuccessor} (see \cref{alg:lexicographic}).
+
+\begin{algorithm}[!tbp]
+    \caption{Computes an approximate MIKI}
+    \label{alg:forward_selection}
+    \input{algorithms/forward_selection}
+\end{algorithm}
+
+Note that for the intended purpose of computing a MIKI out of a vocabulary of $n$ words, it quickly becomes infeasible to perform an exhaustive search, since the number of candidate itemsets is equal to $\dbinom{n}{k}$.
+Knobbe et al. have defined various bounds on the joint entropy of an itemset, which can be utilized to reduce the number of candidate itemsets significantly \citep{Knobbe2006}.
+They provide four algorithms that are guaranteed to find a MIKI and one called \texttt{ForwardSelection} (see \cref{alg:forward_selection}), that may or may not find a MIKI, but reduces the complexity to $\mathcal{O}(kn)$.
+
+While the exact algorithms are considering all possible itemsets and skipping portions of the search space whenever possible, the approximation algorithm computes a MIKI by constructing it incrementally.
+It starts by selecting the item with the highest entropy, resulting in the $1$-MIKI.
+An (approximate) MIKI of size $2$ is then found by computing the joint entropy of the union of the current MIKI with one of the remaining items, while keeping track of the maximum value.
+This process is repeated until an itemset of size $k$ is found.
+
+
+% % % % % % % % % % % % % % % % % % % % % %
+
+
+\section{Utilizing MIKIs for entity resolution}
+\label{sec:miki_utilization}
+
+By computing the MIKI for a given corpus we aim to capture distinct topics that occur in it.
+In order to incorporate this information in the record linker, as described in the previous chapter, we treat each of the chosen words in the MIKI as a new binary attribute.
+This is achieved by extending each reference with $k$ new attributes, each of which is $1$ if the corresponding word did occur in the section that the reference appeared in, and $0$ otherwise.
+To classify candidate record pairs, the same procedure as described in \cref{sec:classification} can be used if a suitable similarity function for the binary attributes is provided.
+For this purpose, the logical and function can be used: probability values are only retrieved if the values in both records are $1$, i.e., the intersection of words in both references are used.
+The probabilities are equal to the fraction of sections that the word appears in.
+The classification procedure remains unchanged: each attribute pair is tested for approximate equality and the probability of the value is obtained and fed into an aggregation function whenever this is the case, resulting in a confidence score.
+The only addition on the part of the classification algorithm is the inclusion of the logical and function.

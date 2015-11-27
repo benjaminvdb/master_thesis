@@ -233,8 +233,8 @@ The dataset provides a realistic use case, however, and findings will certainly 
 The simple attributes, such as first names, are processed as described in \cref{sec:classification}: if two attributes in the two records are considered equivalent, the logarithm of the probabilities are summed to obtain a confidence score.
 The contextual information residing in the \texttt{words} attribute is mapped to $k$ additional binary fields, one for each item in the MIKI.
 These attributes are $1$ whenever the corresponding word is contained in the \texttt{words} attribute and $0$ otherwise.
-This allows these attributes to be treated in a similar fashion to the other attributes.
-Each field is tested for equivalence and the probabilities are aggregated using the $c_{\mathrm{log}}$ function to obtain a confidence score.
+This allows these attributes to be treated in a similar fashion to the other attributes, as described in \cref{sec:miki_utilization}.
+Using the logical and function as a similarity function, only the probabilities of the words that appear in both references are retrieved and aggregated using the $c_{\mathrm{log}}$ function to obtain a confidence score.
 
 However, in our experiments we noticed that the use of a MIKI did not prove useful to increase the score of candidate pairs with very low confidence scores.
 It might happen, for example, that a candidate record pair contains only the first name ``John'', which occurs frequently and thus results in a relatively low confidence score.

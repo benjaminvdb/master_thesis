@@ -1,0 +1,17 @@
+\begin{algorithmic}[1]
+    \Function{ForwardSelection}{$k$, $n$}
+        \State $X:=\varnothing$
+        \For{$i:=1 \To k$}
+            \State $h_{max}:=0$
+            \For{$j:=1 \To n$}
+                \State $h:=\textrm{JointEntropy}(X \cup \left\{j\right\})$
+                \If{$j \not\in X \textbf{ and } h \geq h_{max}$}
+                    \State $h:=h_{max}$
+                    \State $m:=j$
+                    \State $X:=X \cup \left\{m\right\}$
+                \EndIf
+            \EndFor
+        \EndFor
+        \State \Return $X$
+    \EndFunction
+\end{algorithmic}

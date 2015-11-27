@@ -1,0 +1,18 @@
+\begin{algorithmic}[1]
+    \Function{LexicographicSuccessor}{$X$, $k$, $n$}
+        \State $Y:=X$
+        \State $i:=k$
+        \While {$i \geq 1 \textbf{ and } x_i = n - k + i$}
+            \State $i:=i-1$
+            \If{$i=0$}
+                \State \Return{$\textrm{\textit{``undefined''}}$}
+            \Else
+                \For{$j:=i \To k$}
+                    \State $y_j:=x_i + 1 + j - i$
+                \EndFor
+                \State \Return{$Y$}
+            \EndIf
+        \EndWhile
+        \State \Return{$Y$}
+    \EndFunction
+\end{algorithmic}

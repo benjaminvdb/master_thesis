@@ -1,0 +1,16 @@
+\begin{algorithmic}[1]
+    \Function{ExhaustiveMiki}{$k$, $n$}
+        \State $X:=[1, \dots, k]$
+        \State $h_{max}:=\textrm{JointEntropy}(X)$
+        \State $Y:=X$
+        \While {$\textrm{LexicographicSuccessor}(X, n)\neq\textrm{\textit{``undefined''}}$}
+            \State $X:=\textrm{LexicographicSuccessor}(X, n)$
+            \State $h:=\textrm{JointEntropy}(X)$
+            \If{$h > h_{max}$}
+                \State $h:=h_{max}$
+                \State $Y:=X$
+            \EndIf
+        \EndWhile
+        \State \Return $Y$
+    \EndFunction
+\end{algorithmic}

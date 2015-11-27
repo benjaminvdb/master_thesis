@@ -86,7 +86,7 @@
 
 
 %%% Algorithms
-\usepackage{algpseudocode}
+\usepackage[noend]{algpseudocode}
 \usepackage{algorithm}
 \newcommand*\Let[2]{\State #1 $\gets$ #2}                           % Defined for convenience
 \newcommand*{\LineFor}[2]{%
@@ -208,46 +208,6 @@
 \def\universitycity#1{\gdef\@universitycity{#1}}
 \def\universitystate#1{\gdef\@universitystate{#1}}
 \newcommand\gratio{0.6180339887}
-
-
-%%% Dedication
-\newcommand{\dedicationpage}{
-	\pagestyle{fancy}
-	\newpage
-	\thispagestyle{fancy}
-	\vspace*{\fill}
-	\noindent
-	\textsc{\input{frontmatter/dedication}}
-	\vspace*{\fill}
-	\newpage
-	\rm
-}
-
-
-%%% Acknowledgements
-\newcommand{\acknowledgements}{
-	\chapter*{Acknowledgements}
-	\noindent \input{frontmatter/acknowledgements}
-	\vspace*{\fill} 
-	\newpage
-	\setcounter{page}{1}
-	\pagenumbering{arabic}
-}
-
-%%% Abstract
-\newcommand{\abstractpage}{
-    \pagestyle{empty}
-    \vspace*{\fill}
-    \begin{center}
-    	\textsc{Abstract}
-    \end{center}
-	\begin{quotation}
-	    \noindent
-	    \input{frontmatter/abstract}
-	\end{quotation}
-    \vspace*{\fill} \newpage \rm
-	\pagenumbering{arabic}
-}
 
 
 %%% Add missing subscript command similar to \textsuperscript
