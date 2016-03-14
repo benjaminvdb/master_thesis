@@ -12,7 +12,7 @@
 
 \chaplettrine{E}{ntity resolution} is the process of finding records in one or more datasets that relate to the same entity.
 Entities in this context commonly refer to people, such as patients and customers, but they can also refer to products, events or any other concept.
-Its applications range from duplicate detection to the merging of datasets to obtain a single, enriched database.
+Applications of entity resolution range from duplicate detection to the merging of datasets to obtain a single, enriched database.
 It has a long history of research and a lot of effort has been put into building systems that can perform the task in diverse contexts.
 However, many of the techniques developed rely on a database that has a well-defined data model in which specific pieces of information about an entity are mapped to a fixed number of fields.
 Whenever unstructured, continuous text is considered, such as commonly found in books and on the web, many of these techniques are not directly applicable and must be modified or perhaps entirely new approaches must be considered.
@@ -38,9 +38,8 @@ This is essentially an entity resolution problem with the added difference that 
 This projects shows the need for the development of such a system and serves as an excellent use case.
 
 Another possible application of a system for entity resolution in unannotated data lies in the semantic web \citep{Berners2001, Mihalcea2007}.
-The semantic web can be seen as a graph in which the nodes represent concepts which are connected by edges representing a type of relation.
-By annotating hyperlinks on the web with a type of relation in this way, computers can easily and rapidly parse pages, effectively making the same document suitable for both humans to read and computers to process.
-Although the web standards have been extended to support these types of annotations with RDF \citep{Pan2009}, it is not used in all pages on the web, often because it is laborious to incorporate semantic information.
+The semantic web can be seen as a graph in which the nodes represent concepts which are connected by edges that represent a type of relation.
+Although the web standards have been extended to support several types of annotations with RDF \citep{Pan2009}, it is not used in all pages on the web, often because it is laborious to incorporate semantic information.
 In this context, entity resolution could allow for automatic detection of people in text and link documents together that contain information about the same people.
 
 Information could also be extracted from text and aggregated into automatically generated summaries, resembling simple Wikipedia \citep{Wikipedia} pages.
@@ -77,9 +76,11 @@ The following is a section taken from \emph{Fine Roll C 60/33}\citep{FineRolls} 
 
 \noindent It is not always clear in which way the various properties that are mentioned should be treated.
 For example, is ``sherrif of Oxfordshire'' one role or is ``sherrif'' a role and should ``Oxfordshire'' therefore be treated as a provenance?
-The output of the occurrence extraction process therefore depends on various decisions that a made beforehand.
+The output of the occurrence extraction process therefore depends on various decisions that are made beforehand.
+When such decisions are made, the decisions can be captured in a grammar that is used by a parser to segment the input text into records.
+This is what we will call a rule-based system.
 
-An example of such an output in a tabular format can be seen in \cref{tab:segmentation}.
+An example of the tabular output can be seen in \cref{tab:segmentation}.
 The nouns that refer to people through their jobs, such as king and Earl Marshal, are left out in this example.
 The important thing to note is that there are a lot of missing values that have to be dealt with appropriately.
 
@@ -92,12 +93,12 @@ We will therefore study the application of more generic techniques and their imp
 The core of any record linkage system is the step in which references are classified into matches and non-matches.
 In order to do so, a similarity-based approach is often used.
 Based on the assumption that references to the same entity are themselves similar, we can start comparing their segmented records.
-However, this requires a means of comparing records which is not a trivial task.
+However, this requires a means of comparing records, which is not a trivial task.
 There are many different approaches, such as counting the number of edit operations required to turn one string into the other, and each comes with their own quirks and advantages.
 One of the challenges here is to select a similarity metric and another is to deal with the missing data, such as exemplified in \cref{tab:segmentation}.
 
 Another issue arises when we take the property of \emph{transitivity} into account, i.e., if $a$ and $b$ are a match and $a$ and $c$ are a match, then it is reasonable to assume that also $b$ should be a match with $c$.
-However, in some situations, it might occur in which this property does not hold, thus we find that there is an inconsistency in the matching status of the pairs under consideration.
+However, in some situations, it might occur that this property does not hold, thus we find that there is an inconsistency in the matching status of the pairs under consideration.
 Matches can also chain together in which case the ends of the chain are clearly not matches, though intuitively, and by applying the property of transitivity, we could argue that these records should also be matched.
 \cref{fig:transitive_closure} shows an example of such an uncertain situation.
 We could argue that the same person was referenced once with his first name and another time with middle name, yet we could also say that there is an inconsistency and perhaps only one pair should be matched.
@@ -142,40 +143,46 @@ Since two slightly different, but strongly related, problems are addressed, two 
 We will denote \emph{entity resolution} and \emph{record linkage} as two distinct tasks, such that we can distinguish between the main objective of aggregating personal information and linking structured records, respectively.
 Before defining these concepts more formally, we first define their constituents.
 
-We can express entities as \emph{descriptive tuples}, or simply \emph{descriptions}, $t \in A_{1} \times A_{2} \times \dots \times A_{n}$, consisting of the $n$ properties that the object has.
-For example, we could describe the concept of a cube using some of its properties such as the number of dimensions it lives in, the number of sides it has and the number of corners.
-This description is an element of $\mathbb{N} \times \mathbb{N} \times \mathbb{N}$, e.g. $t_{cube}=(3, 6, 8)$.
-A \emph{partial description} $t^{*}$ is a descriptive tuple living in a subspace of another descriptions space, e.g. $t_{cube}^{*}=(3, 8)$.
-Another way of representing a partial description is to add a special null value $\epsilon$ to each of the sets that indicates a \emph{missing value}.
-Instead of omitting a value and thinking about an object in a smaller subspace, we can simply provide $\epsilon$ instead of the omission.
-Using the same example we would obtain $t_{cube}^{*}=(3, \epsilon, 8)$.
-A description $t_i$ is more descriptive than $t_j$ if it has fewer missing values.
-Let us assume that there exists a set $\mathcal{R}$ with \emph{total descriptions} of all real-world entities, i.e., no extensions of the tuples are possible such that they are more descriptive.
-We denote with $t_{i}^{*} \approx_{d} t_{j}$, where $t^{*} \in \mathcal{S}^{*} \backslash \mathcal{S}$ and $t \in \mathcal{S}$, the one-to-one mapping between partial descriptions and their more descriptive counterparts.
-We can imagine $t_{cube}$ of the above mentioned example to live in a subspace of the much larger space of properties defining any geometric object, thus it can be considered a partial description of the object in that larger space.
-We can now describe the process of entity resolution precisely as follows:
+In order to define what we mean with entity resolution, let us first define what we mean with entities and how their descriptions are defined.
+Since it is hard to define a domain that will be suited for any entity, we will use references to entities in an unknown domain $E$.
+Assume we can obtain information about entities through an `oracle' function $Q$, defined on an entity $\bm{e} \in E$ and a property key $k \in \Sigma^{*}$ that maps to a proper value if the entity possesses the property and a `missing value' $\epsilon$ otherwise.
+Using alphabetic characters as keys, we can for example obtain the number of corners of a cube: $Q(\descx{cube}, \stringify{corners}) = 8$.
+
+A \emph{description} $\desc$ consists of a tuple of keys $K$ and values $V$,
+e.g. $\descx{cube}=((\stringify{corners}, \stringify{sides}), (8, 6))$.
+We denote with the $\cardin{\desc}$ the \emph{description length}, defined as $\cardin{K}=\cardin{V}$, thus $\cardin{\descx{cube}}=2$ in the previous example.
+A description $\desc = (K, V)$ is said to describe an entity $\entity$, denoted with $\desc \describes \entity$, whenever the properties of the description match that of the entity, i.e., $Q(k_i, \entity) = v_i$ with $i = 1, 2, \dots, \cardin{\desc}$.
+To allow for small mistakes and variation in the data, we will describe more precisely how to compare properties in \cref{sec:field_comparisons}.
+
+We can now describe the process of entity resolution as follows:
 
 \begin{definition}[Entity resolution]
-    Entity resolution is the process of constructing from a set of partial descriptions another set of partial descriptions $\mathcal{R}^{*}$, defined as
+    Entity resolution is the process of deriving from a set of descriptions $\Delta$ another set of descriptions $\hat{\Delta}$ s.t. each of the described entities $\entity \in E$ are described by \emph{at most one description} (injective, non-surjective) and \emph{no information is lost}, i.e.,
     \begin{equation*}
-        \mathcal{R}^{*} = \left\{ a \mid a \approx_{d} b, \forall{a}, \exists{b} \in \mathcal{R} \right\}
+        \hat{\Delta} = \left\{ \bm{x} \describes \entity \mid \bm{x} \describes \entity \wedge \bm{y} \describes \entity \implies \bm{x} = \bm{y}, \forall \bm{x}, \bm{y} \right\}
     \end{equation*}
 \end{definition}
 
-Entity resolution focuses on the construction of a set of unique and complete descriptions, which inherently involves the aggregation of information whenever two partial descriptions exist for the same real-world entity.
+Note that even in the presence of an oracle $Q$, we could never know if a description truly references an entity, since the non-surjective property implies that a description can describe several elements in $E$.
+What makes matters even more complicated is that we also lack knowledge of the set $E$.
+The best we can do is assume that descriptions describe at least one entity in $E$ and `ground' the oracle to it, i.e., we treat descriptions as incomplete entities.
+This allows us to do pairwise comparisons of descriptions as the core component of the entity resolution process.
+Whenever a query involves an unknown property, an $\epsilon$ is returned.
+
+Also note that from the fact that there is an injective, non-surjective \emph{describes}-relation between $\hat{\Delta}$ and $E$ and that no information is lost, it is implied that descriptions in the original set $\Delta$ are \emph{merged} during the record linkage process.
+Entity resolution therefore focuses on the construction of a set of unique descriptions, which involves the aggregation of information whenever two partial descriptions exist for the same (real-world) entity.
 Record linkage, however, is only concerned with the detection of the latter and not with the aggregation itself.
 
 \begin{definition}[Record linkage]
-    Given a set of (partial) descriptions $\mathcal{R}_{p}$, record linkage is the process of determining the set of pairs $M$, called \emph{matching pairs} or simply \emph{matches}, defined as
-    \begin{equation}
-        M = \left\{ (a, b) \mid \exists{r} \in \mathcal{R}: a \approx_{d} r \wedge b \approx_{d} r \right\}
-    \end{equation}
+    Given a set of (partial) descriptions $\Delta$, record linkage is the process of determining the set of \emph{matching pairs} $M$, or simply \emph{matches}, defined as:
+    \begin{equation*}
+        M = \left\{ (\bm{x}, \bm{y}) \mid \bm{x} \describes \entity \wedge \bm{y} \describes \entity, \exists \entity \in E, \forall \bm{x}, \bm{y} \in \Delta \right\}
+    \end{equation*}
+    \label{def:record_linkage}
 \end{definition}
 
-Record linkage can also be accomplished by the complement of the above states, i.e., determining the set of \emph{non-matches}, which we will call $U$, since $R_{p} = M \cup U$.
-Another interpretation of record linkage is the establishment of ``same-as'' relations between records in a given dataset.
-Formulated in this way it is trivial that this relation is \emph{symmetric}, i.e., $(a, b) \in M \Leftrightarrow (b, a) \in M$.
-The total number of possible matches to be considered is therefore $n(n-1)/2$.
+Again, by grounding the oracle to a specific description, we can do pairwise comparisons between descriptions.
+Note that the relation defined in \cref{def:record_linkage} is \emph{symmetric}, which limits the total number of possible matches to $n(n-1)/2$, if we do not compare descriptions with themselves.
 
 Note that we assume that, in practice, it is impossible to verify whether both $a$ and $b$ are partial descriptions of $c$ since this would require knowledge of their match status -- a ``chicken-and-egg'' problem.
 This shows an important problem in record linkage, namely that there is often a lack of a ground truth.
@@ -250,7 +257,7 @@ Now that we have a formal definition of record linkage we will pose the the rese
 \begin{enumerate}[label=\emph{\roman*.}]
     \item How do we transform the source data into a format that can be used by traditional record linkage techniques?
     %\item Do we need to transform the source data into a tabular format or can we perform entity resolution without such structure?
-    \item What methods can be used to extract information from documents that improve the performance of entity resolution?
+    \item What methods can be used to extract information from documents to improve the performance of entity resolution?
 \end{enumerate}
 
 

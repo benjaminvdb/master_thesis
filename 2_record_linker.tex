@@ -45,7 +45,7 @@ Statistical techniques generally rely on the availability of labeled data for tr
 Luckily, the variant of NER we are trying to achieve here is rather simple as it only involves the detection of people in text and not, for example, place names.
 Also, person names have a well-defined structure and use capitalization, making it a lot easier to detect them.
 
-The method that we settled on is a simplified version of a grammar-based approach and mainly requires a list of first names as a \emph{seed}.
+The method that we settled on is a simplified version of a context-free grammar-based approach and mainly requires a list of first names as a \emph{seed}.
 The input is processed as a sequence of tokens, which is generated simply by splitting the text on spaces after removing punctuation; no further processing on the tokens is performed.
 After that, tokens can be searched for first names, ignoring tokens that are not recognized as such.
 First names are used as anchor points in the grammar by applying rules that try to match tokens based on their relative position to the names.
@@ -273,11 +273,11 @@ From the example it can be seen that a choice sometimes occurs, since multiple a
 \subsection{Q-gram string matching}
 \label{subsec:qgram}
 
-Another class of approximate string similarity functions are based on \emph{q-grams}, sometimes called \emph{n-grams}.
-A q-gram is a sub-sequence of $q$ characters.
+Another class of approximate string similarity functions are based on \emph{$q$-grams}\citep{Ukkonen1992}, sometimes called \emph{$n$-grams}.
+A $q$-gram is a sub-sequence of $q$ characters.
 Often selected values for $q$ are $q=2$ (called bigrams or digrams) and $q=3$ (called trigrams).
-They can be obtained from an input string by moving a sliding window of width $q$ over the string and counting occurrences of each q-gram encountered, effectively computing a multiset of q-grams.
-The general approach of q-gram string matching is to measure similarity of the obtained multisets using the number of q-grams that they have in common.
+They can be obtained from an input string by moving a sliding window of width $q$ over the string and counting occurrences of each q-gram encountered, effectively computing a multiset of $q$-grams.
+The general approach of $q$-gram string matching is to measure similarity of the obtained multisets using the number of $q$-grams that they have in common.
 Many of ways exist for comparing multisets, but three are most often used.
 
 \begin{align}
@@ -288,12 +288,12 @@ Many of ways exist for comparing multisets, but three are most often used.
 
 \noindent A comprehensive overview of multiset distances can be found in \citep{Kosters2008}.
 
-An advantage of q-gram based functions is that they are efficiently computable.
-Computation involves the extraction of q-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert \sigma_2 \vert)$, followed by the computation of the intersection, computed in $\mathcal{O}$.
+An advantage of $q$-gram based functions is that they are efficiently computable.
+Computation involves the extraction of $q$-grams from both strings, which can be computed in time $\mathcal{O}(\vert \sigma_1 \vert + \vert \sigma_2 \vert)$, followed by the computation of the intersection, computed in $\mathcal{O}$.
 Compared to the time complexity of $\mathcal{O}(\vert \sigma_1 \vert \times \vert \sigma_2 \vert)$ of the edit distance this an improvement.
-A disadvantage is that, due to the nature of a set, information is lost about the ordering of the q-grams in the string.
+A disadvantage is that, due to the nature of a set, information is lost about the ordering of the $q$-grams in the string.
 For example, the strings ``abc'' and ``bca'' both include the bigram ``bc'', but in a different place.
-While a method based on edit distance would penalize accordingly, a q-gram based method will simply disregard this fact.
+While a method based on edit distance would penalize accordingly, a $q$-gram based method will simply disregard this fact.
 
 
 % % % % % % % % % % % % % % % % % % % % % %
@@ -302,7 +302,7 @@ While a method based on edit distance would penalize accordingly, a q-gram based
 \subsection{Jaro and Jaro-Winkler similarity}
 \label{subsec:jaro}
 
-The family of Jaro similarity functions combine some of the advantages of both the edit distance and q-gram similarity.
+The family of Jaro similarity functions\citep{Jaro1989} combine some of the advantages of both the edit distance and $q$-gram similarity.
 It counts the number of characters $c$ that are in common within a window that is of size $\lfloor \frac{\text{max}(\SizeOf{\sigma_1}, \SizeOf{\sigma_2})}{2}\rfloor-1$.
 Moreover, the Jaro similarity function also accounts for the number of transpositions $t$, i.e., adjacent characters that are swapped in the two strings.
 Put together, the metric is defined as follows:
@@ -317,11 +317,11 @@ Put together, the metric is defined as follows:
 
 In the context of record linkage it makes sense to spend time on improving approximate similarity functions on a specific use case, namely for names.
 Names regularly appear abbreviated in text, but this does not change the prefix.
-The Jaro-Winkler similarity function takes this into account by increasing the similarity value based on the number of agreeing characters at the beginning of the two strings.
+The Jaro-Winkler\citep{Winkler1990} similarity function takes this into account by increasing the similarity value based on the number of agreeing characters at the beginning of the two strings.
 It is computed as follows:
 
 \begin{equation}
-    \mathrm{s_{winkler}}(\sigma_1, \sigma_2)=\mathrm{s_{jaro}}(\sigma_1, \sigma_2) + (1-\mathrm{s_{jaro}}(\sigma_1, \sigma_2)\frac{p}{10}
+    \mathrm{s_{winkler}}(\sigma_1, \sigma_2)=\mathrm{s_{jaro}}(\sigma_1, \sigma_2) + (1-\mathrm{s_{jaro}}(\sigma_1, \sigma_2)\frac{p}{10})
 \end{equation}
 
 \noindent with $p\in\{0,\dots,4\}$ being the length of the longest common prefix of at most $4$.
@@ -363,7 +363,7 @@ The Jaro similarity can be computed as follows.
 \subsection{Soundex and Editex phonetic similarity}
 \label{subsec:soundex}
 
-Another class of approximate string similarities is the \emph{Soundex} phonetic similarity.
+Another class of approximate string similarities is the \emph{Soundex}\citep{Soundex} phonetic similarity.
 It aims to take into account the phonetics, i.e., the auditory properties of the strings, with emphasis on the \emph{homophones}.
 These are words that are pronounced in the same way, but are written differently, such as road/rode/rowed or seas/sees/seize.
 Ambiguity caused by homophones in conversation are often resolved because of context.
@@ -429,7 +429,7 @@ Since it is computed analogous to the edit distance it is also computed in time 
 \label{sec:classification}
 
 The last step in the pipeline is to classify candidates pairs, i.e., pairs of occurrences within the same block, into \emph{matches} and \emph{non-matches}.
-The classifier bases its decision on roughly on two criteria.
+The classifier bases its decision on roughly two criteria.
 
 \begin{figure}
     \centering
@@ -470,7 +470,7 @@ By setting a threshold on the distance, an \emph{equivalence function} is obtain
 This is shown in \cref{fig:classify2}, where the threshold has been set at $0.2$, resulting in a binary vector of length $3$.
 Note that different equivalence functions could be set for each of the individual fields, depending on the type of value, such as string, categorical and ordinal, and the thresholds could be varied.
 
-Secondly, if the values are equivalent, then the probability of the value occurring is retrieved.
+Secondly, if the values are equivalent, then the prior probabilities of these value occurring is retrieved.
 In these best case, these statistics are readily available, for example from a similar dataset or as computed on a census.
 In many cases, these statistics are not available and the statistics can be computed from the occurrences in the dataset itself.
 This is however sub-optimal, since it introduces bias, based on how many times a person was referenced in the dataset.

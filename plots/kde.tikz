@@ -7,7 +7,7 @@
         axis y line*=left,% the ’*’ avoids arrow heads
         title={Kernel density estimation of candidate pair scores},
         xlabel=Score,
-        ylabel=Positive Density,
+        ylabel=Positive Normalized Density,
         legend cell align=right,
         legend entries={
             Truly matching,
@@ -18,7 +18,7 @@
             anchor={north east},font=\small
         }
     ]
-    \addplot [forget plot] graphics[xmin=0.5,xmax=5.5,ymin=0,ymax=1.727] {plots/kde_eps};
+    \addplot [forget plot] graphics[xmin=0.5,xmax=5.5,ymin=0,ymax=1] {plots/kde_eps};
     \addlegendimage{line legend,Set1-6-1,thick},
     \addlegendimage{line legend,Set1-6-2,thick},
     \end{axis}
@@ -30,7 +30,7 @@
         scale only axis,
         axis y line*=right,
         axis x line=none,
-        ylabel=Negative Density
+        ylabel=Negative Normalized Density
     ]
     \end{axis}
 \end{tikzpicture}
