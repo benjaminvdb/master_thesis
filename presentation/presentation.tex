@@ -160,6 +160,26 @@
 \newcommand*{\SizeOf}[1]{\:\vert {#1} \vert\:}
 
 
+%%% Syntax highlighting in code
+\usepackage[cache=false,outputdir=.texpadtmp]{minted}
+\usemintedstyle{autumn}
+\usepackage{listings}
+\definecolor{codebg}{RGB}{248,248,248}
+
+\usepackage{etoolbox}
+\AtBeginEnvironment{minted}{\singlespacing%
+    \fontsize{10}{10}\selectfont}
+    
+    
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{tikzscale}            % Nice scaling of plots
+\pgfplotsset{
+    compat=1.12,                           % newest version, most features
+}
+
+
 %=======================================
 %============ PRESENTATION =============
 %=======================================
@@ -702,38 +722,188 @@
 
 	\begin{itemize}
 		\item Per definition, Mikis consist of items that are uncorrelated.
-		\item Presence and absence of items are treated in the same way:\begin{itemize}
-			\item lala
-		\end{itemize}
+		\item Roughly stated: items that occur frequently together are captured in the Miki by only one of the items.
+		\item This makes the items within a Miki a good candidate for modelling `topics' of text segments.
+		\item For each item in the Miki, we introduce a binary feature to the records, using the probability of each in the `lookup step` of the classifier.
 	\end{itemize}
-
 	
 \end{frame}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\begin{frame}{Experiments -- Dataset}
+	
+	\begin{itemize}
+		\item For validation of the system, we used manually annotated data from The Gascon Rolls project.
+		\item The Gascon Rolls are records that were drawn up by the English royal administration of Aquitaine-Gascony (south-western France) between 1273 and 1468.
+		\item Contain grants of land, oaths of treaties and other important documents.
+		\item The dataset consists of so-called \emph{calendars}, which are summaries of the actual rolls.
+		\item The original text was written in Latin and translated to modern English.
+	\end{itemize}
+	
+\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\begin{frame}{Experiments -- Dataset}
+
+\begin{table}
+    \centering
+    \caption{Overview of the size of the Gascon Rolls dataset.}
+    \label{tab:data_overview}
+    \begin{tabular}{l r}
+        \toprule
+        & Size \\
+        \midrule
+        Number of rolls & $66$ \\
+        Number of membranes & $943$ \\
+        Number of sections & $1153$ \\
+        Number of occurrences & $30426$ \\
+        Sum of file sizes & $27$ MB \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+	
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\begin{frame}{Experiments -- Occurrence Extraction}
+
+	\begin{itemize}
+		\item The dataset contains $25 836$ 	annotated occurrences.
+		\item A parser based on a context-free grammar was able to find and segment $22 206$ occurrences.
+		\item Out of these $1684$ were not annotated and removed from the dataset resulting in $20 522$ segmented records.
+		\end{itemize}
+
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\begin{frame}{Experiments -- Occurrences}
+
+\begin{table}
+	\footnotesize
+    \centering
+    \begin{tabular}{l l}
+        \toprule
+        \textbf{Field} & \textbf{Description}\\
+        \midrule
+        id & As provided in the source document.\\
+        forename & \\
+        article & Word(s) between the forename and surname.\\
+        surname & \\
+        provenance & Origin of a person.\\
+        title & Used to address a person. \\
+        role & Ascribed to person.\\
+        regnal\_number & Used to distinguish monarchs.\\
+        fileId & Filename \\
+        sectionId & Section identifier. \\
+        pos & Start position in section. \\
+        endpos & End position in section. \\
+        words & Words and their frequencies in section.\\
+        orig & Original text.\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\end{frame}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% Experimental evaluation
+\begin{frame}{Experiments -- Mikis}
 
-% Conclusions and future work
+	\begin{itemize}
+		\item To reduce the number of items considered, several unpromising items were removed. \begin{enumerate}
+    			\item \emph{Infrequent tokens}: any tokens that appear less than $5$ times are discarded.
+    			\item \emph{Frequent tokens}: all tokens appearing in a fixed list of $319$ stop words were ignored.
+    			\item Tokens that are part of \emph{occurrences}, such as first names, were ignored.
+				\end{enumerate}	
+	\end{itemize}
+\end{frame}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\centering
+	\includegraphics[width=\textwidth]{images/pic1}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\centering
+	\includegraphics[width=\textwidth]{images/pic2}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\centering
+	\includegraphics[width=\textwidth]{images/pic3}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\centering
+	\includegraphics[width=\textwidth]{images/pic4}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\centering
+	\includegraphics[width=\textwidth]{images/pic5}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\centering
+	\includegraphics[width=\textwidth]{images/pic6}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%% TO-DOS %%%%%%%%%%
+
+% Inleidend stuk over precision-recall, F1-measure
+% Conclusie
+
+% Bonus: plots netjes in LaTeX!
+
+% Bonus bonus: zie hieronder.
 
 % End slide with picture of thesis front page and URL to GitHub.
 

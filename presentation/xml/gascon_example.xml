@@ -1,0 +1,18 @@
+<text>
+  <group xml:id="it033_13_16f_006-007">
+    <head>
+      For Master Per-Arnaut de Taller.
+    </head>
+    <text xml:id="it033_13_16f_006" type="appointment_to_office">
+      <body>
+        <opener sameAs="#it033_13_16f_005_opener"/>
+        <ab>
+            Grant during pleasure to <name key="entity-005051" type="person"><name key="entity-001064" type="status">Master</name> Per-Arnaut de Taller<orig>Teller</orig></name> of the office that <name key="entity-005052" type="person"><name key="entity-001064" type="status">Master</name> Bernat de Rions<orig>Aruncio</orig></name>,<note>The name has been written over an erasure.</note> who is dead, held in the duchy.
+        </ab>
+        <closer>
+            By K. by the information of <name key="entity-001378" type="person">Oliver<supplied> de Bordeaux</supplied></name>.
+        </closer>
+      </body>
+    </text>
+  </group>
+</text>
