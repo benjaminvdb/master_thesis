@@ -20,6 +20,7 @@
 \usepackage{alltt}      % Easy verbose environment
 \usepackage{fixltx2e}   % Fixes
 \usepackage{booktabs}   % Proper tables
+\usepackage{microtype}
 
 % Beamer (LaTeX PDF presentation) stuff
 \usetheme{uleiden}
@@ -140,6 +141,24 @@
 
 %\newcommand\mathmacro[1][A]{\ensuremath{{#1}_1}}
 \newcommand*{\parsevar}[1]{\ensuremath{\left\{\textrm{#1}\right\}}}
+
+%%% Colored box around text
+\newcommand{\cfbox}[2]{%
+    \colorlet{currentcolor}{.}%
+    {\color{#1}%
+    \fbox{\color{currentcolor}#2}}%
+}
+
+%%% Algorithms
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}                           % Defined for convenience
+\newcommand*{\LineFor}[2]{%
+    \State\algorithmicfor\ {#1}\ \algorithmicdo\ {#2} \algorithmicend\ \algorithmicfor%
+}
+\newcommand*{\To}{\:\bm{ to }\:}
+\newcommand*{\SizeOf}[1]{\:\vert {#1} \vert\:}
+
 
 %=======================================
 %============ PRESENTATION =============
@@ -341,20 +360,374 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\begin{frame}
+	\frametitle{Record Field Comparison (1)}
+	
+	\begin{itemize}
+		\item Records are compared on a per-field basis.
+		\item Fields can be of many different types, but we assume strings.
+		\item Many different ways of computing distances between strings exist.
+		\item To give an impression we will have a look at one particular approach.
+	\end{itemize}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Record Field Comparison (2) -- $Q$-gram similarity}
+	
+	\begin{itemize}
+		\item A $q$-gram is a sequence of $q$ characters.
+		\item To compute the $q$-grams of a word, move a sliding window over the word.\begin{itemize}
+				\item \framebox{Joh}n
+				\item J\framebox{ohn}
+			\end{itemize}
+		\item String similarity between words defined as the similarity between their respective multisets of $q$-grams.
+	\end{itemize}
+	
+	\pause
+	
+	\begin{equation*}
+		\textrm{sim}_{\textrm{jaccard}}(\sigma_1, \sigma_2) = \frac{c_{\textrm{common}}}{c_1 + c_2 - c_{\textrm{common}}}
+	\end{equation*}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Record Field Comparison (3)}
+	
+	\begin{itemize}
+		\item Many different string similarity functions exist. \begin{itemize}
+			\item Edit distance: uses number of transformation steps.
+			\item Soundex: phonetic similarity.
+		\end{itemize}
+		\item Similarity values can often be converted to distances, e.g., $\mathrm{dist}(\sigma)=1-\mathrm{sim}(\sigma)$.
+		\item Distance function chosen depending on the content.
+	\end{itemize}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Candidate Pair Classification (1) -- Distances}
+	
+	\begin{itemize}
+		\item A distance function is defined for every field.
+		\item The classifier first uses these functions to map a record pair to an array of distance values.
+	\end{itemize}
+	
+	\vspace{-8mm}
+	
+	\begin{equation*}
+		\mathrm{map}_{\mathrm{dist}}(\bm{r}_1, \bm{r}_2) \to (d_1, d_2, \ldots, d_n)	 \qquad \text{with } \left\vert \bm{r_1} \right\vert = \left\vert \bm{r_2} \right\vert = n
+	\end{equation*}
+	
+	\pause
+	
+	\begin{itemize}
+		\item Distance values are thresholded to obtain a binary value: fields are either \alert{equivalent} or \alert{nonequivalent}.
+		\item If one or both values are missing, the fields are considered equivalent.
+	\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Candidate Pair Classification (2) -- Probabilities}
+	
+	\begin{itemize}
+		\item If a record field pair is equivalent, we look up the \alert{prior probability} of a person having that property, e.g., in a census.
+		\item If such information is unavailable, we can compute the prior probability from the data.
+		\item Equivalent, but are not unequal values, are treated as an \alert{equivalence class} and their probabilities are summed.
+		\item Using the data itself introduces a bias towards `famous people', i.e., people that occur often.
+	\end{itemize}
+
+\end{frame}
 
 
 
-% Brief introduction to the goals of the TTT project (goals) (1)
-% Formal problem introduction (3)
-% Describe the pipeline (note that we strive for a tabular approach?)
-%     Record extraction is done by means of a CFG
-%     Briefly mention blocking as means of reducing the number of comparisons (show graph that shows benefits).
-%     Field-based comparisons: describe some simple means of comparison: Edit distance.
-           % ---- Briefly explain advantages and disadvantages of methods without diving into the details.
-%     Candidate pair classification (3)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Feature extraction
-%    Give the example of Mr. Carkesse
+
+\begin{frame}
+	\frametitle{Candidate Pair Classification (3) -- Example}
+
+	\begin{center}
+
+        \begin{tabular}{| l | c | c | c |}
+            \cline{2-4}
+            \multicolumn{1}{l|}{ } & \textit{First name} & \textit{Article} & \textit{Last name} \\\hline
+            $p$ & $0.182$ & $0.917$ & $0.00214$ \\\hline
+            $r_1$ & John & de & Engelfield \\\hline
+            \multicolumn{1}{c}{ } & \multicolumn{1}{c}{$0.0 \updownarrow$} & \multicolumn{1}{c}{ } & \multicolumn{1}{c}{$0.13 \updownarrow$} \\\hline
+            $r_2$ & John & & Englefield \\\hline
+            $p$ & $0.182$ &  & $0.00321$\\\hline
+            \multicolumn{1}{l|}{ } & \textit{First name} & \textit{Article} & \textit{Last name}\\\cline{2-4}
+        \end{tabular}
+	        
+	    \bigskip
+	    
+        \begin{tabular}{| l | c | c | c |}
+            \cline{2-4}
+            \multicolumn{1}{l|}{ } & \textit{First name} & \textit{Article} & \textit{Last name} \\\hline
+            $p'$ & $0.182$ & & $0.0535$ \\\hline
+            $E_q$ & $1$ & $1$ & $1$\\\hline
+        \end{tabular}
+       
+     \end{center}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Candidate Pair Classification (4) -- Confidence}
+	
+	\begin{itemize}
+		\item The last step of classification is to aggregate the probabilities in a confidence score.
+		\item Record pairs with nonequivalent fields are not considered for linking.
+		\item Assume independence of fields, e.g., \textit{First Name = John} does not affect the probability of \textit{Last Name = Williams}.
+		\item The confidence score is computed as the sum of log probabilities:
+	\end{itemize}
+	
+	\begin{equation*}
+		\mathrm{conf}(\bm{p})=\sum_{i=0}^{\left\vert \bm{p} \right\vert}\log{p_i}
+	\end{equation*}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Contextual Information (1)}
+	
+	\begin{itemize}
+		\item The previously described procedure makes use of information that is relatively easy to obtain.
+		\item Fields are often empty and the confidence score is therefore low.
+		\item We may be able to exploit the fact that references occur within a certain \alert{context}.
+	\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Contextual Information (2) -- An Example}
+
+	\begin{quote}
+	    ``A letter from the Secretary to Mr. Carkesse, desiring him to move the Commissioners of the Customs, that their Officers in the Out Ports may give this Board an Account of the quantities of Salt that is necessary and used in curing several species of Fish, was agreed and ordered to be sent.''
+	\end{quote}
+	
+	\bigskip
+	
+	\begin{quote}
+	    ``Ordered that Mr. Carkesse be desired to let this Board have on Tuesday next, if possible, the Account of Fish exported, which was desired the 17th of the last month.''
+	\end{quote}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Contextual Information (3) -- Observations}
+
+	\begin{itemize}
+		\item Many stop words occur that are probably not informative.
+		\item There are a few interesting words: Customs, Fish, Salt.
+		\item Individual words might be indicative of the \alert{topic} discussed.
+		\item We need of means of extracting these words from the data.
+		\item We propose \emph{Maximally k-Informative Itemsets} for this.
+	\end{itemize}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+	\frametitle{Maximally $k$-Informative Itemsets}
+	
+	\begin{block}{Joint entropy}
+    	Suppose that $X = \left\{ x_{1}, \dots, x_{k} \right\}$ is an itemset, and $B = \left( b_{1}, \dots, b_{k} \right) \in \left\{ 0, 1 \right\}^{k}$ is a tuple of binary values. The \emph{joint entropy} of $X$ is defined as
+    	\small
+    	\begin{equation*}
+        	H(X) = -\sum_{B \in \left\{ 0, 1 \right\}^{k}} p \left( x_{1} = b_{1}, \dots, x_{k} = b_{k} \right) \lg p \left( x_{1} = b_{1}, \dots, x_{k} = b_{k} \right)
+    	\end{equation*}
+    	\normalsize
+	\end{block}
+	
+	\pause
+	
+	\begin{itemize}
+		\item Presence and absence of items are treated equally.
+		\item The maximum achievable entropy of an itemset of size $k$ is $k$ and has $P(X)=0.5$.
+	\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Maximally $k$-Informative Itemsets}
+
+	\begin{table}
+	\centering
+    \begin{minipage}{.3\textwidth}
+        \centering
+        \begin{tabular}{c c c c}
+            \toprule
+            $A$ & $B$ & $C$ & $D$ \\
+            \midrule
+            1 & 1 & 1 & 0 \\
+            1 & 1 & 0 & 0 \\
+            1 & 1 & 1 & 0 \\ 
+            1 & 0 & 0 & 0 \\
+            0 & 1 & 1 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 1 \\
+            0 & 0 & 0 & 1 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.3\textwidth}
+        \centering
+        \begin{tabular}{c c}
+            \toprule
+            $I$ & $H$ \\
+            \midrule
+            A & 1.00 \\
+            B & 1.00 \\
+            C & 1.00 \\
+            D & 0.95 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.3\textwidth}
+        \centering
+        \begin{tabular}{c c c}
+            \toprule
+            $I_{1}$ & $I_{2}$ & $H$ \\
+            \midrule
+            A & B & 1.81 \\
+            A & C & 2.00 \\
+            A & D & 1.41 \\
+            B & B & 1.81 \\
+            B & D & 1.41 \\
+            C & D & 1.91 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}
+\end{table}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Maximally $k$-Informative Itemsets}
+
+	\begin{block}{Maximally informative $k$-itemset}
+	    Suppose that $I$ is a collection of $n$ items. An itemset $X \subseteq I$ of cardinality $k$ is a \emph{maximally informative k-itemset}, $\mathrm{iff}$ for all itemsets $Y \subseteq I$ of cardinality $k$,
+	    \begin{equation*}
+	        H(Y) \leq H(X)
+	    \end{equation*}
+	\end{block}
+	
+	\pause
+	
+	\begin{itemize}
+		\item There are many itemsets that can be a Miki: $\dbinom{n}{k}$.
+		\item Knobbe et al. proposed several algorithms for finding exact and approximate Mikis.
+	\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Maximally $k$-Informative Itemsets}
+
+	\begin{center}
+		\begin{algorithmic}[1]
+	    \Function{ForwardSelection}{$k$, $n$}
+	        \State $X:=\varnothing$
+	        \For{$i:=1 \To k$}
+	            \State $h_{\mathrm{max}}:=0$
+	            \For{$j:=1 \To n$}
+	                \State $h:=\textrm{JointEntropy}(X \cup \left\{j\right\})$
+	                \If{$j \not\in X \textbf{ and } h \geq h_{\mathrm{max}}$}
+	                    \State $h:=h_{\mathrm{max}}$
+	                    \State $m:=j$
+	                    \State $X:=X \cup \left\{m\right\}$
+	                \EndIf
+	            \EndFor
+	        \EndFor
+	        \State \Return $X$
+	    \EndFunction
+		\end{algorithmic}
+	\end{center}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Maximally $k$-Informative Itemsets}
+
+	\begin{itemize}
+		\item Per definition, Mikis consist of items that are uncorrelated.
+		\item Presence and absence of items are treated in the same way:\begin{itemize}
+			\item lala
+		\end{itemize}
+	\end{itemize}
+
+	
+\end{frame}
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 % Experimental evaluation
 
