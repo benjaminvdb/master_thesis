@@ -1,0 +1,24 @@
+\pgfplotstabletypeset[%
+    every head row/.style={before row=\toprule, 
+    after row=\midrule},
+    every last row/.style={after row=\bottomrule},
+    col sep=semicolon,
+    header=true,
+    font=\small,
+    columns/Word/.style={
+        column type=l,
+        string type
+    },
+    columns/Cum. Entr./.style={
+        column type=c,
+        fixed,
+        fixed zerofill,
+        precision=2
+    },
+    columns/p/.style={
+        column type=c,
+        fixed,
+        fixed zerofill,
+        precision=2
+    }
+]{tables/miki_words_gascon_short.dat}
