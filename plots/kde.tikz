@@ -1,13 +1,13 @@
 \begin{tikzpicture}
     \begin{axis}[
-        yticklabel style={Set1-6-1},
+%        yticklabel style={Set1-6-1},
         axis on top,
         enlargelimits=false,
         scale only axis,
-        axis y line*=left,% the ’*’ avoids arrow heads
+%        axis y line*=left,% the ’*’ avoids arrow heads
         title={Kernel density estimation of candidate pair scores},
         xlabel=Score,
-        ylabel=Positive Normalized Density,
+        ylabel=Normalized Density,
         legend cell align=right,
         legend entries={
             Truly matching,
@@ -23,14 +23,14 @@
     \addlegendimage{line legend,Set1-6-2,thick},
     \end{axis}
    
-    \begin{axis}[
-        xmin=0,xmax=5.5,
-        ymin=0,ymax=12.926,
-        yticklabel style={Set1-6-2},
-        scale only axis,
-        axis y line*=right,
-        axis x line=none,
-        ylabel=Negative Normalized Density
-    ]
-    \end{axis}
+%    \begin{axis}[
+%        xmin=0,xmax=5.5,
+%        ymin=0,ymax=1,
+%        yticklabel style={Set1-6-2},
+%        scale only axis,
+%        axis y line*=right,
+%        axis x line=none,
+%        ylabel=Negative Normalized Density
+%    ]
+%    \end{axis}
 \end{tikzpicture}
