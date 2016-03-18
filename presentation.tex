@@ -258,7 +258,7 @@
 		\item Record extraction
 		\item Comparison of record fields
 		\item Candidate pair classification
-		\item Maximally k-informative itemsets
+		\item Maximally Informative $k$-Itemsets
 		\item Experiments
 		\item Conclusions and future work
 	\end{enumerate}
@@ -287,13 +287,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}
-
-	\begin{shadequote}[r]{Paulo Coelho (The Alchemist)}
-		No matter what he does, every person on earth plays a central role in the history of the world. And normally he doesn't know it.
-	\end{shadequote}
-	
-\end{frame}
+%\begin{frame}
+%
+%	\begin{shadequote}[r]{Paulo Coelho (The Alchemist)}
+%		No matter what he does, every person on earth plays a central role in the history of the world. And normally he doesn't know it.
+%	\end{shadequote}
+%	
+%\end{frame}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -303,7 +303,7 @@
 	\frametitle{Traces Through Time (2) -- Goals}
 
 	\begin{itemize}
-		\item Develop a methodology to identify and trace individuals across large and diverse historical datasets.
+		\item Develop a methodology to \alert{identify} and \alert{trace} individuals across large and diverse historical datasets.
 		\item Look particularly at `fuzzy' data \begin{customlist}{3.5em}{0em}
 			\item Aliases: Will, William
 			\item Incomplete data: John (only a name)
@@ -335,7 +335,7 @@
 			\item The National Archives
 			\item Institute of Historical Research
 			\item Brighton University
-			\item Leiden University
+			\item Leiden University (Arno Knobbe, Kleanthi Georgala, me)
 			\end{itemize}
 		\item Brighton University worked on \emph{Natural Language Processing}.
 		\item Our job was to perform record linkage on the extracted references delivered by Brighton University.
@@ -471,7 +471,7 @@
 
 
 \begin{frame}
-	\frametitle{Record Field Comparison (3)}
+	\frametitle{Record Field Comparison (3) -- More Metrics}
 	
 	\begin{itemize}
 		\item Many different string similarity functions exist. \begin{itemize}
@@ -536,7 +536,7 @@
 
 
 \begin{frame}
-	\frametitle{Candidate Pair Classification (3) -- Example}
+	\frametitle{Candidate Pair Classification (3) -- An Example}
 
 	\begin{center}
 
@@ -593,7 +593,7 @@
 	
 	\begin{itemize}
 		\item The previously described procedure makes use of information that is relatively easy to obtain.
-		\item Fields are often empty and the confidence score is therefore low.
+		\item Fields often have \alert{missing values} and the confidence score is therefore low.
 		\item We may be able to exploit the fact that references occur within a certain \alert{context}.
 	\end{itemize}
 
@@ -630,7 +630,7 @@
 		\item There are a few interesting words: Customs, Fish, Salt.
 		\item Individual words might be indicative of the \alert{topic} discussed.
 		\item We need of means of extracting these words from the data.
-		\item We propose \emph{Maximally k-Informative Itemsets}\footnotemark for this.
+		\item We propose \emph{Maximally Informative $k$-Itemsets}\footnotemark for this.
 	\end{itemize}
 	
 	\footcitetext{Knobbe2006}
@@ -642,7 +642,7 @@
 
 
 \begin{frame}
-	\frametitle{Maximally $k$-Informative Itemsets}
+	\frametitle{Maximally Informative $k$-Itemsets -- Definitions}
 	
 	\begin{block}{Joint entropy}
     	Suppose that $X = \left\{ x_{1}, \dots, x_{k} \right\}$ is an itemset, and $B = \left( b_{1}, \dots, b_{k} \right) \in \left\{ 0, 1 \right\}^{k}$ is a tuple of binary values. The \emph{joint entropy} of $X$ is defined as
@@ -666,7 +666,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Maximally $k$-Informative Itemsets}
+\begin{frame}{Maximally Informative $k$-Itemsets -- An Example}
 
 	\begin{table}
 	\centering
@@ -723,7 +723,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Maximally $k$-Informative Itemsets}
+\begin{frame}{Maximally Informative $k$-Itemsets -- Definitions}
 
 	\begin{block}{Maximally informative $k$-itemset}
 	    Suppose that $I$ is a collection of $n$ items. An itemset $X \subseteq I$ of cardinality $k$ is a \emph{maximally informative k-itemset}, $\mathrm{iff}$ for all itemsets $Y \subseteq I$ of cardinality $k$,
@@ -745,7 +745,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Maximally $k$-Informative Itemsets}
+\begin{frame}{Maximally Informative $k$-Itemsets -- Algorithm}
 
 	\begin{center}
 		\begin{algorithmic}[1]
@@ -775,7 +775,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Maximally $k$-Informative Itemsets}
+\begin{frame}{Maximally Informative $k$-Itemsets -- Usage}
 
 	\begin{itemize}
 		\item Per definition, Mikis consist of items that are \alert{uncorrelated}.
@@ -805,7 +805,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Experiments -- Dataset}
+\begin{frame}{Experiments (1) -- Dataset}
 
 \begin{table}
     \centering
@@ -830,7 +830,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Experiments -- Occurrence Extraction}
+\begin{frame}{Experiments (2) -- Occurrence Extraction}
 
 	\begin{itemize}
 		\item The dataset contains $25 836$ 	annotated occurrences.
@@ -844,7 +844,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Experiments -- Occurrences}
+\begin{frame}{Experiments (3) -- Occurrences}
 
 \begin{table}
 	\footnotesize
@@ -877,7 +877,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}{Experiments -- Mikis}
+\begin{frame}{Experiments (4) -- Mikis}
 
 	\begin{itemize}
 		\item To reduce the number of items considered, several unpromising items were removed. \begin{enumerate}
@@ -892,7 +892,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}
+\begin{frame}{Experiments (5) -- Evaluation}
 
 	\onslide<1>{
 		\begin{block}{Precision}
@@ -918,7 +918,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\begin{frame}
+\begin{frame}{Experiments (6) -- Evaluation}
 
 	\begin{block}{F-measure}
 	    The general \emph{F-measure} measures the effectiveness of retrieval with respect to a user who attaches $\beta$ times as much importance to recall as precision in the following way:\footnotemark
@@ -1076,6 +1076,42 @@
 	
 	\vspace*{\fill}
 	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}[plain]
+	
+	\begin{center}
+		\includegraphics[page=1,width=.5\textwidth]{main.pdf}  % Include cover page from thesis
+		\footnotesize
+		
+		LaTeX source available at
+		
+		\url{https://github.com/benjaminvdb/master_thesis}
+	\end{center}
+	
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{\LaTeX Tips}
+
+	\begin{itemize}
+		\item Use the \textit{booktabs} package for pretty tables.
+		\item Employ a model-view style for displaying data: \begin{enumerate}
+ 			\item Store data in separate file, e.g., CSV (the model).
+ 			\item Style the 	table or plot in a separate file (the view).
+ 			\item Include these in your \LaTeX to keep your text separated from graphics.
+ 			\item Easy to include newer version of results (just replace data file!).
+ 			\end{enumerate}
+ 		\item Plot all your data using \LaTeX with the \textit{tikz} package.
+	\end{itemize}
+
 \end{frame}
 
 
